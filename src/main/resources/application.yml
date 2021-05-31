@@ -1,4 +1,7 @@
 ---
+server:
+  port: 9001
+
 database:
   mongo:
     url: mongodb://localhost:27017
