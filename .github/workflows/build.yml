@@ -4,7 +4,7 @@ on: [ push ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
 
     steps:
       - uses: actions/checkout@v2
@@ -24,10 +24,6 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Build with Gradle
         run: ./gradlew build
-      - uses: actions/upload-artifact@v2
-        with:
-          name: sandbox_bap
-          path: build/libs
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
         # Restoring these files from a GitHub Actions cache might cause problems for future builds.
@@ -41,10 +37,16 @@ jobs:
         with:
           context: .
           push: false
-          tags: beckn-one-sandbox-bap:${{ github.run_number }}
+          tags: 795151977897.dkr.ecr.ap-south-1.amazonaws.com/beckn_one_sandbox_bap:${{ github.run_number }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
       - name: Cache growth workaround
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+      - name: Push image to ECR
+        env:
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 795151977897.dkr.ecr.ap-south-1.amazonaws.com
+          docker push 795151977897.dkr.ecr.ap-south-1.amazonaws.com/beckn_one_sandbox_bap:${GITHUB_RUN_NUMBER}
