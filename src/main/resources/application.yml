@@ -1,8 +1,7 @@
 ---
 server:
   port: 9001
-
-database:
-  mongo:
-    url: mongodb://localhost:27017
-    dbname: bap_sandbox
+spring:
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
