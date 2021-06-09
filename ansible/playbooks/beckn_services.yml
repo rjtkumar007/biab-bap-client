@@ -1,0 +1,12 @@
+---
+- hosts: bap_service
+  roles:
+    - { role: docker, tags: docker }
+    - { role: awscli, tags: awscli }
+    - { role: beckn_service, tags: beckn_one_sandbox_bap }
+  become: yes
+  vars:
+    service_name: beckn_one_sandbox_bap
+    service_description: BAP Service
+    expose_ports: -p 9001:9001
+  tags: deploy_beckn_one_sandbox_bap

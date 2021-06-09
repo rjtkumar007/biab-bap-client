@@ -52,3 +52,9 @@ jobs:
           aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 795151977897.dkr.ecr.ap-south-1.amazonaws.com
           docker push 795151977897.dkr.ecr.ap-south-1.amazonaws.com/beckn_one_sandbox_bap:${GITHUB_RUN_NUMBER}
           docker rmi -f 795151977897.dkr.ecr.ap-south-1.amazonaws.com/beckn_one_sandbox_bap:${GITHUB_RUN_NUMBER}
+      - name: Deploying to the BAP servers qa using ansible
+        run: |
+          cd ansible
+          export ANSIBLE_ROLES_PATH=./roles
+          echo bap_build_no: ${GITHUB_RUN_NUMBER} >> vars/vars.yml
+          /home/ubuntu/.local/bin/ansible-playbook playbooks/beckn_services.yml -i inventory/qa.ini --extra-vars "@vars/vars.yml"
