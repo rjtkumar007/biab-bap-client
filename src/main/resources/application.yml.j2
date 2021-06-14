@@ -1,6 +1,10 @@
 ---
 server:
   port: 9001
+spring:
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
 registry_service:
   url: http://localhost:4000/
 context:
