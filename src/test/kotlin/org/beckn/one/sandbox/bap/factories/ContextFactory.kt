@@ -11,7 +11,7 @@ import java.time.Duration
 class ContextFactory {
   companion object {
     fun getDefaultContext() = Context(
-      domain = Domain.Retail.value,
+      domain = Domain.LocalRetail.value,
       country = Country.India.value,
       city = City.Bengaluru.value,
       action = Action.search,

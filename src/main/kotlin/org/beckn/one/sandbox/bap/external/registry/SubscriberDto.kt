@@ -1,10 +1,6 @@
 package org.beckn.one.sandbox.bap.external.registry
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import org.beckn.one.sandbox.bap.domain.Subscriber
+import java.time.Clock
 import java.time.LocalDateTime
 
 data class SubscriberDto constructor(
@@ -16,15 +12,12 @@ data class SubscriberDto constructor(
   val country: String,
   val signing_public_key: String,
   val encr_public_key: String,
-  @field:JsonSerialize(contentUsing = LocalDateTimeSerializer::class)
-  @field:JsonDeserialize(contentUsing = LocalDateTimeDeserializer::class)
-  val valid_from: LocalDateTime = LocalDateTime.now(),
-  @field:JsonSerialize(contentUsing = LocalDateTimeSerializer::class)
-  @field:JsonDeserialize(contentUsing = LocalDateTimeDeserializer::class)
-  val valid_until: LocalDateTime = LocalDateTime.now(),
   val status: Status,
-  val created: LocalDateTime = LocalDateTime.now(),
-  val updated: LocalDateTime = LocalDateTime.now()
+  val clock: Clock = Clock.systemUTC(),
+  val valid_from: LocalDateTime = LocalDateTime.now(clock),
+  val valid_until: LocalDateTime = LocalDateTime.now(clock),
+  val created: LocalDateTime = LocalDateTime.now(clock),
+  val updated: LocalDateTime = LocalDateTime.now(clock)
 ) {
   enum class Type {
     BAP, BPP, BG, LREG, CREG, RREG

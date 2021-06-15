@@ -10,33 +10,30 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import java.io.IOException
 
 @Service
-class RegistryService {
-  @Autowired
-  lateinit var registryServiceClient: RegistryServiceClient
-
-  @Value("\${context.domain}")
-  lateinit var domain: String
-
-  @Value("\${context.city}")
-  lateinit var city: String
-
-  @Value("\${context.country}")
-  lateinit var country: String
-
+class RegistryService(
+  @Autowired val registryServiceClient: RegistryServiceClient,
+  @Value("\${context.domain}") var domain: String,
+  @Value("\${context.city}") var city: String,
+  @Value("\${context.country}") var country: String
+) {
   fun lookupGateways(): Either<RegistryLookupError, List<SubscriberDto>> {
-    val httpResponse = registryServiceClient.lookup(
-      SubscriberLookupRequest(
-        type = Subscriber.Type.BG,
-        domain = domain,
-        city = city,
-        country = country
-      )
-    ).execute()
-    if (httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-      return Either.Left(RegistryLookupError.InternalServerError)
+    val request = SubscriberLookupRequest(
+      type = Subscriber.Type.BG,
+      domain = domain,
+      city = city,
+      country = country
+    )
+    try {
+      val httpResponse = registryServiceClient.lookup(request).execute()
+      if (httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+        return Either.Left(RegistryLookupError.RegistryError)
+      }
+      return Either.Right(httpResponse.body()!!)
+    } catch (e: IOException) {
+      return Either.Left(RegistryLookupError.RegistryError)
     }
-    return Either.Right(httpResponse.body()!!)
   }
 }

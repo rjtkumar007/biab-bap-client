@@ -4,6 +4,6 @@ server:
 registry_service:
   url: http://localhost:4000/
 context:
-  domain: retail
+  domain: local-retail
   city: Bengaluru
   country: India

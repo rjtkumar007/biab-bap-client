@@ -7,11 +7,11 @@ import org.beckn.one.sandbox.bap.errors.HttpError
 import org.springframework.http.HttpStatus
 
 sealed class RegistryLookupError : HttpError {
-  val registryLookupFailed = Error("BAP_001", "Registry lookup failed")
+  val registryError = Error("BAP_001", "Registry lookup returned error")
 
-  object InternalServerError : RegistryLookupError() {
+  object RegistryError : RegistryLookupError() {
     override fun response(): Response =
-      Response(status = ResponseStatus.NACK, message_id = null, error = registryLookupFailed)
+      Response(status = ResponseStatus.NACK, message_id = null, error = registryError)
 
     override fun code(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
   }

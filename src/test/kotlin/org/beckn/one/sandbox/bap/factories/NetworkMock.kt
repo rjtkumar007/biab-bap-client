@@ -4,8 +4,8 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import org.beckn.one.sandbox.bap.constants.City
 import org.beckn.one.sandbox.bap.constants.Country
 import org.beckn.one.sandbox.bap.constants.Domain
-import org.beckn.one.sandbox.bap.domain.Subscriber
-
+import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
+import java.time.Clock
 
 object NetworkMock {
 
@@ -37,7 +37,7 @@ object NetworkMock {
     deliveryPuneBpp.resetAll()
   }
 
-  fun getAllSubscribers(): List<Subscriber> {
+  fun getAllSubscribers(): List<SubscriberDto> {
     return listOf(
       getRetailBengaluruBg(),
       getAnotherRetailBengaluruBg(),
@@ -57,11 +57,11 @@ object NetworkMock {
   )
 
   private fun getRetailBengaluruBpp() = createSubscriber(
-    number = 4, mockServer = retailBengaluruBpp, type = Subscriber.Type.BPP
+    number = 4, mockServer = retailBengaluruBpp, type = SubscriberDto.Type.BPP
   )
 
   private fun getAnotherRetailBengaluruBpp() = createSubscriber(
-    number = 5, mockServer = anotherRetailBengaluruBpp, type = Subscriber.Type.BPP
+    number = 5, mockServer = anotherRetailBengaluruBpp, type = SubscriberDto.Type.BPP
   )
 
   private fun getDeliveryPuneBpp() = createSubscriber(
@@ -69,26 +69,24 @@ object NetworkMock {
     mockServer = deliveryPuneBpp,
     city = City.Pune.value,
     domain = Domain.Delivery.value,
-    type = Subscriber.Type.BPP
+    type = SubscriberDto.Type.BPP
   )
 
   private fun createSubscriber(
     number: Int,
     mockServer: WireMockServer,
-    type: Subscriber.Type = Subscriber.Type.BG,
-    domain: String = Domain.Retail.value,
+    type: SubscriberDto.Type = SubscriberDto.Type.BG,
+    domain: String = Domain.LocalRetail.value,
     city: String = City.Bengaluru.value,
     country: String = Country.India.value,
-    status: Subscriber.Status = Subscriber.Status.SUBSCRIBED
-  ) = Subscriber(
-    subscriber_id = "subscriber-$number.network-$number.org",
-    subscriber_url = mockServer.baseUrl(),
+    status: SubscriberDto.Status = SubscriberDto.Status.SUBSCRIBED
+  ) = SubscriberDtoFactory.getDefault(
+    number = number,
+    baseUrl = mockServer.baseUrl(),
     type = type,
     domain = domain,
     city = city,
     country = country,
     status = status,
-    signing_public_key = "signing_public_key $number",
-    encr_public_key = "encr_public_key $number"
   )
 }
