@@ -19,14 +19,15 @@ class RegistryService(
   @Value("\${context.country}") var country: String
 ) {
   fun lookupGateways(): Either<RegistryLookupError, List<SubscriberDto>> {
-    val request = SubscriberLookupRequest(
-      type = Subscriber.Type.BG,
-      domain = domain,
-      city = city,
-      country = country
-    )
     return try {
-      val httpResponse = registryServiceClient.lookup(request).execute()
+      val httpResponse = registryServiceClient.lookup(
+        SubscriberLookupRequest(
+          type = Subscriber.Type.BG,
+          domain = domain,
+          city = city,
+          country = country
+        )
+      ).execute()
       when {
         httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value() -> Either.Left(RegistryLookupError.RegistryError)
         httpResponse.body() == null -> Either.Left(RegistryLookupError.NullResponseError)
