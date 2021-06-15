@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.configurations
 
-import org.beckn.one.sandbox.bap.external.registry.RegistryService
+import org.beckn.one.sandbox.bap.external.registry.RegistryServiceClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -16,12 +16,12 @@ class RegistryServiceConfiguration {
   lateinit var registryServiceUrl: String
 
   @Bean
-  fun registryService(): RegistryService {
+  fun registryServiceClient(): RegistryServiceClient {
     val retrofit = Retrofit.Builder()
       .baseUrl(registryServiceUrl)
       .addConverterFactory(JacksonConverterFactory.create())
       .build()
 
-    return retrofit.create(RegistryService::class.java)
+    return retrofit.create(RegistryServiceClient::class.java)
   }
 }

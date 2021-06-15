@@ -1,12 +1,13 @@
-package org.beckn.one.sandbox.bap.registry
+package org.beckn.one.sandbox.bap.external.registry
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import org.beckn.one.sandbox.bap.domain.Subscriber
 import java.time.LocalDateTime
 
-data class Subscriber constructor(
+data class SubscriberDto constructor(
   val subscriber_id: String,
   val subscriber_url: String,
   val type: Type,
@@ -33,3 +34,4 @@ data class Subscriber constructor(
     INITIATED, UNDER_SUBSCRIPTION, SUBSCRIBED, EXPIRED, UNSUBSCRIBED, INVALID_SSL
   }
 }
+

@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import org.beckn.one.sandbox.bap.constants.City
 import org.beckn.one.sandbox.bap.constants.Country
 import org.beckn.one.sandbox.bap.constants.Domain
-import org.beckn.one.sandbox.bap.registry.Subscriber
+import org.beckn.one.sandbox.bap.domain.Subscriber
 
 
 object NetworkMock {
@@ -17,7 +17,7 @@ object NetworkMock {
   val anotherRetailBengaluruBpp = WireMockServer(4005)
   val deliveryPuneBpp = WireMockServer(4006)
 
-  fun createBecknNetwork(): List<Subscriber> {
+  fun startAllSubscribers() {
     registry.start()
     retailBengaluruBg.start()
     anotherRetailBengaluruBg.start()
@@ -25,7 +25,19 @@ object NetworkMock {
     retailBengaluruBpp.start()
     anotherRetailBengaluruBpp.start()
     deliveryPuneBpp.start()
+  }
 
+  fun resetAllSubscribers() {
+    registry.resetAll()
+    retailBengaluruBg.resetAll()
+    anotherRetailBengaluruBg.resetAll()
+    deliveryPuneBg.resetAll()
+    retailBengaluruBpp.resetAll()
+    anotherRetailBengaluruBpp.resetAll()
+    deliveryPuneBpp.resetAll()
+  }
+
+  fun getAllSubscribers(): List<Subscriber> {
     return listOf(
       getRetailBengaluruBg(),
       getAnotherRetailBengaluruBg(),

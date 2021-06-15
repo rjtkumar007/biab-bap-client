@@ -1,10 +1,10 @@
 package org.beckn.one.sandbox.bap.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomakehurst.wiremock.client.WireMock.post
-import com.github.tomakehurst.wiremock.client.WireMock.serverError
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.SandboxBapTestConfig
+import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.factories.NetworkMock
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
@@ -26,11 +26,16 @@ class SearchControllerSpec @Autowired constructor(
   @Autowired val mockMvc: MockMvc,
   @Autowired val objectMapper: ObjectMapper
 ) : DescribeSpec() {
-
   init {
+
     describe("Search") {
-      it("should return error response when beckn gateway lookup fails") {
-        NetworkMock.createBecknNetwork()
+      NetworkMock.startAllSubscribers()
+
+      beforeEach {
+        NetworkMock.resetAllSubscribers()
+      }
+
+      it("should return error response when registry lookup fails") {
         NetworkMock.registry
           .stubFor(post("/lookup").willReturn(serverError()))
 
