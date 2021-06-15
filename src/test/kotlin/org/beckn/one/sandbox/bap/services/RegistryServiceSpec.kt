@@ -53,7 +53,7 @@ internal class RegistryServiceSpec : DescribeSpec() {
         verify(registryServiceClient).lookup(request)
       }
 
-      it("should return timeout error when registry call times out") {
+      it("should return registry error when registry call fails with an IO exception") {
         `when`(registryServiceClient.lookup(request)).thenReturn(
           Calls.failure(IOException("Timeout"))
         )
@@ -67,6 +67,46 @@ internal class RegistryServiceSpec : DescribeSpec() {
               it.response() shouldBe Response(
                 status = ResponseStatus.NACK,
                 error = Error("BAP_001", "Registry lookup returned error")
+              )
+            },
+            { fail("Lookup should have timed out but didn't. Response: $it") }
+          )
+      }
+
+      it("should return registry error when registry call fails with a runtime exception") {
+        `when`(registryServiceClient.lookup(request)).thenReturn(
+          Calls.failure(RuntimeException("Network error"))
+        )
+
+        val response: Either<RegistryLookupError, List<SubscriberDto>> = registryService.lookupGateways()
+
+        response
+          .fold(
+            {
+              it.code() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+              it.response() shouldBe Response(
+                status = ResponseStatus.NACK,
+                error = Error("BAP_001", "Registry lookup returned error")
+              )
+            },
+            { fail("Lookup should have timed out but didn't. Response: $it") }
+          )
+      }
+
+      it("should return no subscribers error when registry response is null") {
+        `when`(registryServiceClient.lookup(request)).thenReturn(
+          Calls.response(null)
+        )
+
+        val response: Either<RegistryLookupError, List<SubscriberDto>> = registryService.lookupGateways()
+
+        response
+          .fold(
+            {
+              it.code() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+              it.response() shouldBe Response(
+                status = ResponseStatus.NACK,
+                error = Error("BAP_002", "Registry lookup returned null")
               )
             },
             { fail("Lookup should have timed out but didn't. Response: $it") }

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.io.IOException
 
 @Service
 class RegistryService(
@@ -26,14 +25,15 @@ class RegistryService(
       city = city,
       country = country
     )
-    try {
+    return try {
       val httpResponse = registryServiceClient.lookup(request).execute()
-      if (httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-        return Either.Left(RegistryLookupError.RegistryError)
+      when {
+        httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value() -> Either.Left(RegistryLookupError.RegistryError)
+        httpResponse.body() == null -> Either.Left(RegistryLookupError.NullResponseError)
+        else -> Either.Right(httpResponse.body()!!)
       }
-      return Either.Right(httpResponse.body()!!)
-    } catch (e: IOException) {
-      return Either.Left(RegistryLookupError.RegistryError)
+    } catch (e: Exception) {
+      Either.Left(RegistryLookupError.RegistryError)
     }
   }
 }
