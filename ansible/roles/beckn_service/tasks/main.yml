@@ -23,3 +23,10 @@
     - Systemctl Daemon Reload
     - Systemctl Enable Service
     - Restart Service
+
+- name: Substitute application properties
+  template:
+    src: "../../../../src/main/resources/application.yml.j2"
+    dest: "{{ user_dir }}/application.yml"
+    backup: yes
+

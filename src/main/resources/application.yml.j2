@@ -11,3 +11,7 @@ context:
   domain: retail
   city: Bengaluru
   country: India
+database:
+  mongo:
+    url: mongodb://{{ mongo_host }}:{{ mongo_port }}
+    dbname: {{ bap_mongo_dbname }}
