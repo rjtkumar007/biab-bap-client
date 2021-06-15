@@ -19,11 +19,10 @@ class SearchService(@Autowired val registryService: RegistryService) {
             .body(it.response())
         },
         {
-          successfulResponse()
+          ResponseEntity
+            .ok(Response(status = ResponseStatus.ACK, message_id = UUID.randomUUID().toString()))
         }
       )
   }
 
-  private fun successfulResponse() =
-    ResponseEntity.ok(Response(status = ResponseStatus.ACK, message_id = UUID.randomUUID().toString()))
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import retrofit2.Response
 
 @Service
 class RegistryService(
@@ -29,12 +30,18 @@ class RegistryService(
         )
       ).execute()
       when {
-        httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value() -> Either.Left(RegistryLookupError.RegistryError)
-        httpResponse.body() == null -> Either.Left(RegistryLookupError.NullResponseError)
+        internalServerError(httpResponse) -> Either.Left(RegistryLookupError.RegistryError)
+        noGatewaysFound(httpResponse) -> Either.Left(RegistryLookupError.NoGatewayFoundError)
         else -> Either.Right(httpResponse.body()!!)
       }
     } catch (e: Exception) {
       Either.Left(RegistryLookupError.RegistryError)
     }
   }
+
+  private fun noGatewaysFound(httpResponse: Response<List<SubscriberDto>>) =
+    httpResponse.body() == null || httpResponse.body()?.isEmpty() == true
+
+  private fun internalServerError(httpResponse: Response<List<SubscriberDto>>) =
+    httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
 }

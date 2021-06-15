@@ -93,7 +93,7 @@ internal class RegistryServiceSpec : DescribeSpec() {
           )
       }
 
-      it("should return no subscribers error when registry response is null") {
+      it("should return no gateways found error when registry response is null") {
         `when`(registryServiceClient.lookup(request)).thenReturn(
           Calls.response(null)
         )
@@ -106,7 +106,27 @@ internal class RegistryServiceSpec : DescribeSpec() {
               it.code() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
               it.response() shouldBe Response(
                 status = ResponseStatus.NACK,
-                error = Error("BAP_002", "Registry lookup returned null")
+                error = Error("BAP_002", "Registry lookup did not return any gateways")
+              )
+            },
+            { fail("Lookup should have timed out but didn't. Response: $it") }
+          )
+      }
+
+      it("should return no gateways found error when registry response is empty") {
+        `when`(registryServiceClient.lookup(request)).thenReturn(
+          Calls.response(emptyList())
+        )
+
+        val response: Either<RegistryLookupError, List<SubscriberDto>> = registryService.lookupGateways()
+
+        response
+          .fold(
+            {
+              it.code() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+              it.response() shouldBe Response(
+                status = ResponseStatus.NACK,
+                error = Error("BAP_002", "Registry lookup did not return any gateways")
               )
             },
             { fail("Lookup should have timed out but didn't. Response: $it") }

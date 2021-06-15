@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus
 
 sealed class RegistryLookupError : HttpError {
   val registryError = Error("BAP_001", "Registry lookup returned error")
-  val nullResponseError = Error("BAP_002", "Registry lookup returned null")
+  val noGatewaysFoundError = Error("BAP_002", "Registry lookup did not return any gateways")
 
   object RegistryError : RegistryLookupError() {
     override fun response(): Response =
@@ -17,9 +17,9 @@ sealed class RegistryLookupError : HttpError {
     override fun code(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
   }
 
-  object NullResponseError : RegistryLookupError() {
+  object NoGatewayFoundError : RegistryLookupError() {
     override fun response(): Response =
-      Response(status = ResponseStatus.NACK, message_id = null, error = nullResponseError)
+      Response(status = ResponseStatus.NACK, message_id = null, error = noGatewaysFoundError)
 
     override fun code(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
   }
