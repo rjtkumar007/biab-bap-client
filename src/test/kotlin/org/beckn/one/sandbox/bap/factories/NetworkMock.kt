@@ -5,7 +5,6 @@ import org.beckn.one.sandbox.bap.constants.City
 import org.beckn.one.sandbox.bap.constants.Country
 import org.beckn.one.sandbox.bap.constants.Domain
 import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
-import java.time.Clock
 
 object NetworkMock {
 
@@ -48,23 +47,31 @@ object NetworkMock {
     )
   }
 
-  private fun getRetailBengaluruBg() = createSubscriber(1, retailBengaluruBg)
+  fun getAllGateways(): List<SubscriberDto> {
+    return listOf(
+      getRetailBengaluruBg(),
+      getAnotherRetailBengaluruBg(),
+      getDeliveryPuneBg(),
+    )
+  }
 
-  private fun getAnotherRetailBengaluruBg() = createSubscriber(2, anotherRetailBengaluruBg)
+  fun getRetailBengaluruBg() = createSubscriberDto(1, retailBengaluruBg)
 
-  private fun getDeliveryPuneBg() = createSubscriber(
+  private fun getAnotherRetailBengaluruBg() = createSubscriberDto(2, anotherRetailBengaluruBg)
+
+  private fun getDeliveryPuneBg() = createSubscriberDto(
     number = 3, mockServer = deliveryPuneBg, city = City.Pune.value, domain = Domain.Delivery.value
   )
 
-  private fun getRetailBengaluruBpp() = createSubscriber(
+  private fun getRetailBengaluruBpp() = createSubscriberDto(
     number = 4, mockServer = retailBengaluruBpp, type = SubscriberDto.Type.BPP
   )
 
-  private fun getAnotherRetailBengaluruBpp() = createSubscriber(
+  private fun getAnotherRetailBengaluruBpp() = createSubscriberDto(
     number = 5, mockServer = anotherRetailBengaluruBpp, type = SubscriberDto.Type.BPP
   )
 
-  private fun getDeliveryPuneBpp() = createSubscriber(
+  private fun getDeliveryPuneBpp() = createSubscriberDto(
     number = 6,
     mockServer = deliveryPuneBpp,
     city = City.Pune.value,
@@ -72,7 +79,7 @@ object NetworkMock {
     type = SubscriberDto.Type.BPP
   )
 
-  private fun createSubscriber(
+  private fun createSubscriberDto(
     number: Int,
     mockServer: WireMockServer,
     type: SubscriberDto.Type = SubscriberDto.Type.BG,

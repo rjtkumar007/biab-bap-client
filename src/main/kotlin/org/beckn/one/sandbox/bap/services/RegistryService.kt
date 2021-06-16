@@ -6,6 +6,8 @@ import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError
 import org.beckn.one.sandbox.bap.external.registry.RegistryServiceClient
 import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.external.registry.SubscriberLookupRequest
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
@@ -15,9 +17,10 @@ import retrofit2.Response
 @Service
 class RegistryService(
   @Autowired val registryServiceClient: RegistryServiceClient,
-  @Value("\${context.domain}") var domain: String,
-  @Value("\${context.city}") var city: String,
-  @Value("\${context.country}") var country: String
+  @Value("\${context.domain}") val domain: String,
+  @Value("\${context.city}") val city: String,
+  @Value("\${context.country}") val country: String,
+  val log: Logger = LoggerFactory.getLogger(RegistryService::class.java)
 ) {
   fun lookupGateways(): Either<RegistryLookupError, List<SubscriberDto>> {
     return try {
@@ -35,6 +38,7 @@ class RegistryService(
         else -> Either.Right(httpResponse.body()!!)
       }
     } catch (e: Exception) {
+      log.error("Error when calling Registry Lookup API", e)
       Either.Left(RegistryLookupError.RegistryError)
     }
   }

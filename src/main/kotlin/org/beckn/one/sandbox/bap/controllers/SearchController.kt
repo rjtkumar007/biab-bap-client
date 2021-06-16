@@ -14,7 +14,7 @@ class SearchController(@Autowired val searchService: SearchService) {
 
   @RequestMapping("/search")
   @ResponseBody
-  fun search(@RequestParam searchString: String): ResponseEntity<Response> {
-    return searchService.search()
+  fun searchV1(@RequestParam searchString: String): ResponseEntity<Response> {
+    return searchService.search(searchString)
   }
 }

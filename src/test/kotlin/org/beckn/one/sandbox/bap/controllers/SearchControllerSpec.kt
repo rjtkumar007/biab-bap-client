@@ -3,10 +3,9 @@ package org.beckn.one.sandbox.bap.controllers
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
-import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
+import org.beckn.one.sandbox.bap.factories.BecknResponseFactory
 import org.beckn.one.sandbox.bap.factories.NetworkMock
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.CoreMatchers.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -48,20 +47,29 @@ class SearchControllerSpec @Autowired constructor(
           .andExpect(jsonPath("$.error.message", `is`("Registry lookup returned error")))
       }
 
-      it("should return error response when registry lookup returns no gateways") {
+      it("should invoke Beckn /search API on first gateway") {
+        val gatewaysJson = objectMapper.writeValueAsString(NetworkMock.getAllGateways())
         NetworkMock.registry
-          .stubFor(post("/lookup").willReturn(okJson(objectMapper.writeValueAsString(listOf<SubscriberDto>()))))
+          .stubFor(post("/lookup").willReturn(okJson(gatewaysJson)))
+        NetworkMock.retailBengaluruBg
+          .stubFor(
+            post("/search").willReturn(
+              okJson(
+                objectMapper.writeValueAsString(BecknResponseFactory.getDefault())
+              )
+            )
+          )
 
         mockMvc
           .perform(
             get("/search")
               .param("searchString", "Fictional mystery books")
           )
-          .andExpect(status().is5xxServerError)
-          .andExpect(jsonPath("$.status", `is`("NACK")))
-          .andExpect(jsonPath("$.message_id", `is`(nullValue())))
-          .andExpect(jsonPath("$.error.code", `is`("BAP_002")))
-          .andExpect(jsonPath("$.error.message", `is`("Registry lookup did not return any gateways")))
+          .andExpect(status().is2xxSuccessful)
+          .andExpect(jsonPath("$.status", `is`("ACK")))
+          .andExpect(jsonPath("$.message_id", `is`(notNullValue())))
+
+        NetworkMock.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
       }
     }
   }

@@ -18,15 +18,16 @@ repositories {
 }
 
 dependencies {
-  val retrofitVersion = "2.9.0"
+  val retrofitVersion = "2.9.+"
 
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.+")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3")
+  implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.+")
+  implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.+")
   implementation("io.arrow-kt:arrow-optics:0.13.2")
   implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
   implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
