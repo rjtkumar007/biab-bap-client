@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class SearchController(@Autowired val searchService: SearchService) {
 
-  @RequestMapping("/search")
+  @RequestMapping("/v1/search")
   @ResponseBody
   fun searchV1(@RequestParam searchString: String): ResponseEntity<Response> {
     return searchService.search(searchString)

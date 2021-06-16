@@ -37,7 +37,7 @@ class SearchControllerSpec @Autowired constructor(
 
         mockMvc
           .perform(
-            get("/search")
+            get("/v1/search")
               .param("searchString", "Fictional mystery books")
           )
           .andExpect(status().is5xxServerError)
@@ -62,7 +62,7 @@ class SearchControllerSpec @Autowired constructor(
 
         mockMvc
           .perform(
-            get("/search")
+            get("/v1/search")
               .param("searchString", "Fictional mystery books")
           )
           .andExpect(status().is2xxSuccessful)
