@@ -11,7 +11,7 @@ sealed class GatewaySearchError : HttpError {
 
   object GatewayError : GatewaySearchError() {
     override fun response(): Response =
-      Response(status = ResponseStatus.NACK, message_id = null, error = gatewayError)
+      Response(status = ResponseStatus.NACK, messageId = null, error = gatewayError)
 
     override fun code(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
   }

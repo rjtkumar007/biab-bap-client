@@ -12,14 +12,14 @@ sealed class RegistryLookupError : HttpError {
 
   object RegistryError : RegistryLookupError() {
     override fun response(): Response =
-      Response(status = ResponseStatus.NACK, message_id = null, error = registryError)
+      Response(status = ResponseStatus.NACK, messageId = null, error = registryError)
 
     override fun code(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
   }
 
   object NoGatewayFoundError : RegistryLookupError() {
     override fun response(): Response =
-      Response(status = ResponseStatus.NACK, message_id = null, error = noGatewaysFoundError)
+      Response(status = ResponseStatus.NACK, messageId = null, error = noGatewaysFoundError)
 
     override fun code(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
   }

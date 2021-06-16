@@ -23,6 +23,6 @@ class SearchController(@Autowired val searchService: SearchService) {
   @RequestMapping("/v0/search")
   @ResponseBody
   fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<Response> {
-    return ResponseEntity.ok(Response(status = ResponseStatus.ACK, message_id = UUID.randomUUID().toString()))
+    return ResponseEntity.ok(Response(status = ResponseStatus.ACK, messageId = UUID.randomUUID().toString()))
   }
 }

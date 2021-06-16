@@ -44,7 +44,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
         val queryString = "Fictional mystery books"
         val searchRequest = Request(
           ContextFactory.getDefaultContext(clock),
-          Intent(query_string = queryString)
+          Intent(queryString = queryString)
         )
         `when`(gatewayServiceClientFactory.getClient(gateway)).thenReturn(gatewayServiceClient)
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(
@@ -68,7 +68,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
         verify(gatewayServiceClient).search(
           Request(
             ContextFactory.getDefaultContext(clock = clock),
-            Intent(query_string = queryString)
+            Intent(queryString = queryString)
           )
         )
       }

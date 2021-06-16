@@ -15,9 +15,9 @@ class ContextFactory {
       country = Country.India.value,
       city = City.Bengaluru.value,
       action = Action.search,
-      core_version = ProtocolVersion.V0_9_1.value,
-      bap_id = "beckn_in_a_box_bap",
-      bap_uri = "beckn_in_a_box_bap.com",
+      coreVersion = ProtocolVersion.V0_9_1.value,
+      bapId = "beckn_in_a_box_bap",
+      bapUri = "beckn_in_a_box_bap.com",
       clock = clock
     )
   }

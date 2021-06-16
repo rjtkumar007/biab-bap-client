@@ -31,7 +31,7 @@ class SearchService(
         {
           log.info("Found gateways: {}", it)
           ResponseEntity
-            .ok(Response(status = ResponseStatus.ACK, message_id = UUID.randomUUID().toString()))
+            .ok(Response(status = ResponseStatus.ACK, messageId = UUID.randomUUID().toString()))
         }
       )
   }

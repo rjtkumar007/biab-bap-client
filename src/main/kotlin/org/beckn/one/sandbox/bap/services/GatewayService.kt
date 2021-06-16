@@ -28,7 +28,7 @@ class GatewayService(
     return try {
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
       val httpResponse = gatewayServiceClient.search(
-        Request(buildContext(), Intent(query_string = queryString))
+        Request(buildContext(), Intent(queryString = queryString))
       ).execute()
       when {
         internalServerError(httpResponse) -> Either.Left(GatewaySearchError.GatewayError)
@@ -45,9 +45,9 @@ class GatewayService(
     country = country,
     city = city,
     action = Action.search,
-    core_version = ProtocolVersion.V0_9_1.value,
-    bap_id = bapId,
-    bap_uri = bapUrl,
+    coreVersion = ProtocolVersion.V0_9_1.value,
+    bapId = bapId,
+    bapUri = bapUrl,
     clock = clock
   )
 
