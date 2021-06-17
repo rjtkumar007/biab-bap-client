@@ -9,6 +9,7 @@ import org.beckn.one.sandbox.bap.constants.Domain
 import org.beckn.one.sandbox.bap.domain.Subscriber
 import org.beckn.one.sandbox.bap.dtos.Error
 import org.beckn.one.sandbox.bap.dtos.Response
+import org.beckn.one.sandbox.bap.dtos.ResponseMessage.Companion.nack
 import org.beckn.one.sandbox.bap.dtos.ResponseStatus
 import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError
 import org.beckn.one.sandbox.bap.external.registry.RegistryServiceClient
@@ -47,7 +48,7 @@ internal class RegistryServiceSpec : DescribeSpec() {
 
         response
           .fold(
-            { fail("Lookup failed. Code: $it.code(), Error: ${it.response().error}") },
+            { fail("Lookup failed. Code: $it.code(), Error: ${it.error()}") },
             { subscribers -> subscribers shouldBe listOf(SubscriberDtoFactory.getDefault(clock = clock)) }
           )
         verify(registryServiceClient).lookup(request)
@@ -63,11 +64,9 @@ internal class RegistryServiceSpec : DescribeSpec() {
         response
           .fold(
             {
-              it.code() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
-              it.response() shouldBe Response(
-                status = ResponseStatus.NACK,
-                error = Error("BAP_001", "Registry lookup returned error")
-              )
+              it.status() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+              it.message() shouldBe nack()
+              it.error() shouldBe Error("BAP_001", "Registry lookup returned error")
             },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )
@@ -83,11 +82,9 @@ internal class RegistryServiceSpec : DescribeSpec() {
         response
           .fold(
             {
-              it.code() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
-              it.response() shouldBe Response(
-                status = ResponseStatus.NACK,
-                error = Error("BAP_001", "Registry lookup returned error")
-              )
+              it.status() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+              it.message() shouldBe nack()
+              it.error() shouldBe Error("BAP_001", "Registry lookup returned error")
             },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )
@@ -103,11 +100,9 @@ internal class RegistryServiceSpec : DescribeSpec() {
         response
           .fold(
             {
-              it.code() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
-              it.response() shouldBe Response(
-                status = ResponseStatus.NACK,
-                error = Error("BAP_002", "Registry lookup did not return any gateways")
-              )
+              it.status() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+              it.message() shouldBe nack()
+              it.error() shouldBe Error("BAP_002", "Registry lookup did not return any gateways")
             },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )
@@ -123,11 +118,9 @@ internal class RegistryServiceSpec : DescribeSpec() {
         response
           .fold(
             {
-              it.code() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
-              it.response() shouldBe Response(
-                status = ResponseStatus.NACK,
-                error = Error("BAP_002", "Registry lookup did not return any gateways")
-              )
+              it.status() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+              it.message() shouldBe nack()
+              it.error() shouldBe Error("BAP_002", "Registry lookup did not return any gateways")
             },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )

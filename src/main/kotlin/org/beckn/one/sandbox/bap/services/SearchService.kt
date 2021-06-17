@@ -1,14 +1,14 @@
 package org.beckn.one.sandbox.bap.services
 
 import arrow.core.flatMap
-import org.beckn.one.sandbox.bap.dtos.Response
-import org.beckn.one.sandbox.bap.dtos.ResponseStatus
+import org.beckn.one.sandbox.bap.dtos.BecknResponse
+import org.beckn.one.sandbox.bap.dtos.Context
+import org.beckn.one.sandbox.bap.dtos.ResponseMessage
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class SearchService(
@@ -17,7 +17,7 @@ class SearchService(
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun search(queryString: String): ResponseEntity<Response> {
+  fun search(queryString: String, context: Context): ResponseEntity<BecknResponse> {
     return registryService
       .lookupGateways()
       .flatMap { gatewayService.search(it.first(), queryString) }
@@ -25,13 +25,24 @@ class SearchService(
         {
           log.error("Error when initiating search. Error: {}", it)
           ResponseEntity
-            .status(it.code().value())
-            .body(it.response())
+            .status(it.status().value())
+            .body(
+              BecknResponse(
+                context = context,
+                message = it.message(),
+                error = it.error()
+              )
+            )
         },
         {
           log.info("Found gateways: {}", it)
           ResponseEntity
-            .ok(Response(status = ResponseStatus.ACK, messageId = UUID.randomUUID().toString()))
+            .ok(
+              BecknResponse(
+                context = context,
+                message = ResponseMessage.ack()
+              )
+            )
         }
       )
   }

@@ -7,10 +7,8 @@ import org.beckn.one.sandbox.bap.dtos.ResponseStatus
 
 class BecknResponseFactory {
   companion object {
-    fun getDefault() = BecknResponse(
-      context = ContextFactory.getDefaultContext(), message = ResponseMessage(
-        Ack(ResponseStatus.ACK)
-      )
+    fun getDefault(contextFactory: ContextFactory) = BecknResponse(
+      context = contextFactory.create(), message = ResponseMessage(Ack(ResponseStatus.ACK))
     )
   }
 }

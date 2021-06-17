@@ -6,11 +6,16 @@ import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.constants.City
 import org.beckn.one.sandbox.bap.constants.Country
 import org.beckn.one.sandbox.bap.constants.Domain
-import org.beckn.one.sandbox.bap.dtos.*
+import org.beckn.one.sandbox.bap.dtos.BecknResponse
+import org.beckn.one.sandbox.bap.dtos.Error
+import org.beckn.one.sandbox.bap.dtos.Intent
+import org.beckn.one.sandbox.bap.dtos.Request
+import org.beckn.one.sandbox.bap.dtos.ResponseMessage.Companion.nack
 import org.beckn.one.sandbox.bap.errors.registry.GatewaySearchError
 import org.beckn.one.sandbox.bap.external.gateway.GatewayServiceClient
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.factories.NetworkMock
+import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.junit.jupiter.api.Assertions
 import org.mockito.Mockito.*
 import org.springframework.http.HttpStatus
@@ -24,6 +29,15 @@ internal class GatewayServiceSpec : DescribeSpec() {
   private val gatewayServiceClient: GatewayServiceClient = mock(GatewayServiceClient::class.java)
   private val gatewayServiceClientFactory = mock(GatewayServiceClientFactory::class.java)
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
+  private val uuidFactory = mock(UuidFactory::class.java)
+  private val contextFactory = ContextFactory(
+    domain = Domain.LocalRetail.value,
+    city = City.Bengaluru.value,
+    country = Country.India.value,
+    bapId = "beckn_in_a_box_bap",
+    bapUrl = "beckn_in_a_box_bap.com",
+    uuidFactory = uuidFactory
+  )
 
   private val gatewayService: GatewayService =
     GatewayService(
@@ -33,7 +47,8 @@ internal class GatewayServiceSpec : DescribeSpec() {
       bapId = "beckn_in_a_box_bap",
       bapUrl = "beckn_in_a_box_bap.com",
       gatewayServiceClientFactory = gatewayServiceClientFactory,
-      clock = clock
+      clock = clock,
+      contextFactory = contextFactory
     )
 
   init {
@@ -42,8 +57,9 @@ internal class GatewayServiceSpec : DescribeSpec() {
         NetworkMock.startAllSubscribers()
         val gateway = NetworkMock.getRetailBengaluruBg()
         val queryString = "Fictional mystery books"
+        `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
         val searchRequest = Request(
-          ContextFactory.getDefaultContext(clock),
+          contextFactory.create(clock),
           Intent(queryString = queryString)
         )
         `when`(gatewayServiceClientFactory.getClient(gateway)).thenReturn(gatewayServiceClient)
@@ -57,17 +73,15 @@ internal class GatewayServiceSpec : DescribeSpec() {
         response
           .fold(
             {
-              it.code() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
-              it.response() shouldBe Response(
-                status = ResponseStatus.NACK,
-                error = Error("BAP_003", "Gateway search returned error")
-              )
+              it.status() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+              it.message() shouldBe nack()
+              it.error() shouldBe Error("BAP_003", "Gateway search returned error")
             },
             { Assertions.fail("Search should have timed out but didn't. Response: $it") }
           )
         verify(gatewayServiceClient).search(
           Request(
-            ContextFactory.getDefaultContext(clock = clock),
+            contextFactory.create(clock = clock),
             Intent(queryString = queryString)
           )
         )

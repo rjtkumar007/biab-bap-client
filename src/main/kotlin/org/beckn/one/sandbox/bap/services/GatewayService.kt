@@ -1,9 +1,12 @@
 package org.beckn.one.sandbox.bap.services
 
 import arrow.core.Either
-import org.beckn.one.sandbox.bap.dtos.*
+import org.beckn.one.sandbox.bap.dtos.BecknResponse
+import org.beckn.one.sandbox.bap.dtos.Intent
+import org.beckn.one.sandbox.bap.dtos.Request
 import org.beckn.one.sandbox.bap.errors.registry.GatewaySearchError
 import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,13 +16,14 @@ import org.springframework.stereotype.Service
 import java.time.Clock
 
 @Service
-class GatewayService(
+class GatewayService @Autowired constructor(
   @Value("\${context.domain}") val domain: String,
   @Value("\${context.city}") val city: String,
   @Value("\${context.country}") val country: String,
   @Value("\${context.bap_id}") val bapId: String,
   @Value("\${context.bap_url}") val bapUrl: String,
-  @Autowired val gatewayServiceClientFactory: GatewayServiceClientFactory,
+  val gatewayServiceClientFactory: GatewayServiceClientFactory,
+  val contextFactory: ContextFactory,
   val clock: Clock = Clock.systemUTC()
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
@@ -28,7 +32,7 @@ class GatewayService(
     return try {
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
       val httpResponse = gatewayServiceClient.search(
-        Request(buildContext(), Intent(queryString = queryString))
+        Request(contextFactory.create(clock), Intent(queryString = queryString))
       ).execute()
       when {
         internalServerError(httpResponse) -> Either.Left(GatewaySearchError.GatewayError)
@@ -39,17 +43,6 @@ class GatewayService(
       Either.Left(GatewaySearchError.GatewayError)
     }
   }
-
-  private fun buildContext() = Context(
-    domain = domain,
-    country = country,
-    city = city,
-    action = Action.search,
-    coreVersion = ProtocolVersion.V0_9_1.value,
-    bapId = bapId,
-    bapUri = bapUrl,
-    clock = clock
-  )
 
   private fun internalServerError(httpResponse: retrofit2.Response<BecknResponse>) =
     httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()

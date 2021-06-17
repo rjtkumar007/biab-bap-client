@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.services
+package org.beckn.one.sandbox.bap
 
 enum class ProtocolVersion(val value: String) {
   V0_9_1("0.9.1")

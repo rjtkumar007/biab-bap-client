@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.dtos.ResponseStatus.ACK
 import org.beckn.one.sandbox.bap.factories.BecknResponseFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.factories.NetworkMock
 import org.hamcrest.CoreMatchers.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,8 +23,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 class SearchControllerSpec @Autowired constructor(
-  @Autowired val mockMvc: MockMvc,
-  @Autowired val objectMapper: ObjectMapper
+  val mockMvc: MockMvc,
+  val objectMapper: ObjectMapper,
+  val contextFactory: ContextFactory
 ) : DescribeSpec() {
   init {
 
@@ -44,8 +46,7 @@ class SearchControllerSpec @Autowired constructor(
               .param("searchString", "Fictional mystery books")
           )
           .andExpect(status().is5xxServerError)
-          .andExpect(jsonPath("$.status", `is`("NACK")))
-          .andExpect(jsonPath("$.message_id", `is`(nullValue())))
+          .andExpect(jsonPath("$.message.ack.status", `is`("NACK")))
           .andExpect(jsonPath("$.error.code", `is`("BAP_001")))
           .andExpect(jsonPath("$.error.message", `is`("Registry lookup returned error")))
       }
@@ -58,7 +59,7 @@ class SearchControllerSpec @Autowired constructor(
           .stubFor(
             post("/search").willReturn(
               okJson(
-                objectMapper.writeValueAsString(BecknResponseFactory.getDefault())
+                objectMapper.writeValueAsString(BecknResponseFactory.getDefault(contextFactory))
               )
             )
           )
@@ -69,8 +70,8 @@ class SearchControllerSpec @Autowired constructor(
               .param("searchString", "Fictional mystery books")
           )
           .andExpect(status().is2xxSuccessful)
-          .andExpect(jsonPath("$.status", `is`(ACK.status)))
-          .andExpect(jsonPath("$.message_id", `is`(notNullValue())))
+          .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
+          .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
 
         NetworkMock.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
       }
