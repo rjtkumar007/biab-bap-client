@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.time.Clock
 
 @Service
 class GatewayService @Autowired constructor(
@@ -25,8 +24,7 @@ class GatewayService @Autowired constructor(
   @Value("\${context.bap_id}") val bapId: String,
   @Value("\${context.bap_url}") val bapUrl: String,
   val gatewayServiceClientFactory: GatewayServiceClientFactory,
-  val contextFactory: ContextFactory,
-  val clock: Clock = Clock.systemUTC()
+  val contextFactory: ContextFactory
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
 
@@ -35,7 +33,7 @@ class GatewayService @Autowired constructor(
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
       val httpResponse = gatewayServiceClient.search(
-        Request(contextFactory.create(clock), Intent(queryString = queryString))
+        Request(contextFactory.create(), Intent(queryString = queryString))
       ).execute()
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       when {

@@ -33,7 +33,8 @@ internal class GatewayServiceSpec : DescribeSpec() {
     country = Country.India.value,
     bapId = "beckn_in_a_box_bap",
     bapUrl = "beckn_in_a_box_bap.com",
-    uuidFactory = uuidFactory
+    uuidFactory = uuidFactory,
+    clock = clock
   )
 
   private val gatewayService: GatewayService =
@@ -44,7 +45,6 @@ internal class GatewayServiceSpec : DescribeSpec() {
       bapId = "beckn_in_a_box_bap",
       bapUrl = "beckn_in_a_box_bap.com",
       gatewayServiceClientFactory = gatewayServiceClientFactory,
-      clock = clock,
       contextFactory = contextFactory
     )
 
@@ -82,7 +82,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
   }
 
   private fun getRequest(queryString: String) = Request(
-    contextFactory.create(clock),
+    contextFactory.create(),
     Intent(queryString = queryString)
   )
 

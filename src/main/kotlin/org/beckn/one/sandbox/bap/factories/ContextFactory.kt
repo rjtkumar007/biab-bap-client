@@ -16,8 +16,9 @@ class ContextFactory @Autowired constructor(
   @Value("\${context.bap_id}") private val bapId: String,
   @Value("\${context.bap_url}") private val bapUrl: String,
   private val uuidFactory: UuidFactory,
+  private val clock: Clock = Clock.systemUTC()
 ) {
-  fun create(clock: Clock = Clock.systemUTC()) = Context(
+  fun create() = Context(
     domain = domain,
     country = country,
     city = city,
