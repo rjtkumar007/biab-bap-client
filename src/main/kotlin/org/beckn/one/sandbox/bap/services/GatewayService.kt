@@ -1,10 +1,12 @@
 package org.beckn.one.sandbox.bap.services
 
 import arrow.core.Either
-import org.beckn.one.sandbox.bap.dtos.Response
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import org.beckn.one.sandbox.bap.dtos.Intent
 import org.beckn.one.sandbox.bap.dtos.Request
-import org.beckn.one.sandbox.bap.errors.registry.GatewaySearchError
+import org.beckn.one.sandbox.bap.dtos.Response
+import org.beckn.one.sandbox.bap.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.slf4j.Logger
@@ -30,17 +32,19 @@ class GatewayService @Autowired constructor(
 
   fun search(gateway: SubscriberDto, queryString: String): Either<GatewaySearchError, Response> {
     return try {
+      log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
       val httpResponse = gatewayServiceClient.search(
         Request(contextFactory.create(clock), Intent(queryString = queryString))
       ).execute()
+      log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       when {
-        internalServerError(httpResponse) -> Either.Left(GatewaySearchError.GatewayError)
-        else -> Either.Right(httpResponse.body()!!)
+        internalServerError(httpResponse) -> Left(GatewaySearchError.GatewayError)
+        else -> Right(httpResponse.body()!!)
       }
     } catch (e: Exception) {
-      log.error("Error when calling Registry Lookup API", e)
-      Either.Left(GatewaySearchError.GatewayError)
+      log.error("Error when initiating search", e)
+      Left(GatewaySearchError.GatewayError)
     }
   }
 

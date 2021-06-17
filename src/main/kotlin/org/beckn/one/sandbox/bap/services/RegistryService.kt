@@ -23,21 +23,23 @@ class RegistryService(
   @Autowired val registryServiceClient: RegistryServiceClient,
   @Value("\${context.domain}") val domain: String,
   @Value("\${context.city}") val city: String,
-  @Value("\${context.country}") val country: String,
-  val log: Logger = LoggerFactory.getLogger(RegistryService::class.java)
+  @Value("\${context.country}") val country: String
 ) {
+  val log: Logger = LoggerFactory.getLogger(RegistryService::class.java)
 
   fun lookupGateways(): Either<RegistryLookupError, List<SubscriberDto>> {
-
     return try {
-      val httpResponse = registryServiceClient.lookup(lookupGatewayRequest()).execute()
+      val request = lookupGatewayRequest()
+      log.info("Looking up gateways: {}", request)
+      val httpResponse = registryServiceClient.lookup(request).execute()
+      log.info("Lookup gateway response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       when {
         internalServerError(httpResponse) -> Left(RegistryError)
         noGatewaysFound(httpResponse) -> Left(NoGatewayFoundError)
         else -> Right(httpResponse.body()!!)
       }
     } catch (e: Exception) {
-      log.error("Error when calling Registry Lookup API", e)
+      log.error("Error when looking up gateways", e)
       Left(RegistryError)
     }
   }

@@ -11,7 +11,7 @@ import org.beckn.one.sandbox.bap.dtos.Error
 import org.beckn.one.sandbox.bap.dtos.Intent
 import org.beckn.one.sandbox.bap.dtos.Request
 import org.beckn.one.sandbox.bap.dtos.ResponseMessage.Companion.nack
-import org.beckn.one.sandbox.bap.errors.registry.GatewaySearchError
+import org.beckn.one.sandbox.bap.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.external.gateway.GatewayServiceClient
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.factories.NetworkMock

@@ -17,19 +17,19 @@ class SearchService(
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun search(queryString: String, context: Context): ResponseEntity<Response> {
+  fun search(context: Context, queryString: String): ResponseEntity<Response> {
     return registryService
       .lookupGateways()
       .flatMap { gatewayService.search(it.first(), queryString) }
       .fold(
         {
-          log.error("Error when initiating search. Error: {}", it)
+          log.error("Error during search. Error: {}", it)
           ResponseEntity
             .status(it.status().value())
             .body(Response(context, it.message(), it.error()))
         },
         {
-          log.info("Found gateways: {}", it)
+          log.info("Successfully initiated search: {}", it)
           ResponseEntity.ok(Response(context, ResponseMessage.ack()))
         }
       )

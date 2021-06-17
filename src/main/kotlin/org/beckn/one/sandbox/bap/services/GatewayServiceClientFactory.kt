@@ -9,7 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 
 @Service
-class GatewayServiceClientFactory(@Autowired val objectMapper: ObjectMapper) {
+class GatewayServiceClientFactory @Autowired constructor(val objectMapper: ObjectMapper) {
   fun getClient(gateway: SubscriberDto): GatewayServiceClient {
     val retrofit = Retrofit.Builder()
       .baseUrl(gateway.subscriber_url)

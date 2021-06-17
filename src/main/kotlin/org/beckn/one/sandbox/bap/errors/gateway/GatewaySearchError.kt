@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.errors.registry
+package org.beckn.one.sandbox.bap.errors.gateway
 
 import org.beckn.one.sandbox.bap.dtos.Error
 import org.beckn.one.sandbox.bap.dtos.ResponseMessage
