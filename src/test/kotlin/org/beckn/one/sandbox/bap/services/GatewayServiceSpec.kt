@@ -6,11 +6,9 @@ import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.constants.City
 import org.beckn.one.sandbox.bap.constants.Country
 import org.beckn.one.sandbox.bap.constants.Domain
-import org.beckn.one.sandbox.bap.dtos.Response
-import org.beckn.one.sandbox.bap.dtos.Error
 import org.beckn.one.sandbox.bap.dtos.Intent
 import org.beckn.one.sandbox.bap.dtos.Request
-import org.beckn.one.sandbox.bap.dtos.ResponseMessage.Companion.nack
+import org.beckn.one.sandbox.bap.dtos.Response
 import org.beckn.one.sandbox.bap.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.external.gateway.GatewayServiceClient
 import org.beckn.one.sandbox.bap.factories.ContextFactory
@@ -18,7 +16,6 @@ import org.beckn.one.sandbox.bap.factories.NetworkMock
 import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.junit.jupiter.api.Assertions
 import org.mockito.Mockito.*
-import org.springframework.http.HttpStatus
 import retrofit2.mock.Calls
 import java.io.IOException
 import java.time.Clock
@@ -53,16 +50,18 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
   init {
     describe("Search") {
+      NetworkMock.startAllSubscribers()
+      val gateway = NetworkMock.getRetailBengaluruBg()
+      val queryString = "Fictional mystery books"
+      `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
+      `when`(gatewayServiceClientFactory.getClient(gateway)).thenReturn(gatewayServiceClient)
+
+      beforeEach {
+        NetworkMock.resetAllSubscribers()
+      }
+
       it("should return gateway error when gateway search call fails with an IO exception") {
-        NetworkMock.startAllSubscribers()
-        val gateway = NetworkMock.getRetailBengaluruBg()
-        val queryString = "Fictional mystery books"
-        `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
-        val searchRequest = Request(
-          contextFactory.create(clock),
-          Intent(queryString = queryString)
-        )
-        `when`(gatewayServiceClientFactory.getClient(gateway)).thenReturn(gatewayServiceClient)
+        val searchRequest = getRequest(queryString)
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(
           Calls.failure(IOException("Timeout"))
         )
@@ -72,21 +71,19 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
         response
           .fold(
-            {
-              it.status() shouldBe HttpStatus.INTERNAL_SERVER_ERROR
-              it.message() shouldBe nack()
-              it.error() shouldBe Error("BAP_003", "Gateway search returned error")
-            },
+            { it shouldBe GatewaySearchError.GatewayError },
             { Assertions.fail("Search should have timed out but didn't. Response: $it") }
           )
         verify(gatewayServiceClient).search(
-          Request(
-            contextFactory.create(clock = clock),
-            Intent(queryString = queryString)
-          )
+          getRequest(queryString)
         )
       }
     }
   }
+
+  private fun getRequest(queryString: String) = Request(
+    contextFactory.create(clock),
+    Intent(queryString = queryString)
+  )
 
 }
