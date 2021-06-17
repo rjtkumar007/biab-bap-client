@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.external.registry
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.Clock
 import java.time.LocalDateTime
@@ -17,10 +18,10 @@ data class SubscriberDto(
 
   @JsonIgnore
   val clock: Clock = Clock.systemUTC(),
-  val valid_from: LocalDateTime = LocalDateTime.now(clock),
-  val valid_until: LocalDateTime = LocalDateTime.now(clock),
-  val created: LocalDateTime = LocalDateTime.now(clock),
-  val updated: LocalDateTime = LocalDateTime.now(clock)
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS") val valid_from: LocalDateTime = LocalDateTime.now(clock),
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS") val valid_until: LocalDateTime = LocalDateTime.now(clock),
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS") val created: LocalDateTime = LocalDateTime.now(clock),
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS") val updated: LocalDateTime = LocalDateTime.now(clock)
 ) {
 
   enum class Type {

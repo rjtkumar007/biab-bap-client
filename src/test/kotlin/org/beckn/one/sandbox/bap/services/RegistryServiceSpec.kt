@@ -8,9 +8,7 @@ import org.beckn.one.sandbox.bap.constants.Country
 import org.beckn.one.sandbox.bap.constants.Domain
 import org.beckn.one.sandbox.bap.domain.Subscriber
 import org.beckn.one.sandbox.bap.dtos.Error
-import org.beckn.one.sandbox.bap.dtos.Response
 import org.beckn.one.sandbox.bap.dtos.ResponseMessage.Companion.nack
-import org.beckn.one.sandbox.bap.dtos.ResponseStatus
 import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError
 import org.beckn.one.sandbox.bap.external.registry.RegistryServiceClient
 import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
