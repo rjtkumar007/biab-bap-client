@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.dtos
 
 data class Response(
-  val status: ResponseStatus,
-  val messageId: String? = null,
-  val error: Error? = null
+  val context: Context,
+  val message: ResponseMessage,
+  val error: Error? = null,
 )

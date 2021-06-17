@@ -6,7 +6,7 @@ import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.constants.City
 import org.beckn.one.sandbox.bap.constants.Country
 import org.beckn.one.sandbox.bap.constants.Domain
-import org.beckn.one.sandbox.bap.dtos.BecknResponse
+import org.beckn.one.sandbox.bap.dtos.Response
 import org.beckn.one.sandbox.bap.dtos.Error
 import org.beckn.one.sandbox.bap.dtos.Intent
 import org.beckn.one.sandbox.bap.dtos.Request
@@ -67,7 +67,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
           Calls.failure(IOException("Timeout"))
         )
 
-        val response: Either<GatewaySearchError, BecknResponse> =
+        val response: Either<GatewaySearchError, Response> =
           gatewayService.search(gateway, queryString)
 
         response

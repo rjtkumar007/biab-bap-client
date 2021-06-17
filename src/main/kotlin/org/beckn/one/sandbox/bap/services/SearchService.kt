@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.services
 
 import arrow.core.flatMap
-import org.beckn.one.sandbox.bap.dtos.BecknResponse
 import org.beckn.one.sandbox.bap.dtos.Context
+import org.beckn.one.sandbox.bap.dtos.Response
 import org.beckn.one.sandbox.bap.dtos.ResponseMessage
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -17,7 +17,7 @@ class SearchService(
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun search(queryString: String, context: Context): ResponseEntity<BecknResponse> {
+  fun search(queryString: String, context: Context): ResponseEntity<Response> {
     return registryService
       .lookupGateways()
       .flatMap { gatewayService.search(it.first(), queryString) }
@@ -26,23 +26,11 @@ class SearchService(
           log.error("Error when initiating search. Error: {}", it)
           ResponseEntity
             .status(it.status().value())
-            .body(
-              BecknResponse(
-                context = context,
-                message = it.message(),
-                error = it.error()
-              )
-            )
+            .body(Response(context, it.message(), it.error()))
         },
         {
           log.info("Found gateways: {}", it)
-          ResponseEntity
-            .ok(
-              BecknResponse(
-                context = context,
-                message = ResponseMessage.ack()
-              )
-            )
+          ResponseEntity.ok(Response(context, ResponseMessage.ack()))
         }
       )
   }

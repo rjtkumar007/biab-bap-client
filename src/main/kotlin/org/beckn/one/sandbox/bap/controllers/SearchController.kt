@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.controllers
 
-import org.beckn.one.sandbox.bap.dtos.BecknResponse
+import org.beckn.one.sandbox.bap.dtos.Response
 import org.beckn.one.sandbox.bap.dtos.ResponseMessage
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.services.SearchService
@@ -19,13 +19,13 @@ class SearchController @Autowired constructor(
 
   @RequestMapping("/v1/search")
   @ResponseBody
-  fun searchV1(@RequestParam searchString: String): ResponseEntity<BecknResponse> {
+  fun searchV1(@RequestParam searchString: String): ResponseEntity<Response> {
     return searchService.search(searchString, contextFactory.create())
   }
 
   @RequestMapping("/v0/search")
   @ResponseBody
-  fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<BecknResponse> {
-    return ResponseEntity.ok(BecknResponse(contextFactory.create(), ResponseMessage.ack()))
+  fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<Response> {
+    return ResponseEntity.ok(Response(contextFactory.create(), ResponseMessage.ack()))
   }
 }

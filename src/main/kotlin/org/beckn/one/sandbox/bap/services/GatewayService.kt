@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.services
 
 import arrow.core.Either
-import org.beckn.one.sandbox.bap.dtos.BecknResponse
+import org.beckn.one.sandbox.bap.dtos.Response
 import org.beckn.one.sandbox.bap.dtos.Intent
 import org.beckn.one.sandbox.bap.dtos.Request
 import org.beckn.one.sandbox.bap.errors.registry.GatewaySearchError
@@ -28,7 +28,7 @@ class GatewayService @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
 
-  fun search(gateway: SubscriberDto, queryString: String): Either<GatewaySearchError, BecknResponse> {
+  fun search(gateway: SubscriberDto, queryString: String): Either<GatewaySearchError, Response> {
     return try {
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
       val httpResponse = gatewayServiceClient.search(
@@ -44,6 +44,6 @@ class GatewayService @Autowired constructor(
     }
   }
 
-  private fun internalServerError(httpResponse: retrofit2.Response<BecknResponse>) =
+  private fun internalServerError(httpResponse: retrofit2.Response<Response>) =
     httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
 }
