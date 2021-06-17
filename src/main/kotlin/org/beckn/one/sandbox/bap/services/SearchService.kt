@@ -23,7 +23,7 @@ class SearchService(
       .flatMap { gatewayService.search(it.first(), queryString) }
       .fold(
         {
-          log.error("Error when initiating search")
+          log.error("Error when initiating search. Error: {}", it)
           ResponseEntity
             .status(it.code().value())
             .body(it.response())
@@ -35,5 +35,4 @@ class SearchService(
         }
       )
   }
-
 }

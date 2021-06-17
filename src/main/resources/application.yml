@@ -2,10 +2,10 @@
 server:
   port: 9001
 registry_service:
-  url: http://localhost:4000/
+  url: https://run.mocky.io/v3/3b2afdc9-3dde-4a9a-8d19-1b0c9ab5882f/
 context:
   domain: local-retail
   city: Bengaluru
-  country: India
+  country: IND
   bap_id: beckn_in_a_box_bap
   bap_url: beckn_in_a_box_bap.com

@@ -8,6 +8,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface GatewayServiceClient {
-  @POST("/search")
+  @POST("search")
   fun search(@Body request: Request<Intent>): Call<BecknResponse>
 }
