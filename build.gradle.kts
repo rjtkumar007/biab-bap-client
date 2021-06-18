@@ -40,6 +40,7 @@ dependencies {
   testImplementation("io.kotest:kotest-runner-junit5:4.4.3")
   testImplementation("io.kotest:kotest-extensions-spring:4.4.3")
   testImplementation("com.github.tomakehurst:wiremock-jre8:2.28.0")
+  testImplementation("org.testcontainers:mongodb:1.15.3")
 }
 
 tasks.withType<KotlinCompile> {

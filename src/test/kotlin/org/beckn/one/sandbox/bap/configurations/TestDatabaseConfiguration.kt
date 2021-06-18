@@ -1,0 +1,21 @@
+package org.beckn.one.sandbox.bap.configurations
+
+import com.mongodb.client.MongoDatabase
+import org.litote.kmongo.KMongo
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
+
+@Configuration
+class TestDatabaseConfiguration {
+  @Bean
+  @Primary
+  fun testDatabase(): MongoDatabase {
+    val host = MongoContainer.instance.host
+    val port = MongoContainer.instance.getMappedPort(MongoContainer.MONGODB_PORT)
+    val connectionString = "mongodb://$host:$port"
+    val client = KMongo.createClient(connectionString)
+    return client.getDatabase("sandbox_bpp")
+  }
+}
