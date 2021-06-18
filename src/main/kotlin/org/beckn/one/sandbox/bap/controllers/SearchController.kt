@@ -1,7 +1,6 @@
 package org.beckn.one.sandbox.bap.controllers
 
-import org.beckn.one.sandbox.bap.dtos.Response
-import org.beckn.one.sandbox.bap.dtos.ResponseMessage
+import org.beckn.one.sandbox.bap.dtos.*
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.services.SearchService
 import org.slf4j.Logger
@@ -31,5 +30,34 @@ class SearchController @Autowired constructor(
   @ResponseBody
   fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<Response> {
     return ResponseEntity.ok(Response(contextFactory.create(), ResponseMessage.ack()))
+  }
+
+  @RequestMapping("/v0/on_search")
+  @ResponseBody
+  fun onSearchV0(@RequestParam(required = false) messageId: String? = ""): ResponseEntity<List<ProviderWithItems>> {
+    return ResponseEntity.ok(
+      listOf(
+        ProviderWithItems(
+          provider = Provider(
+            id = "p1", name = "LocalBaniya", locations = listOf("Camp", "Shastri Nagar"),
+            descriptor = "Your local grocery", images = listOf("/localbaniya")
+          ),
+          items = listOf(Item(
+            id = "it-1", name = "Sugar", parentItemId = "pid-1", descriptor = "Very sweet",
+            price = Price(
+              estimated = "1", computed = "2", listed = "3", offered = "4", minimum = "5", maximum = "6"
+            ),
+            categoryId = "cat-1", images = listOf("/imageA", "/imageB"),
+            tags = mapOf("classifiedAs" to "grocery"),
+            attributes = mapOf("colour" to "white")
+          )),
+          categories = listOf(
+            Category(id = "cat-1", name = "Groceries", descriptor = "Grocery items"),
+            Category(id = "cat-2", name = "Perishable Items", descriptor = "Perishable items")
+          ),
+          offers = listOf(),
+        )
+      )
+    )
   }
 }
