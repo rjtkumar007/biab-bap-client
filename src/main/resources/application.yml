@@ -9,3 +9,7 @@ context:
   country: IND
   bap_id: beckn_in_a_box_bap
   bap_url: beckn_in_a_box_bap.com
+database:
+  mongo:
+    url: mongodb://localhost:27017
+    name: sandbox_bap

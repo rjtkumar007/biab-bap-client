@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import org.beckn.one.sandbox.bap.domain.Subscriber
+import org.beckn.one.sandbox.bap.domains.Subscriber
 import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError
 import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError.Internal
 import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError.NoGatewayFound

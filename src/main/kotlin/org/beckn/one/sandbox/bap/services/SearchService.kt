@@ -4,6 +4,7 @@ import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.dtos.Context
 import org.beckn.one.sandbox.bap.dtos.Response
 import org.beckn.one.sandbox.bap.dtos.ResponseMessage
+import org.beckn.one.sandbox.bap.entities.Message
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,14 +14,17 @@ import org.springframework.stereotype.Service
 @Service
 class SearchService(
   @Autowired val registryService: RegistryService,
-  @Autowired val gatewayService: GatewayService
+  @Autowired val gatewayService: GatewayService,
+  @Autowired val messageService: MessageService,
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
   fun search(context: Context, queryString: String): ResponseEntity<Response> {
     return registryService
       .lookupGateways()
-      .flatMap { gatewayService.search(it.first(), queryString) }
+      .flatMap {
+        gatewayService.search(it.first(), queryString)
+      }
       .fold(
         {
           log.error("Error during search. Error: {}", it)
@@ -30,6 +34,9 @@ class SearchService(
         },
         {
           log.info("Successfully initiated search: {}", it)
+          val message = Message(id = context.messageId)
+          messageService.save(message)
+          log.info("Saved message: {}", message)
           ResponseEntity.ok(Response(context, ResponseMessage.ack()))
         }
       )

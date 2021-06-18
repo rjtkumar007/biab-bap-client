@@ -6,7 +6,7 @@ import org.beckn.one.sandbox.bap.constants.Country
 import org.beckn.one.sandbox.bap.constants.Domain
 import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
 
-object NetworkMock {
+object MockNetwork {
 
   val registry = WireMockServer(4000)
   val retailBengaluruBg = WireMockServer(4001)

@@ -12,7 +12,7 @@ import org.beckn.one.sandbox.bap.dtos.ResponseMessage.Companion.nack
 import org.beckn.one.sandbox.bap.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.external.gateway.GatewayServiceClient
 import org.beckn.one.sandbox.bap.factories.ContextFactory
-import org.beckn.one.sandbox.bap.factories.NetworkMock
+import org.beckn.one.sandbox.bap.factories.MockNetwork
 import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.junit.jupiter.api.Assertions
 import org.mockito.Mockito.*
@@ -50,13 +50,13 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
   init {
     describe("Search") {
-      NetworkMock.startAllSubscribers()
-      val gateway = NetworkMock.getRetailBengaluruBg()
+      MockNetwork.startAllSubscribers()
+      val gateway = MockNetwork.getRetailBengaluruBg()
       `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
       `when`(gatewayServiceClientFactory.getClient(gateway)).thenReturn(gatewayServiceClient)
 
       beforeEach {
-        NetworkMock.resetAllSubscribers()
+        MockNetwork.resetAllSubscribers()
         reset(gatewayServiceClient)
       }
 

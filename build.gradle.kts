@@ -32,6 +32,7 @@ dependencies {
   implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
   implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
   implementation("com.squareup.retrofit2:retrofit-mock:$retrofitVersion")
+  implementation("org.litote.kmongo:kmongo:4.2.7")
 
   kapt("io.arrow-kt:arrow-meta:0.13.2")
 
