@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.configurations
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.beckn.one.sandbox.bap.external.registry.RegistryServiceClient
+import org.beckn.one.sandbox.bap.client.external.registry.RegistryServiceClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
