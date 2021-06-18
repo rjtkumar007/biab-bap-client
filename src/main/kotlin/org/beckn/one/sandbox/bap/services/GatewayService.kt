@@ -6,6 +6,7 @@ import arrow.core.Either.Right
 import org.beckn.one.sandbox.bap.dtos.Intent
 import org.beckn.one.sandbox.bap.dtos.Request
 import org.beckn.one.sandbox.bap.dtos.Response
+import org.beckn.one.sandbox.bap.dtos.ResponseStatus
 import org.beckn.one.sandbox.bap.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.factories.ContextFactory
@@ -37,15 +38,20 @@ class GatewayService @Autowired constructor(
       ).execute()
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       when {
-        internalServerError(httpResponse) -> Left(GatewaySearchError.GatewayError)
+        isInternalServerError(httpResponse) -> Left(GatewaySearchError.Internal)
+        httpResponse.body() == null -> Left(GatewaySearchError.NullResponse)
+        isAckNegative(httpResponse) -> Left(GatewaySearchError.Nack)
         else -> Right(httpResponse.body()!!)
       }
     } catch (e: Exception) {
       log.error("Error when initiating search", e)
-      Left(GatewaySearchError.GatewayError)
+      Left(GatewaySearchError.Internal)
     }
   }
 
-  private fun internalServerError(httpResponse: retrofit2.Response<Response>) =
+  private fun isInternalServerError(httpResponse: retrofit2.Response<Response>) =
     httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
+
+  private fun isAckNegative(httpResponse: retrofit2.Response<Response>) =
+    httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
 }

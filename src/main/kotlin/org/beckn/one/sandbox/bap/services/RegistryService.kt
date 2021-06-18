@@ -5,8 +5,8 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import org.beckn.one.sandbox.bap.domain.Subscriber
 import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError
-import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError.NoGatewayFoundError
-import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError.RegistryError
+import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError.Internal
+import org.beckn.one.sandbox.bap.errors.registry.RegistryLookupError.NoGatewayFound
 import org.beckn.one.sandbox.bap.external.registry.RegistryServiceClient
 import org.beckn.one.sandbox.bap.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.external.registry.SubscriberLookupRequest
@@ -34,13 +34,13 @@ class RegistryService(
       val httpResponse = registryServiceClient.lookup(request).execute()
       log.info("Lookup gateway response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       when {
-        internalServerError(httpResponse) -> Left(RegistryError)
-        noGatewaysFound(httpResponse) -> Left(NoGatewayFoundError)
+        internalServerError(httpResponse) -> Left(Internal)
+        noGatewaysFound(httpResponse) -> Left(NoGatewayFound)
         else -> Right(httpResponse.body()!!)
       }
     } catch (e: Exception) {
       log.error("Error when looking up gateways", e)
-      Left(RegistryError)
+      Left(Internal)
     }
   }
 

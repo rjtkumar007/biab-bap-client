@@ -1,6 +1,5 @@
 package org.beckn.one.sandbox.bap.services
 
-import arrow.core.Either
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.constants.City
@@ -9,6 +8,7 @@ import org.beckn.one.sandbox.bap.constants.Domain
 import org.beckn.one.sandbox.bap.dtos.Intent
 import org.beckn.one.sandbox.bap.dtos.Request
 import org.beckn.one.sandbox.bap.dtos.Response
+import org.beckn.one.sandbox.bap.dtos.ResponseMessage.Companion.nack
 import org.beckn.one.sandbox.bap.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.external.gateway.GatewayServiceClient
 import org.beckn.one.sandbox.bap.factories.ContextFactory
@@ -23,10 +23,11 @@ import java.time.Instant
 import java.time.ZoneId
 
 internal class GatewayServiceSpec : DescribeSpec() {
-  private val gatewayServiceClient: GatewayServiceClient = mock(GatewayServiceClient::class.java)
+  private val queryString = "Fictional mystery books"
   private val gatewayServiceClientFactory = mock(GatewayServiceClientFactory::class.java)
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
+  private val gatewayServiceClient: GatewayServiceClient = mock(GatewayServiceClient::class.java)
   private val contextFactory = ContextFactory(
     domain = Domain.LocalRetail.value,
     city = City.Bengaluru.value,
@@ -36,7 +37,6 @@ internal class GatewayServiceSpec : DescribeSpec() {
     uuidFactory = uuidFactory,
     clock = clock
   )
-
   private val gatewayService: GatewayService =
     GatewayService(
       domain = Domain.LocalRetail.value,
@@ -52,36 +52,62 @@ internal class GatewayServiceSpec : DescribeSpec() {
     describe("Search") {
       NetworkMock.startAllSubscribers()
       val gateway = NetworkMock.getRetailBengaluruBg()
-      val queryString = "Fictional mystery books"
       `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
       `when`(gatewayServiceClientFactory.getClient(gateway)).thenReturn(gatewayServiceClient)
 
       beforeEach {
         NetworkMock.resetAllSubscribers()
+        reset(gatewayServiceClient)
       }
 
       it("should return gateway error when gateway search call fails with an IO exception") {
-        val searchRequest = getRequest(queryString)
+        val searchRequest = getRequest()
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(
           Calls.failure(IOException("Timeout"))
         )
 
-        val response: Either<GatewaySearchError, Response> =
-          gatewayService.search(gateway, queryString)
+        val response = gatewayService.search(gateway, queryString)
 
         response
           .fold(
-            { it shouldBe GatewaySearchError.GatewayError },
+            { it shouldBe GatewaySearchError.Internal },
             { Assertions.fail("Search should have timed out but didn't. Response: $it") }
           )
-        verify(gatewayServiceClient).search(
-          getRequest(queryString)
-        )
+        verify(gatewayServiceClient).search(getRequest())
+      }
+
+      it("should return gateway error when gateway search returns null response") {
+        val searchRequest = getRequest()
+        `when`(gatewayServiceClient.search(searchRequest)).thenReturn(Calls.response(null))
+
+        val response = gatewayService.search(gateway, queryString)
+
+        response
+          .fold(
+            { it shouldBe GatewaySearchError.NullResponse },
+            { Assertions.fail("Search should have failed due to gateway NACK response but didn't. Response: $it") }
+          )
+        verify(gatewayServiceClient).search(getRequest())
+      }
+
+      it("should return gateway error when gateway search returns negative acknowledgement") {
+        val searchRequest = getRequest()
+        val nackResponse = Calls.response(Response(contextFactory.create(), nack()))
+        `when`(gatewayServiceClient.search(searchRequest)).thenReturn(nackResponse)
+
+        val response = gatewayService.search(gateway, queryString)
+
+        response
+          .fold(
+            { it shouldBe GatewaySearchError.Nack },
+            { Assertions.fail("Search should have failed due to gateway NACK response but didn't. Response: $it") }
+          )
+        verify(gatewayServiceClient).search(getRequest())
       }
     }
   }
 
-  private fun getRequest(queryString: String) = Request(
+  private fun getRequest() = Request(
     contextFactory.create(),
     Intent(queryString = queryString)
   )

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.dtos.ResponseStatus.ACK
-import org.beckn.one.sandbox.bap.factories.BecknResponseFactory
+import org.beckn.one.sandbox.bap.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.factories.NetworkMock
 import org.hamcrest.CoreMatchers.*
@@ -59,7 +59,7 @@ class SearchControllerSpec @Autowired constructor(
           .stubFor(
             post("/search").willReturn(
               okJson(
-                objectMapper.writeValueAsString(BecknResponseFactory.getDefault(contextFactory))
+                objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory))
               )
             )
           )

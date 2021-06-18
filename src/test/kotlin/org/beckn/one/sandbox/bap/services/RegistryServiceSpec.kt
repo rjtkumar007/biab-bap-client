@@ -58,7 +58,7 @@ internal class RegistryServiceSpec : DescribeSpec() {
 
         response
           .fold(
-            { it shouldBe RegistryLookupError.RegistryError },
+            { it shouldBe RegistryLookupError.Internal },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )
       }
@@ -72,7 +72,7 @@ internal class RegistryServiceSpec : DescribeSpec() {
 
         response
           .fold(
-            { it shouldBe RegistryLookupError.RegistryError },
+            { it shouldBe RegistryLookupError.Internal },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )
       }
@@ -86,7 +86,7 @@ internal class RegistryServiceSpec : DescribeSpec() {
 
         response
           .fold(
-            { it shouldBe RegistryLookupError.NoGatewayFoundError },
+            { it shouldBe RegistryLookupError.NoGatewayFound },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )
       }
@@ -100,7 +100,7 @@ internal class RegistryServiceSpec : DescribeSpec() {
 
         response
           .fold(
-            { it shouldBe RegistryLookupError.NoGatewayFoundError },
+            { it shouldBe RegistryLookupError.NoGatewayFound },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )
       }

@@ -9,7 +9,7 @@ sealed class RegistryLookupError : HttpError {
   val registryError = Error("BAP_001", "Registry lookup returned error")
   val noGatewaysFoundError = Error("BAP_002", "Registry lookup did not return any gateways")
 
-  object RegistryError : RegistryLookupError() {
+  object Internal : RegistryLookupError() {
     override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
@@ -17,7 +17,7 @@ sealed class RegistryLookupError : HttpError {
     override fun error(): Error = registryError
   }
 
-  object NoGatewayFoundError : RegistryLookupError() {
+  object NoGatewayFound : RegistryLookupError() {
     override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
