@@ -2,7 +2,7 @@
 server:
   port: 9001
 registry_service:
-  url: https://run.mocky.io/v3/3b2afdc9-3dde-4a9a-8d19-1b0c9ab5882f/
+  url: https://demo4460370.mockable.io/registry/
 context:
   domain: local-retail
   city: Bengaluru
