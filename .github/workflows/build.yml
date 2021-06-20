@@ -30,6 +30,13 @@ jobs:
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
           rm -f ~/.gradle/caches/modules-2/gc.properties
+
+  deploy:
+    name: package and deploy the service
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: [ self-hosted, linux ]
+    steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: Build docker image
