@@ -6,7 +6,7 @@ import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
-import org.beckn.one.sandbox.bap.common.domains.Subscriber
+import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.errors.registry.RegistryLookupError
 import org.beckn.one.sandbox.bap.client.external.registry.RegistryServiceClient
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto

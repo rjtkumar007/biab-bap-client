@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.common.domains
+package org.beckn.one.sandbox.bap.client.external.domains
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize

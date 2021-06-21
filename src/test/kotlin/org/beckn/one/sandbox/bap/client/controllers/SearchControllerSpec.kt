@@ -5,10 +5,10 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.beckn.one.sandbox.bap.common.dtos.Response
-import org.beckn.one.sandbox.bap.common.dtos.ResponseStatus.ACK
+import org.beckn.one.sandbox.bap.protocol.schemas.Response
+import org.beckn.one.sandbox.bap.protocol.schemas.ResponseStatus.ACK
 import org.beckn.one.sandbox.bap.client.entities.Message
-import org.beckn.one.sandbox.bap.common.factories.ContextFactory
+import org.beckn.one.sandbox.bap.protocol.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.client.repositories.MessageRepository

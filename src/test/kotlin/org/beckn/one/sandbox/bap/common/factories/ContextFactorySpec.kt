@@ -6,7 +6,9 @@ import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
-import org.beckn.one.sandbox.bap.common.dtos.Action
+import org.beckn.one.sandbox.bap.protocol.schemas.Action
+import org.beckn.one.sandbox.bap.protocol.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.protocol.schemas.factories.UuidFactory
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import java.time.Clock

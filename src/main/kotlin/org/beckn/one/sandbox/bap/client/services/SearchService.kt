@@ -1,9 +1,9 @@
 package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.flatMap
-import org.beckn.one.sandbox.bap.common.dtos.Context
-import org.beckn.one.sandbox.bap.common.dtos.Response
-import org.beckn.one.sandbox.bap.common.dtos.ResponseMessage
+import org.beckn.one.sandbox.bap.protocol.schemas.Context
+import org.beckn.one.sandbox.bap.protocol.schemas.Response
+import org.beckn.one.sandbox.bap.protocol.schemas.ResponseMessage
 import org.beckn.one.sandbox.bap.client.entities.Message
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

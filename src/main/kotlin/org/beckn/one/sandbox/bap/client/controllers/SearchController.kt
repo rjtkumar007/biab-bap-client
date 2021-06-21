@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.services.SearchService
-import org.beckn.one.sandbox.bap.common.dtos.*
-import org.beckn.one.sandbox.bap.common.factories.ContextFactory
+import org.beckn.one.sandbox.bap.protocol.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.protocol.schemas.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

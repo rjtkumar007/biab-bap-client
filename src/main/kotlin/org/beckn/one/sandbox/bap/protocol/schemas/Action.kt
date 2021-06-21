@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.common.dtos
+package org.beckn.one.sandbox.bap.protocol.schemas
 
 enum class Action {
   search, select, `init`, confirm, update, status, track, cancel, feedback, support, on_search, on_select, on_init,

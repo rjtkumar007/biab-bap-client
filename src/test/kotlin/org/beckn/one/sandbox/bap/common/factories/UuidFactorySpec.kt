@@ -4,6 +4,7 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeTypeOf
+import org.beckn.one.sandbox.bap.protocol.schemas.factories.UuidFactory
 import java.util.*
 
 internal class UuidFactorySpec : DescribeSpec() {

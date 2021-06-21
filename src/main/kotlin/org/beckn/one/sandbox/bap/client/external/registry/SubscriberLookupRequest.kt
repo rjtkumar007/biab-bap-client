@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.client.external.registry
 
-import org.beckn.one.sandbox.bap.common.domains.Subscriber
+import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 
 data class SubscriberLookupRequest(
   val subscriber_id: String? = null,
