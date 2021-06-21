@@ -29,7 +29,7 @@ class GatewayService @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
 
-  fun search(gateway: SubscriberDto, queryString: String): Either<GatewaySearchError, Response> {
+  fun search(gateway: SubscriberDto, queryString: String?): Either<GatewaySearchError, Response> {
     return try {
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)

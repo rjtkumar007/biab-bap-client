@@ -19,7 +19,7 @@ class SearchService(
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun search(context: Context, queryString: String): ResponseEntity<Response> {
+  fun search(context: Context, queryString: String?): ResponseEntity<Response> {
     return registryService
       .lookupGateways()
       .flatMap { gatewayService.search(it.first(), queryString) }

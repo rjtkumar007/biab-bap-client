@@ -21,7 +21,7 @@ class SearchController @Autowired constructor(
 
   @RequestMapping("/v1/search")
   @ResponseBody
-  fun searchV1(@RequestParam searchString: String): ResponseEntity<Response> {
+  fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<Response> {
     log.info("Got search request: {}", searchString)
     return searchService.search(contextFactory.create(), searchString)
   }
