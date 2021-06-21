@@ -3,8 +3,8 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import org.beckn.one.sandbox.bap.client.errors.HttpError
 import org.beckn.one.sandbox.bap.client.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.common.entities.Message
-import org.beckn.one.sandbox.bap.common.repositories.MessageRepository
+import org.beckn.one.sandbox.bap.client.entities.Message
+import org.beckn.one.sandbox.bap.client.repositories.MessageRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

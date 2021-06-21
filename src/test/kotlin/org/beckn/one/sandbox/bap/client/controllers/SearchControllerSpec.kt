@@ -7,11 +7,11 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.common.dtos.Response
 import org.beckn.one.sandbox.bap.common.dtos.ResponseStatus.ACK
-import org.beckn.one.sandbox.bap.common.entities.Message
+import org.beckn.one.sandbox.bap.client.entities.Message
 import org.beckn.one.sandbox.bap.common.factories.ContextFactory
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
-import org.beckn.one.sandbox.bap.common.repositories.MessageRepository
+import org.beckn.one.sandbox.bap.client.repositories.MessageRepository
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,9 +24,6 @@ import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
 
 @SpringBootTest
 @AutoConfigureMockMvc

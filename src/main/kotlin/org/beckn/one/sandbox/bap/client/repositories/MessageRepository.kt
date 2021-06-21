@@ -1,8 +1,8 @@
-package org.beckn.one.sandbox.bap.common.repositories
+package org.beckn.one.sandbox.bap.client.repositories
 
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
-import org.beckn.one.sandbox.bap.common.entities.Message
+import org.beckn.one.sandbox.bap.client.entities.Message
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.save

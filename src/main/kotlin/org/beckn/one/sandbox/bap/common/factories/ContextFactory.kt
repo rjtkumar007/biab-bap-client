@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.common.factories
 
-import org.beckn.one.sandbox.bap.common.ProtocolVersion
 import org.beckn.one.sandbox.bap.common.dtos.Action
 import org.beckn.one.sandbox.bap.common.dtos.Context
+import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

@@ -4,9 +4,9 @@ import com.mongodb.MongoException
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.common.entities.Message
+import org.beckn.one.sandbox.bap.client.entities.Message
 import org.beckn.one.sandbox.bap.common.factories.UuidFactory
-import org.beckn.one.sandbox.bap.common.repositories.MessageRepository
+import org.beckn.one.sandbox.bap.client.repositories.MessageRepository
 import org.junit.jupiter.api.Assertions.fail
 import org.mockito.Mockito.*
 

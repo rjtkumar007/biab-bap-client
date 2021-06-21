@@ -4,7 +4,7 @@ import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.common.dtos.Context
 import org.beckn.one.sandbox.bap.common.dtos.Response
 import org.beckn.one.sandbox.bap.common.dtos.ResponseMessage
-import org.beckn.one.sandbox.bap.common.entities.Message
+import org.beckn.one.sandbox.bap.client.entities.Message
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

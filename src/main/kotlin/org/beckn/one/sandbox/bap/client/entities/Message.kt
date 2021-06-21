@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.common.entities
+package org.beckn.one.sandbox.bap.client.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.bson.codecs.pojo.annotations.BsonId

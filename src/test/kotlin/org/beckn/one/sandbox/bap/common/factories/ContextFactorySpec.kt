@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.common.factories
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.common.ProtocolVersion
+import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
