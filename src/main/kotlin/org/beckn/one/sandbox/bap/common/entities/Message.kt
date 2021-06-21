@@ -6,5 +6,6 @@ import org.litote.kmongo.newId
 
 data class Message(
   @field:BsonId private val _id: Id<String> = newId(),
-  @field:BsonId val id: String
+  val id: String,
 )
+
