@@ -3,12 +3,12 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
+import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.common.dtos.Intent
 import org.beckn.one.sandbox.bap.common.dtos.Request
 import org.beckn.one.sandbox.bap.common.dtos.Response
 import org.beckn.one.sandbox.bap.common.dtos.ResponseStatus
-import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
-import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.common.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -41,7 +41,10 @@ class GatewayService @Autowired constructor(
         isInternalServerError(httpResponse) -> Left(GatewaySearchError.Internal)
         httpResponse.body() == null -> Left(GatewaySearchError.NullResponse)
         isAckNegative(httpResponse) -> Left(GatewaySearchError.Nack)
-        else -> Right(httpResponse.body()!!)
+        else -> {
+          log.info("Successfully invoked search on gateway. Response: {}", httpResponse.body())
+          Right(httpResponse.body()!!)
+        }
       }
     } catch (e: Exception) {
       log.error("Error when initiating search", e)

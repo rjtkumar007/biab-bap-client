@@ -1,5 +1,7 @@
 package org.beckn.one.sandbox.bap.configurations
 
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoDatabase
 import org.litote.kmongo.KMongo
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +16,11 @@ class DatabaseConfiguration @Autowired constructor(
 ) {
   @Bean
   fun database(): MongoDatabase {
-    val client = KMongo.createClient(connectionString)
+    val settings = MongoClientSettings.builder()
+      .applyConnectionString(ConnectionString(connectionString))
+
+      .build()
+    val client = KMongo.createClient(settings)
     return client.getDatabase(databaseName)
   }
 }

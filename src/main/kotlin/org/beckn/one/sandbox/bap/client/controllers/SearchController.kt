@@ -1,6 +1,5 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.beckn.one.sandbox.bap.client.services.SearchService
 import org.beckn.one.sandbox.bap.common.dtos.*
 import org.beckn.one.sandbox.bap.common.factories.ContextFactory
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDateTime
 
 @RestController
 class SearchController @Autowired constructor(

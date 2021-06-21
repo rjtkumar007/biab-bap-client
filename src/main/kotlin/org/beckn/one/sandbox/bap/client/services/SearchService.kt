@@ -22,14 +22,8 @@ class SearchService(
   fun search(context: Context, queryString: String): ResponseEntity<Response> {
     return registryService
       .lookupGateways()
-      .flatMap {
-        gatewayService.search(it.first(), queryString)
-      }
-      .flatMap {
-        log.info("Successfully initiated search: {}", it)
-        val message = Message(id = context.messageId)
-        messageService.save(message)
-      }
+      .flatMap { gatewayService.search(it.first(), queryString) }
+      .flatMap { messageService.save(Message(id = context.messageId, type = Message.Type.Search)) }
       .fold(
         {
           log.error("Error during search. Error: {}", it)
@@ -38,6 +32,7 @@ class SearchService(
             .body(Response(context, it.message(), it.error()))
         },
         {
+          log.info("Successfully initiated Search")
           ResponseEntity.ok(Response(context, ResponseMessage.ack()))
         }
       )
