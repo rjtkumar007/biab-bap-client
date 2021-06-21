@@ -25,6 +25,11 @@ class SearchService(
       .flatMap {
         gatewayService.search(it.first(), queryString)
       }
+      .flatMap {
+        log.info("Successfully initiated search: {}", it)
+        val message = Message(id = context.messageId)
+        messageService.save(message)
+      }
       .fold(
         {
           log.error("Error during search. Error: {}", it)
@@ -33,10 +38,6 @@ class SearchService(
             .body(Response(context, it.message(), it.error()))
         },
         {
-          log.info("Successfully initiated search: {}", it)
-          val message = Message(id = context.messageId)
-          messageService.save(message)
-          log.info("Saved message: {}", message)
           ResponseEntity.ok(Response(context, ResponseMessage.ack()))
         }
       )
