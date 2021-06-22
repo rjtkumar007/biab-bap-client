@@ -3,9 +3,12 @@ package org.beckn.one.sandbox.bap.configurations
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoDatabase
-import org.beckn.one.sandbox.bap.protocol.entities.SearchResponse
-import org.beckn.one.sandbox.bap.protocol.repositories.GenericRepository
+import org.beckn.one.sandbox.bap.message.entities.Message
+import org.beckn.one.sandbox.bap.message.entities.SearchResponse
+import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
+import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.litote.kmongo.KMongo
+import org.litote.kmongo.getCollectionOfName
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -28,6 +31,11 @@ class DatabaseConfiguration @Autowired constructor(
 
   @Bean
   @Qualifier("search-repo")
-  fun searchResponseRepo(@Autowired database: MongoDatabase): GenericRepository<SearchResponse> =
-    GenericRepository.create(database)
+  fun searchResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<SearchResponse> =
+    BecknResponseRepository(database.getCollectionOfName("search_responses"))
+
+  @Bean
+  @Qualifier("message-repo")
+  fun messageResponseRepo(@Autowired database: MongoDatabase): GenericRepository<Message> =
+    GenericRepository.create(database, "message_responses")
 }

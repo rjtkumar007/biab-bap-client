@@ -41,6 +41,7 @@ dependencies {
   testImplementation("io.kotest:kotest-extensions-spring:4.4.3")
   testImplementation("com.github.tomakehurst:wiremock-jre8:2.28.0")
   testImplementation("org.testcontainers:mongodb:1.15.3")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
 }
 
 tasks.withType<KotlinCompile> {

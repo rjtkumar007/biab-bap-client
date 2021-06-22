@@ -1,10 +1,10 @@
 package org.beckn.one.sandbox.bap.common.factories
 
-import org.beckn.one.sandbox.bap.protocol.schemas.Ack
-import org.beckn.one.sandbox.bap.protocol.schemas.Response
-import org.beckn.one.sandbox.bap.protocol.schemas.ResponseMessage
-import org.beckn.one.sandbox.bap.protocol.schemas.ResponseStatus
-import org.beckn.one.sandbox.bap.protocol.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.schemas.Ack
+import org.beckn.one.sandbox.bap.schemas.Response
+import org.beckn.one.sandbox.bap.schemas.ResponseMessage
+import org.beckn.one.sandbox.bap.schemas.ResponseStatus
+import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 
 class ResponseFactory {
   companion object {

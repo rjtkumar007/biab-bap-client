@@ -1,10 +1,11 @@
 package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.flatMap
-import org.beckn.one.sandbox.bap.protocol.schemas.Context
-import org.beckn.one.sandbox.bap.protocol.schemas.Response
-import org.beckn.one.sandbox.bap.protocol.schemas.ResponseMessage
-import org.beckn.one.sandbox.bap.client.entities.Message
+import org.beckn.one.sandbox.bap.message.entities.Message
+import org.beckn.one.sandbox.bap.message.services.MessageService
+import org.beckn.one.sandbox.bap.schemas.Context
+import org.beckn.one.sandbox.bap.schemas.Response
+import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

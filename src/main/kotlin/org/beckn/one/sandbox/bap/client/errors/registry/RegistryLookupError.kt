@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.client.errors.registry
 
-import org.beckn.one.sandbox.bap.protocol.schemas.Error
-import org.beckn.one.sandbox.bap.protocol.schemas.ResponseMessage
-import org.beckn.one.sandbox.bap.client.errors.HttpError
+import org.beckn.one.sandbox.bap.schemas.Error
+import org.beckn.one.sandbox.bap.schemas.ResponseMessage
+import org.beckn.one.sandbox.bap.errors.HttpError
 import org.springframework.http.HttpStatus
 
 sealed class RegistryLookupError : HttpError {

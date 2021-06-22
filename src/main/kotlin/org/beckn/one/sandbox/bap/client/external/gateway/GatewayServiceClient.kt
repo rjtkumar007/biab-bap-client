@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.client.external.gateway
 
-import org.beckn.one.sandbox.bap.protocol.schemas.Response
-import org.beckn.one.sandbox.bap.protocol.schemas.Intent
-import org.beckn.one.sandbox.bap.protocol.schemas.Request
+import org.beckn.one.sandbox.bap.schemas.Response
+import org.beckn.one.sandbox.bap.schemas.Intent
+import org.beckn.one.sandbox.bap.schemas.Request
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

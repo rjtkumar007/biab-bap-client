@@ -5,15 +5,16 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.beckn.one.sandbox.bap.protocol.schemas.Response
-import org.beckn.one.sandbox.bap.protocol.schemas.ResponseStatus.ACK
-import org.beckn.one.sandbox.bap.client.entities.Message
-import org.beckn.one.sandbox.bap.protocol.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
-import org.beckn.one.sandbox.bap.client.repositories.MessageRepository
+import org.beckn.one.sandbox.bap.message.entities.Message
+import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
+import org.beckn.one.sandbox.bap.schemas.Response
+import org.beckn.one.sandbox.bap.schemas.ResponseStatus.ACK
+import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
+import org.litote.kmongo.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -33,7 +34,7 @@ class SearchControllerSpec @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
   val contextFactory: ContextFactory,
-  val messageRepository: MessageRepository
+  val messageRepository: GenericRepository<Message>
 ) : DescribeSpec() {
   init {
 
@@ -83,7 +84,7 @@ class SearchControllerSpec @Autowired constructor(
 
         MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
         val searchResponse = objectMapper.readValue(result.response.contentAsString, Response::class.java)
-        val savedMessage = messageRepository.findById(searchResponse.context.messageId)
+        val savedMessage = messageRepository.findOne(Message::id eq searchResponse.context.messageId)
         savedMessage shouldNotBe null
         savedMessage?.id shouldBe searchResponse.context.messageId
         savedMessage?.type shouldBe Message.Type.Search
