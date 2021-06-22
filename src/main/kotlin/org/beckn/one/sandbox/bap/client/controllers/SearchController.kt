@@ -21,15 +21,13 @@ class SearchController @Autowired constructor(
 
   @RequestMapping("/v1/search")
   @ResponseBody
-  fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<Response> {
-    log.info("Got search request: {}", searchString)
-    return searchService.search(contextFactory.create(), searchString)
-  }
+  fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<Response> =
+    searchService.search(contextFactory.create(), searchString)
 
   @RequestMapping("/v0/search")
   @ResponseBody
   fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<Response> {
-    return ResponseEntity.ok(Response(contextFactory.create(), ResponseMessage.ack()))
+    return ResponseEntity.ok(Response(context = contextFactory.create(), message = ResponseMessage.ack()))
   }
 
   @RequestMapping("/v0/on_search")
@@ -62,4 +60,10 @@ class SearchController @Autowired constructor(
       )
     )
   }
+
+  @RequestMapping("/v1/on_search")
+  @ResponseBody
+  fun onSearchV1(@RequestParam messageId: String): ResponseEntity<SearchResponse> =
+    searchService.onSearch(contextFactory.create(messageId = messageId))
+
 }

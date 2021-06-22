@@ -6,6 +6,7 @@ import org.beckn.one.sandbox.bap.message.services.MessageService
 import org.beckn.one.sandbox.bap.schemas.Context
 import org.beckn.one.sandbox.bap.schemas.Response
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
+import org.beckn.one.sandbox.bap.schemas.SearchResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +22,7 @@ class SearchService(
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
   fun search(context: Context, queryString: String?): ResponseEntity<Response> {
+    log.info("Got search request: {}", queryString)
     return registryService
       .lookupGateways()
       .flatMap { gatewayService.search(it.first(), queryString) }
@@ -35,6 +37,24 @@ class SearchService(
         {
           log.info("Successfully initiated Search")
           ResponseEntity.ok(Response(context, ResponseMessage.ack()))
+        }
+      )
+  }
+
+  fun onSearch(context: Context): ResponseEntity<SearchResponse> {
+    log.info("Got on search request for message id: {}", context.messageId)
+    return messageService.findById(context.messageId)
+      .fold(
+        {
+          log.error("Error when finding message by id. Error: {}", it)
+          ResponseEntity
+            .status(it.status().value())
+            .body(SearchResponse(context = context, error = it.error()))
+        },
+        {
+          log.info("Successfully initiated Search")
+          ResponseEntity
+            .ok(SearchResponse(context = context))
         }
       )
   }

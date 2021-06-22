@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.schemas.factories
 
+import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
 import org.beckn.one.sandbox.bap.schemas.Action
 import org.beckn.one.sandbox.bap.schemas.Context
-import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -18,7 +18,7 @@ class ContextFactory @Autowired constructor(
   private val uuidFactory: UuidFactory,
   private val clock: Clock = Clock.systemUTC()
 ) {
-  fun create() = Context(
+  fun create(transactionId: String = uuidFactory.create(), messageId: String = uuidFactory.create()) = Context(
     domain = domain,
     country = country,
     city = city,
@@ -26,8 +26,8 @@ class ContextFactory @Autowired constructor(
     coreVersion = ProtocolVersion.V0_9_1.value,
     bapId = bapId,
     bapUri = bapUrl,
-    transactionId = uuidFactory.create(),
-    messageId = uuidFactory.create(),
+    transactionId = transactionId,
+    messageId = messageId,
     clock = clock,
   )
 }
