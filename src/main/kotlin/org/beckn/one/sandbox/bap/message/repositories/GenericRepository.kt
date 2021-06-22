@@ -2,7 +2,6 @@ package org.beckn.one.sandbox.bap.message.repositories
 
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
-import org.beckn.one.sandbox.bap.message.entities.Message
 import org.bson.Document
 import org.bson.conversions.Bson
 import org.litote.kmongo.findOne
@@ -37,9 +36,5 @@ open class GenericRepository<R>(private val collection: MongoCollection<R>) {
   fun all() = collection.find().toList()
 
   fun clear() = collection.deleteMany(Document())
-
-}
-
-class MyRepo(collection: MongoCollection<Message>): GenericRepository<Message>(collection) {
 
 }

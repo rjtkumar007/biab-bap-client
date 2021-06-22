@@ -29,16 +29,18 @@ class BecknResponseRepositorySpec : DescribeSpec() {
           context = context,
           message = Catalog()
         )
-        repo.insertMany(listOf(
-          searchResponse,
-          searchResponse,
-          searchResponse.copy(context = context.copy(messageId = "123"))
-        ))
 
         it("should fetch responses by message id") {
+          repo.clear()
+          repo.insertMany(
+            listOf(
+              searchResponse,
+              searchResponse,
+              searchResponse.copy(context = context.copy(messageId = "123"))
+            )
+          )
           repo.findByMessageId(context.messageId).size shouldBeExactly 2
         }
-
       }
     }
   }

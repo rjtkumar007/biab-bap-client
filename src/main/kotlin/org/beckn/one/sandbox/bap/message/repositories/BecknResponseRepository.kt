@@ -6,7 +6,7 @@ import org.beckn.one.sandbox.bap.message.entities.Context
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 
-class BecknResponseRepository<R : BecknResponse>(
+open class BecknResponseRepository<R : BecknResponse>(
   collection: MongoCollection<R>
 ) : GenericRepository<R>(collection) {
 
