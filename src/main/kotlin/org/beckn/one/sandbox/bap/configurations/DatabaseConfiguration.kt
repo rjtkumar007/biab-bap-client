@@ -3,8 +3,11 @@ package org.beckn.one.sandbox.bap.configurations
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoDatabase
+import org.beckn.one.sandbox.bap.protocol.entities.SearchResponse
+import org.beckn.one.sandbox.bap.protocol.repositories.GenericRepository
 import org.litote.kmongo.KMongo
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,9 +21,13 @@ class DatabaseConfiguration @Autowired constructor(
   fun database(): MongoDatabase {
     val settings = MongoClientSettings.builder()
       .applyConnectionString(ConnectionString(connectionString))
-
       .build()
     val client = KMongo.createClient(settings)
     return client.getDatabase(databaseName)
   }
+
+  @Bean
+  @Qualifier("search-repo")
+  fun searchResponseRepo(@Autowired database: MongoDatabase): GenericRepository<SearchResponse> =
+    GenericRepository.create(database)
 }
