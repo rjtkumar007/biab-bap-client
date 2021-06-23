@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.message.entities.Message
+import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
@@ -23,10 +23,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @TestPropertySource(locations = ["/application-test.yml"])
 class SearchControllerOnSearchSpec @Autowired constructor(
   val mockMvc: MockMvc,
-  val objectMapper: ObjectMapper,
-  val contextFactory: ContextFactory,
   val uuidFactory: UuidFactory,
-  val messageRepository: GenericRepository<Message>
+  val contextFactory: ContextFactory,
+  val messageRepository: GenericRepository<Message>,
+  val searchResponseRepository: GenericRepository<SearchResponse>
 ) : DescribeSpec() {
   init {
 

@@ -9,4 +9,4 @@ data class SearchResponse(
   override val context: Context,
   val message: Catalog,
   override val error: Error? = null
-): BecknResponse
+) : BecknResponse

@@ -1,20 +1,18 @@
 package org.beckn.one.sandbox.bap.schemas
 
-import org.beckn.one.sandbox.bap.message.entities.Message
-
-interface BaseResponse {
+interface Response {
   val context: Context
   val error: Error?
 }
 
-data class Response(
+data class BecknResponse(
   override val context: Context,
   val message: ResponseMessage,
   override val error: Error? = null,
-) : BaseResponse
+) : Response
 
 data class SearchResponse(
   override val context: Context,
-  val message: Message? = null,
+  val message: List<Catalog>? = null,
   override val error: Error? = null,
-) : BaseResponse
+) : Response
