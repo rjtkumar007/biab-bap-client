@@ -8,9 +8,10 @@ import io.kotest.matchers.ints.shouldBeExactly
 import org.beckn.one.sandbox.bap.configurations.DatabaseConfiguration
 import org.beckn.one.sandbox.bap.configurations.TestDatabaseConfiguration
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.Catalog
-import org.beckn.one.sandbox.bap.message.entities.Context
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
+import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
+import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapper
+import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapperImpl
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,23 +26,26 @@ import java.time.ZoneId
   classes = [
     TestDatabaseConfiguration::class,
     DatabaseConfiguration::class,
-    SearchResponseStoreService::class
+    SearchResponseStoreService::class,
+    SearchResponseMapperImpl::class
   ]
 )
 internal class SearchResponseStoreServiceSpec @Autowired constructor(
+  val searchResponseMapper: SearchResponseMapper,
   val searchResponseStoreService: SearchResponseStoreService,
   @Qualifier("search-repo") val searchResponseRepo: BecknResponseRepository<SearchResponse>
 ) : DescribeSpec() {
+
 
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),
     ZoneId.of("Asia/Calcutta")
   )
 
-  private val context = Context(
+  private val context = org.beckn.one.sandbox.bap.schemas.Context(
     domain = "LocalRetail",
     country = "IN",
-    action = Context.Action.SEARCH,
+    action = org.beckn.one.sandbox.bap.schemas.Context.Action.SEARCH,
     city = "Pune",
     coreVersion = "0.9.1-draft03",
     bapId = "http://host.bap.com",
@@ -51,17 +55,18 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
     timestamp = LocalDateTime.now(fixedClock)
   )
 
-  val searchResponse = SearchResponse(
+  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.SearchResponse(
     context = context,
-    message = Catalog()
+    message = CatalogFactory().create(2)
   )
 
   init {
     describe("SearchResponseStore") {
+        val searchResponse = searchResponseMapper.fromSchema(schemaSearchResponse)
 
       context("when save is called with search response") {
         searchResponseRepo.clear()
-        val response = searchResponseStoreService.save(searchResponse)
+        val response = searchResponseStoreService.save(schemaSearchResponse)
 
         it("should save response to store") {
           searchResponseRepo.all().size shouldBeExactly 1
@@ -86,8 +91,8 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
         val mockRepo = mock<BecknResponseRepository<SearchResponse>>{
           onGeneric{ insertOne(searchResponse) }.thenThrow(MongoException("Write error"))
         }
-        val failureSearchResponseService = SearchResponseStoreService(mockRepo)
-        val response = failureSearchResponseService.save(searchResponse)
+        val failureSearchResponseService = SearchResponseStoreService(mockRepo, searchResponseMapper)
+        val response = failureSearchResponseService.save(schemaSearchResponse)
 
         it("should return a left with write error") {
           response.shouldBeLeft(DatabaseError.OnWrite)
@@ -98,7 +103,7 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
         val mockRepo = mock<BecknResponseRepository<SearchResponse>>{
           onGeneric{ findByMessageId(context.messageId) }.thenThrow(MongoException("Write error"))
         }
-        val failureSearchResponseService = SearchResponseStoreService(mockRepo)
+        val failureSearchResponseService = SearchResponseStoreService(mockRepo, searchResponseMapper)
         val response = failureSearchResponseService.findByMessageId(context.messageId)
 
         it("should return a left with write error") {
