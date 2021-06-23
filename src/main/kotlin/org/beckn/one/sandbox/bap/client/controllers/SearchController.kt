@@ -39,18 +39,30 @@ class SearchController @Autowired constructor(
           ),
           items = listOf(
             ProtocolItem(
-              id = "it-1", name = "Sugar", parentItemId = "pid-1", descriptor = ProtocolDescriptor("Very sweet"),
+              id = "it-1",
+              parentItemId = "pid-1",
+              descriptor = ProtocolDescriptor(name = "Very sweet", images = listOf("/imageA", "/imageB")),
               price = ProtocolPrice(
-                estimated = "1", computed = "2", listed = "3", offered = "4", minimum = "5", maximum = "6"
+                currency = "Rupee",
+                value = "3",
+                estimatedValue = "1",
+                computedValue = "2",
+                listedValue = "3",
+                offeredValue = "4",
+                minimumValue = "5",
+                maximumValue = "6"
               ),
-              categoryId = "cat-1", images = listOf("/imageA", "/imageB"),
+              categoryId = "cat-1",
               tags = mapOf("classifiedAs" to "grocery"),
-              attributes = mapOf("colour" to "white")
+              matched = true, related = true, recommended = true
             )
           ),
           categories = listOf(
-            ProtocolCategory(id = "cat-1", name = "Groceries", descriptor = ProtocolDescriptor(name = "Grocery items")),
-            ProtocolCategory(id = "cat-2", name = "Perishable Items", descriptor = ProtocolDescriptor(name = "Perishable items"))
+            ProtocolCategory(id = "cat-1", descriptor = ProtocolDescriptor(name = "Grocery items")),
+            ProtocolCategory(
+              id = "cat-2",
+              descriptor = ProtocolDescriptor(name = "Perishable items")
+            )
           ),
           offers = listOf(),
         )

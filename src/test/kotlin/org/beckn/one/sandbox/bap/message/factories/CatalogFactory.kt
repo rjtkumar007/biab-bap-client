@@ -12,7 +12,6 @@ class CatalogFactory {
           categories = listOf(
             ProtocolCategory(
               id = "provider-$index-category-$index",
-              name = "provider-$index-category-$index name",
               descriptor = descriptor("provider-$index-category", index),
               tags = mapOf("category-tag1" to "category-value1")
             )
@@ -20,40 +19,22 @@ class CatalogFactory {
           items = listOf(
             ProtocolItem(
               id = "Item_$index",
-              name = "Item_$index name",
               descriptor = descriptor("provider-$index-item", index),
               price = ProtocolPrice(
-                minimum = "100",
-                estimated = "101",
-                computed = "102",
-                offered = "103",
-                listed = "104",
-                maximum = "105",
+                currency = "Rupees",
+                value = "99",
+                minimumValue = "100",
+                estimatedValue = "101",
+                computedValue = "102",
+                offeredValue = "103",
+                listedValue = "104",
+                maximumValue = "105",
               ),
               categoryId = "provider-$index-category-$index",
-              images = listOf("https://image1.com", "https://image2.com"),
               tags = mapOf("item-tag1" to "item-value1"),
-              attributes = mapOf("item-attribute1" to "item-attribute-value1"),
-              addons = listOf(
-                ProtocolAddOn(
-                  id = "Addon_$index",
-                  descriptor = descriptor("provider-$index-addon", index),
-                  price = ProtocolPrice(
-                    minimum = "50",
-                    estimated = "51",
-                    computed = "52",
-                    offered = "53",
-                    listed = "54",
-                    maximum = "55",
-                  )
-                )
-              ),
-              configurableAttributes = listOf(
-                ProtocolConfigurableItemAttribute(
-                  name = "configurable-item-attribute-$index",
-                  permissibleValues = listOf("configurable-item-attribute-$index-value1")
-                )
-              )
+              matched = true,
+              related = true,
+              recommended = true
             )
           )
         )
@@ -67,5 +48,8 @@ class CatalogFactory {
     symbol = "$type-$index symbol",
     shortDesc = "A short description about $type-$index",
     longDesc = "A long description about $type-$index",
+    images = listOf("uri:https://$type-$index-image-1.com", "uri:https://$type-$index-image-2.com"),
+    audio = "$type-$index-image-audio-file-path",
+    threeDRender = "$type-$index-3d"
   )
 }

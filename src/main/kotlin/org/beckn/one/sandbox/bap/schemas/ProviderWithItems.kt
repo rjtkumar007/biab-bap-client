@@ -2,6 +2,7 @@ package org.beckn.one.sandbox.bap.schemas
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
+import java.time.LocalDateTime
 
 data class ProviderWithItems(
   val provider: Provider,
@@ -20,8 +21,9 @@ data class Provider(
 
 data class ProtocolCategory @Default constructor(
   val id: String,
-  val name: String,
+  val parentCategoryId: String? = null,
   val descriptor: ProtocolDescriptor,
+  val time: LocalDateTime? = null,
   val tags: Map<String, String>? = null
 )
 
@@ -35,16 +37,16 @@ data class ProtocolOffer(
 
 data class ProtocolItem @Default constructor(
   val id: String? = null,
-  val name: String? = null,
-  @JsonProperty("parent_item_id") val parentItemId: String? = null,
+  val parentItemId: String? = null,
   val descriptor: ProtocolDescriptor? = null,
   val price: ProtocolPrice? = null,
-  @JsonProperty("category_id") val categoryId: String? = null,
-  val images: List<String>? = null,
-  val tags: Map<String, String>? = null,
-  val attributes: Map<String, String>? = null,
-  val addons: List<ProtocolAddOn>? = null,
-  @JsonProperty("configurable_attributes") val configurableAttributes: List<ProtocolConfigurableItemAttribute>? = null
+  val categoryId: String? = null,
+  val locationId: String? = null,
+  val time: LocalDateTime? = null,
+  val matched: Boolean?,
+  val related: Boolean?,
+  val recommended: Boolean?,
+  val tags: Map<String, String>? = null
 )
 
 data class ProtocolAddOn @Default constructor(
@@ -54,12 +56,14 @@ data class ProtocolAddOn @Default constructor(
 )
 
 data class ProtocolPrice @Default constructor(
-  @JsonProperty("estimated_value") val estimated: String,
-  @JsonProperty("computed_value") val computed: String,
-  @JsonProperty("listed_value") val listed: String,
-  @JsonProperty("offered_value") val offered: String,
-  @JsonProperty("minimum_value") val minimum: String,
-  @JsonProperty("maximum_value") val maximum: String
+  val currency: String,
+  val value: String,
+  val estimatedValue: String,
+  val computedValue: String,
+  val listedValue: String,
+  val offeredValue: String,
+  val minimumValue: String,
+  val maximumValue: String
 )
 
 data class ProtocolConfigurableItemAttribute @Default constructor(

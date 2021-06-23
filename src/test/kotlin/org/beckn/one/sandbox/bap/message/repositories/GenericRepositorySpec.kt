@@ -31,7 +31,7 @@ class GenericRepositorySpec : DescribeSpec() {
         )
         val livingRoomFurniture = Category(
           id = "category/c2",
-          parentId = "category/c1",
+          parentCategoryId = "category/c1",
           descriptor = Descriptor(
             name = "Furniture",
             longDesc = "Wooden, Iron, Plastic furniture for home"
