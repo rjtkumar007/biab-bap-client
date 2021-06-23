@@ -12,7 +12,7 @@ data class BecknResponse(
 ) : Response
 
 data class SearchResponse(
-  override val context: Context,
-  val message: List<Catalog>? = null,
-  override val error: Error? = null,
+    override val context: Context,
+    val message: List<BecknCatalog>? = null,
+    override val error: Error? = null,
 ) : Response

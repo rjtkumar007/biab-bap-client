@@ -1,6 +1,8 @@
 package org.beckn.one.sandbox.bap.message.entities
 
-data class Descriptor(
+import org.beckn.one.sandbox.bap.Default
+
+data class Descriptor @Default constructor(
   val name: String?,
   val code: String? = null,
   val symbol: String? = null,

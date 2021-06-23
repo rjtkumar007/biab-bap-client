@@ -1,6 +1,8 @@
 package org.beckn.one.sandbox.bap.message.entities
 
-data class Item(
+import org.beckn.one.sandbox.bap.Default
+
+data class Item @Default constructor(
   val id: String? = null,
   val parentItemId: String? = null,
   val descriptor: Descriptor? = null,

@@ -1,10 +1,12 @@
 package org.beckn.one.sandbox.bap.schemas
 
-data class Catalog (
+import org.beckn.one.sandbox.bap.Default
+
+data class BecknCatalog @Default constructor(
   val bppProviders: List<ProviderCatalog>? = null,
 )
 
-data class ProviderCatalog(
+data class ProviderCatalog @Default constructor(
   val id: String? = null,
   val descriptor: Descriptor? = null,
   val categories: List<Category>? = null,

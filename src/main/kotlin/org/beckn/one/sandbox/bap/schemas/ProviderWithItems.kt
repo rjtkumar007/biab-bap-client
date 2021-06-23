@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.schemas
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.beckn.one.sandbox.bap.Default
 
 data class ProviderWithItems(
   val provider: Provider,
@@ -17,10 +18,10 @@ data class Provider(
   val images: List<String>?
 )
 
-data class Category(
+data class Category @Default constructor(
   val id: String,
   val name: String,
-  val descriptor: String,
+  val descriptor: Descriptor,
   val tags: Map<String, String>? = null
 )
 
@@ -32,13 +33,13 @@ data class Offer(
   @JsonProperty("item_ids") val itemIds: List<String>
 )
 
-data class Item(
-  val id: String,
-  val name: String,
+data class Item @Default constructor(
+  val id: String? = null,
+  val name: String? = null,
   @JsonProperty("parent_item_id") val parentItemId: String? = null,
-  val descriptor: String,
-  val price: Price,
-  @JsonProperty("category_id") val categoryId: String,
+  val descriptor: Descriptor? = null,
+  val price: Price? = null,
+  @JsonProperty("category_id") val categoryId: String? = null,
   val images: List<String>? = null,
   val tags: Map<String, String>? = null,
   val attributes: Map<String, String>? = null,
@@ -46,13 +47,13 @@ data class Item(
   @JsonProperty("configurable_attributes") val configurableAttributes: List<ConfigurableItemAttribute>? = null
 )
 
-data class AddOn(
+data class AddOn @Default constructor(
   val id: String,
   val descriptor: String,
   val price: Price
 )
 
-data class Price(
+data class Price @Default constructor(
   @JsonProperty("estimated_value") val estimated: String,
   @JsonProperty("computed_value") val computed: String,
   @JsonProperty("listed_value") val listed: String,
@@ -61,7 +62,7 @@ data class Price(
   @JsonProperty("maximum_value") val maximum: String
 )
 
-data class ConfigurableItemAttribute(
+data class ConfigurableItemAttribute @Default constructor(
   val name: String,
   val permissibleValues: List<String>
 )

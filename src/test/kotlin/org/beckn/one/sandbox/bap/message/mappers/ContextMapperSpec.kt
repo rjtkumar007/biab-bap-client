@@ -28,7 +28,7 @@ class ContextMapperSpec @Autowired constructor(
   @Value("\${context.bap_uri}") private val bapUri: String,
 ) : DescribeSpec() {
   init {
-    describe("Map Context") {
+    describe("ContextMapper") {
       it("should map all fields from schema to entity") {
         val schema = contextFactory.create()
 

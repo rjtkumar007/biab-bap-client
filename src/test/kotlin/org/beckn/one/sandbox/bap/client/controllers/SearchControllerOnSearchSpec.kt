@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.client.controllers
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
+import org.beckn.one.sandbox.bap.message.mappers.ContextMapper
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
@@ -25,6 +26,7 @@ class SearchControllerOnSearchSpec @Autowired constructor(
   val mockMvc: MockMvc,
   val uuidFactory: UuidFactory,
   val contextFactory: ContextFactory,
+  val contextMapper: ContextMapper,
   val messageRepository: GenericRepository<Message>,
   val searchResponseRepository: GenericRepository<SearchResponse>
 ) : DescribeSpec() {

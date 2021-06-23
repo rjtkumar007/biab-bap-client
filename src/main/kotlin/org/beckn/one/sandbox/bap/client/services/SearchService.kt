@@ -1,12 +1,15 @@
 package org.beckn.one.sandbox.bap.client.services
 
+import arrow.core.Either.Right
 import arrow.core.flatMap
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.message.entities.Message
+import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.services.MessageService
-import org.beckn.one.sandbox.bap.schemas.Context
+import org.beckn.one.sandbox.bap.message.services.SearchResponseStoreService
 import org.beckn.one.sandbox.bap.schemas.BecknResponse
+import org.beckn.one.sandbox.bap.schemas.Context
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
-import org.beckn.one.sandbox.bap.schemas.SearchResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +21,8 @@ class SearchService(
   @Autowired val registryService: RegistryService,
   @Autowired val gatewayService: GatewayService,
   @Autowired val messageService: MessageService,
+  @Autowired val searchResponseStoreService: SearchResponseStoreService,
+  @Autowired val catalogMapper: CatalogMapper,
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
@@ -41,20 +46,23 @@ class SearchService(
       )
   }
 
-  fun onSearch(context: Context): ResponseEntity<SearchResponse> {
+  fun onSearch(context: Context): ResponseEntity<ClientSearchResponse> {
     log.info("Got on search request for message id: {}", context.messageId)
-    return messageService.findById(context.messageId)
+    return messageService
+      .findById(context.messageId)
+      .flatMap { searchResponseStoreService.findByMessageId(context.messageId) }
+      .flatMap { resEntity -> Right(resEntity.map { res -> catalogMapper.entityToSchema(res.message) }) }
       .fold(
         {
-          log.error("Error when finding message by id. Error: {}", it)
+          log.error("Error when finding search response by message id. Error: {}", it)
           ResponseEntity
             .status(it.status().value())
-            .body(SearchResponse(context = context, error = it.error()))
+            .body(ClientSearchResponse(context = context, error = it.error()))
         },
         {
-          log.info("Successfully initiated Search")
+          log.info("Found {} responses for message {}", it.size, context.messageId)
           ResponseEntity
-            .ok(SearchResponse(context = context))
+            .ok(ClientSearchResponse(context = context, message = it))
         }
       )
   }

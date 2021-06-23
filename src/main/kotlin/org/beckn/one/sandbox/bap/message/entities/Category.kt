@@ -1,6 +1,8 @@
 package org.beckn.one.sandbox.bap.message.entities
 
-data class Category(
+import org.beckn.one.sandbox.bap.Default
+
+data class Category @Default constructor(
   val _id: String? = null,
   val id: String? = null,
   val children: List<String> = emptyList(),

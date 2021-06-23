@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.services.SearchService
 import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
@@ -17,8 +18,6 @@ class SearchController @Autowired constructor(
   val searchService: SearchService,
   val contextFactory: ContextFactory
 ) {
-  val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
-
   @RequestMapping("/v1/search")
   @ResponseBody
   fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<BecknResponse> =
@@ -42,7 +41,7 @@ class SearchController @Autowired constructor(
           ),
           items = listOf(
             Item(
-              id = "it-1", name = "Sugar", parentItemId = "pid-1", descriptor = "Very sweet",
+              id = "it-1", name = "Sugar", parentItemId = "pid-1", descriptor = Descriptor("Very sweet"),
               price = Price(
                 estimated = "1", computed = "2", listed = "3", offered = "4", minimum = "5", maximum = "6"
               ),
@@ -52,8 +51,8 @@ class SearchController @Autowired constructor(
             )
           ),
           categories = listOf(
-            Category(id = "cat-1", name = "Groceries", descriptor = "Grocery items"),
-            Category(id = "cat-2", name = "Perishable Items", descriptor = "Perishable items")
+            Category(id = "cat-1", name = "Groceries", descriptor = Descriptor(name = "Grocery items")),
+            Category(id = "cat-2", name = "Perishable Items", descriptor = Descriptor(name = "Perishable items"))
           ),
           offers = listOf(),
         )
@@ -63,7 +62,6 @@ class SearchController @Autowired constructor(
 
   @RequestMapping("/v1/on_search")
   @ResponseBody
-  fun onSearchV1(@RequestParam messageId: String): ResponseEntity<SearchResponse> =
+  fun onSearchV1(@RequestParam messageId: String): ResponseEntity<ClientSearchResponse> =
     searchService.onSearch(contextFactory.create(messageId = messageId))
-
 }
