@@ -20,6 +20,10 @@ repositories {
 dependencies {
   val retrofitVersion = "2.9.+"
 
+  kapt("io.arrow-kt:arrow-meta:0.13.2")
+  kapt("org.mapstruct:mapstruct-processor:1.4.2.Final")
+  kapt("org.mapstruct:mapstruct-jdk8:1.4.2.Final")
+
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.+")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-web")
@@ -33,8 +37,7 @@ dependencies {
   implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
   implementation("com.squareup.retrofit2:retrofit-mock:$retrofitVersion")
   implementation("org.litote.kmongo:kmongo:4.2.7")
-
-  kapt("io.arrow-kt:arrow-meta:0.13.2")
+  implementation("org.mapstruct:mapstruct:1.4.2.Final")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("io.kotest:kotest-runner-junit5:4.4.3")

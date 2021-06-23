@@ -21,4 +21,28 @@ data class Context(
   val timestamp: LocalDateTime = LocalDateTime.now(clock),
   val key: String? = null,
   val ttl: Duration? = null,
-)
+) {
+  enum class Action(val value: String) {
+    SEARCH("search"),
+    SELECT("select"),
+    INIT("`init`"),
+    CONFIRM("confirm"),
+    UPDATE("update"),
+    STATUS("status"),
+    TRACK("track"),
+    CANCEL("cancel"),
+    FEEDBACK("feedback"),
+    SUPPORT("support"),
+    ON_SEARCH("on_search"),
+    ON_SELECT("on_select"),
+    ON_INIT("on_init"),
+    ON_CONFIRM("on_confirm"),
+    ON_UPDATE("on_update"),
+    ON_STATUS("on_status"),
+    ON_TRACK("on_track"),
+    ON_CANCEL("on_cancel"),
+    ON_FEEDBACK("on_feedback"),
+    ON_SUPPORT("on_support"),
+    ACK("ack"),
+  }
+}

@@ -1,7 +1,6 @@
 package org.beckn.one.sandbox.bap.schemas.factories
 
 import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
-import org.beckn.one.sandbox.bap.schemas.Action
 import org.beckn.one.sandbox.bap.schemas.Context
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -14,7 +13,7 @@ class ContextFactory @Autowired constructor(
   @Value("\${context.city}") private val city: String,
   @Value("\${context.country}") private val country: String,
   @Value("\${context.bap_id}") private val bapId: String,
-  @Value("\${context.bap_url}") private val bapUrl: String,
+  @Value("\${context.bap_uri}") private val bapUrl: String,
   private val uuidFactory: UuidFactory,
   private val clock: Clock = Clock.systemUTC()
 ) {
@@ -22,7 +21,7 @@ class ContextFactory @Autowired constructor(
     domain = domain,
     country = country,
     city = city,
-    action = Action.search,
+    action = Context.Action.SEARCH,
     coreVersion = ProtocolVersion.V0_9_1.value,
     bapId = bapId,
     bapUri = bapUrl,

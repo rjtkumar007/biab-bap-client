@@ -1,7 +1,10 @@
 package org.beckn.one.sandbox.bap.message.entities
 
-data class Context (
+import com.fasterxml.jackson.annotation.JsonIgnore
+import java.time.Clock
+import java.time.LocalDateTime
 
+data class Context(
   val domain: Domain,
   val country: String,
   val city: String,
@@ -13,14 +16,12 @@ data class Context (
   val bppUri: String? = null,
   val transactionId: String,
   val messageId: String,
-  val timestamp: java.time.LocalDateTime,
+  @JsonIgnore val clock: Clock = Clock.systemUTC(),
+  val timestamp: java.time.LocalDateTime = LocalDateTime.now(clock),
   val key: String? = null,
   val ttl: Duration? = null
 ) {
-
-
-
-  enum class Action(val value: String){
+  enum class Action(val value: String) {
     SEARCH("search"),
     SELECT("select"),
     INIT("init"),
@@ -31,17 +32,17 @@ data class Context (
     CANCEL("cancel"),
     FEEDBACK("feedback"),
     SUPPORT("support"),
-    ONSEARCH("on_search"),
-    ONSELECT("on_select"),
-    ONINIT("on_init"),
-    ONCONFIRM("on_confirm"),
-    ONUPDATE("on_update"),
-    ONSTATUS("on_status"),
-    ONTRACK("on_track"),
-    ONCANCEL("on_cancel"),
-    ONFEEDBACK("on_feedback"),
-    ONSUPPORT("on_support"),
-    ACK("ack");
+    ON_SEARCH("on_search"),
+    ON_SELECT("on_select"),
+    ON_INIT("on_init"),
+    ON_CONFIRM("on_confirm"),
+    ON_UPDATE("on_update"),
+    ON_STATUS("on_status"),
+    ON_TRACK("on_track"),
+    ON_CANCEL("on_cancel"),
+    ON_FEEDBACK("on_feedback"),
+    ON_SUPPORT("on_support"),
+    ACK("ack"),
   }
 }
 

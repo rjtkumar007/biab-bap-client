@@ -43,7 +43,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
       city = City.Bengaluru.value,
       country = Country.India.value,
       bapId = "beckn_in_a_box_bap",
-      bapUrl = "beckn_in_a_box_bap.com",
+      bapUri = "beckn_in_a_box_bap.com",
       gatewayServiceClientFactory = gatewayServiceClientFactory,
       contextFactory = contextFactory
     )

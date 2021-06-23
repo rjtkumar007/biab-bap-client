@@ -23,7 +23,7 @@ class GatewayService @Autowired constructor(
   @Value("\${context.city}") val city: String,
   @Value("\${context.country}") val country: String,
   @Value("\${context.bap_id}") val bapId: String,
-  @Value("\${context.bap_url}") val bapUrl: String,
+  @Value("\${context.bap_uri}") val bapUri: String,
   val gatewayServiceClientFactory: GatewayServiceClientFactory,
   val contextFactory: ContextFactory
 ) {
