@@ -5,9 +5,9 @@ import org.beckn.one.sandbox.bap.Default
 
 data class ProviderWithItems(
   val provider: Provider,
-  val items: List<Item>,
-  val categories: List<Category>,
-  val offers: List<Offer>,
+  val items: List<ProtocolItem>,
+  val categories: List<ProtocolCategory>,
+  val offers: List<ProtocolOffer>,
 )
 
 data class Provider(
@@ -18,14 +18,14 @@ data class Provider(
   val images: List<String>?
 )
 
-data class Category @Default constructor(
+data class ProtocolCategory @Default constructor(
   val id: String,
   val name: String,
-  val descriptor: Descriptor,
+  val descriptor: ProtocolDescriptor,
   val tags: Map<String, String>? = null
 )
 
-data class Offer(
+data class ProtocolOffer(
   val id: String,
   val name: String,
   val descriptor: String,
@@ -33,27 +33,27 @@ data class Offer(
   @JsonProperty("item_ids") val itemIds: List<String>
 )
 
-data class Item @Default constructor(
+data class ProtocolItem @Default constructor(
   val id: String? = null,
   val name: String? = null,
   @JsonProperty("parent_item_id") val parentItemId: String? = null,
-  val descriptor: Descriptor? = null,
-  val price: Price? = null,
+  val descriptor: ProtocolDescriptor? = null,
+  val price: ProtocolPrice? = null,
   @JsonProperty("category_id") val categoryId: String? = null,
   val images: List<String>? = null,
   val tags: Map<String, String>? = null,
   val attributes: Map<String, String>? = null,
-  val addons: List<AddOn>? = null,
-  @JsonProperty("configurable_attributes") val configurableAttributes: List<ConfigurableItemAttribute>? = null
+  val addons: List<ProtocolAddOn>? = null,
+  @JsonProperty("configurable_attributes") val configurableAttributes: List<ProtocolConfigurableItemAttribute>? = null
 )
 
-data class AddOn @Default constructor(
+data class ProtocolAddOn @Default constructor(
   val id: String,
-  val descriptor: String,
-  val price: Price
+  val descriptor: ProtocolDescriptor,
+  val price: ProtocolPrice
 )
 
-data class Price @Default constructor(
+data class ProtocolPrice @Default constructor(
   @JsonProperty("estimated_value") val estimated: String,
   @JsonProperty("computed_value") val computed: String,
   @JsonProperty("listed_value") val listed: String,
@@ -62,7 +62,7 @@ data class Price @Default constructor(
   @JsonProperty("maximum_value") val maximum: String
 )
 
-data class ConfigurableItemAttribute @Default constructor(
+data class ProtocolConfigurableItemAttribute @Default constructor(
   val name: String,
   val permissibleValues: List<String>
 )

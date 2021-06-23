@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.schemas
 
 import org.beckn.one.sandbox.bap.Default
 
-data class Descriptor @Default constructor(
+data class ProtocolDescriptor @Default constructor(
   val name: String?,
   val code: String? = null,
   val symbol: String? = null,

@@ -7,7 +7,7 @@ import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.schemas.Intent
 import org.beckn.one.sandbox.bap.schemas.Request
-import org.beckn.one.sandbox.bap.schemas.BecknResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.beckn.one.sandbox.bap.schemas.ResponseStatus
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
@@ -29,7 +29,7 @@ class GatewayService @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
 
-  fun search(gateway: SubscriberDto, queryString: String?): Either<GatewaySearchError, BecknResponse> {
+  fun search(gateway: SubscriberDto, queryString: String?): Either<GatewaySearchError, ProtocolResponse> {
     return try {
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
@@ -52,9 +52,9 @@ class GatewayService @Autowired constructor(
     }
   }
 
-  private fun isInternalServerError(httpResponse: retrofit2.Response<BecknResponse>) =
+  private fun isInternalServerError(httpResponse: retrofit2.Response<ProtocolResponse>) =
     httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
 
-  private fun isAckNegative(httpResponse: retrofit2.Response<BecknResponse>) =
+  private fun isAckNegative(httpResponse: retrofit2.Response<ProtocolResponse>) =
     httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
 }

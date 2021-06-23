@@ -4,8 +4,6 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.services.SearchService
 import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
@@ -20,13 +18,13 @@ class SearchController @Autowired constructor(
 ) {
   @RequestMapping("/v1/search")
   @ResponseBody
-  fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<BecknResponse> =
+  fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<ProtocolResponse> =
     searchService.search(contextFactory.create(), searchString)
 
   @RequestMapping("/v0/search")
   @ResponseBody
-  fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<BecknResponse> {
-    return ResponseEntity.ok(BecknResponse(context = contextFactory.create(), message = ResponseMessage.ack()))
+  fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<ProtocolResponse> {
+    return ResponseEntity.ok(ProtocolResponse(context = contextFactory.create(), message = ResponseMessage.ack()))
   }
 
   @RequestMapping("/v0/on_search")
@@ -40,9 +38,9 @@ class SearchController @Autowired constructor(
             descriptor = "Your local grocery", images = listOf("/localbaniya")
           ),
           items = listOf(
-            Item(
-              id = "it-1", name = "Sugar", parentItemId = "pid-1", descriptor = Descriptor("Very sweet"),
-              price = Price(
+            ProtocolItem(
+              id = "it-1", name = "Sugar", parentItemId = "pid-1", descriptor = ProtocolDescriptor("Very sweet"),
+              price = ProtocolPrice(
                 estimated = "1", computed = "2", listed = "3", offered = "4", minimum = "5", maximum = "6"
               ),
               categoryId = "cat-1", images = listOf("/imageA", "/imageB"),
@@ -51,8 +49,8 @@ class SearchController @Autowired constructor(
             )
           ),
           categories = listOf(
-            Category(id = "cat-1", name = "Groceries", descriptor = Descriptor(name = "Grocery items")),
-            Category(id = "cat-2", name = "Perishable Items", descriptor = Descriptor(name = "Perishable items"))
+            ProtocolCategory(id = "cat-1", name = "Groceries", descriptor = ProtocolDescriptor(name = "Grocery items")),
+            ProtocolCategory(id = "cat-2", name = "Perishable Items", descriptor = ProtocolDescriptor(name = "Perishable items"))
           ),
           offers = listOf(),
         )

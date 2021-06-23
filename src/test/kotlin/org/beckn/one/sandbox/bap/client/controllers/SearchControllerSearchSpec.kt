@@ -9,7 +9,7 @@ import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.BecknResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.beckn.one.sandbox.bap.schemas.ResponseStatus.ACK
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.hamcrest.CoreMatchers.`is`
@@ -83,7 +83,7 @@ class SearchControllerSearchSpec @Autowired constructor(
           .andReturn()
 
         MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
-        val searchResponse = objectMapper.readValue(result.response.contentAsString, BecknResponse::class.java)
+        val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolResponse::class.java)
         val savedMessage = messageRepository.findOne(Message::id eq searchResponse.context.messageId)
         savedMessage shouldNotBe null
         savedMessage?.id shouldBe searchResponse.context.messageId

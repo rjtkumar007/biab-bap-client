@@ -2,7 +2,9 @@ package org.beckn.one.sandbox.bap.message.mappers
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
+import org.beckn.one.sandbox.bap.message.entities.Catalog
+import org.beckn.one.sandbox.bap.message.entities.Item
+import org.beckn.one.sandbox.bap.message.entities.ProviderCatalog
 import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -26,11 +28,14 @@ class CatalogMapperSpec @Autowired constructor(
 
         val mappedEntity = mapper.schemaToEntity(catalog1Schema)
 
-        mappedEntity.bppProviders shouldNotBe null
-        mappedEntity.bppProviders?.size shouldBe 1
-        mappedEntity.bppProviders?.first()?.id shouldBe catalog1Schema.bppProviders?.first()?.id
-        mappedEntity.bppProviders?.first()?.items?.size shouldBe 1
-        mappedEntity.bppProviders?.first()?.items?.first()?.id shouldBe catalog1Schema.bppProviders?.first()?.items?.first()?.id
+        mappedEntity shouldBe Catalog(
+          listOf(
+            ProviderCatalog(
+              id = "provider-1.com",
+              items = listOf(Item(id = "Item_1"))
+            )
+          )
+        )
       }
     }
   }

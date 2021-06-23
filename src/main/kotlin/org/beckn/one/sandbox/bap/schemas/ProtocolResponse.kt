@@ -5,14 +5,14 @@ interface Response {
   val error: Error?
 }
 
-data class BecknResponse(
+data class ProtocolResponse(
   override val context: Context,
   val message: ResponseMessage,
   override val error: Error? = null,
 ) : Response
 
 data class SearchResponse(
-    override val context: Context,
-    val message: List<BecknCatalog>? = null,
-    override val error: Error? = null,
+  override val context: Context,
+  val message: List<ProtocolCatalog>? = null,
+  override val error: Error? = null,
 ) : Response
