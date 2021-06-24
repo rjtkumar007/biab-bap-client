@@ -4,30 +4,57 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.message.entities.*
 import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
+import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
+import java.time.Clock
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-class CatalogMapperSpec @Autowired constructor(
-  private val mapper: CatalogMapper
+class SearchResponseMapperSpec @Autowired constructor(
+  private val mapper: SearchResponseMapper
 ) : DescribeSpec() {
   val catalogFactory = CatalogFactory()
 
+  private val fixedClock = Clock.fixed(
+    Instant.parse("2018-11-30T18:35:24.00Z"),
+    ZoneId.of("Asia/Calcutta")
+  )
+
   init {
-    describe("CatalogMapper") {
+    describe("SearchResponseMapper") {
       it("should map all fields from schema to entity") {
-        val catalog1Schema = catalogFactory.create()
+        val protocolSearchResponse = ProtocolSearchResponse(
+          message = ProtocolSearchResponseMessage(
+            catalogFactory.create(1)
+          ),
+          context = org.beckn.one.sandbox.bap.schemas.Context(
+            domain = "LocalRetail",
+            country = "IN",
+            action = org.beckn.one.sandbox.bap.schemas.Context.Action.SEARCH,
+            city = "Pune",
+            coreVersion = "0.9.1-draft03",
+            bapId = "http://host.bap.com",
+            bapUri = "http://host.bap.com",
+            transactionId = "222",
+            messageId = "222",
+            timestamp = LocalDateTime.now(fixedClock)
+          )
+        )
+        val mappedEntity = mapper.schemaToEntity(protocolSearchResponse)
 
-        val mappedEntity = mapper.schemaToEntity(catalog1Schema)
-
-        mappedEntity shouldBe
-            Catalog(
+        mappedEntity shouldBe SearchResponse(
+          message = SearchResponseMessage(
+            catalog = Catalog(
               bppProviders = listOf(
                 ProviderCatalog(
                   id = "provider-1",
@@ -63,6 +90,20 @@ class CatalogMapperSpec @Autowired constructor(
                 )
               )
             )
+          ),
+          context = Context(
+            domain = "LocalRetail",
+            country = "IN",
+            action = Context.Action.SEARCH,
+            city = "Pune",
+            coreVersion = "0.9.1-draft03",
+            bapId = "http://host.bap.com",
+            bapUri = "http://host.bap.com",
+            transactionId = "222",
+            messageId = "222",
+            timestamp = LocalDateTime.now(fixedClock)
+          )
+        )
       }
     }
   }

@@ -20,7 +20,7 @@ class CatalogMapperSpec @Autowired constructor(
   val catalogFactory = CatalogFactory()
 
   init {
-    describe("SearchResponseMapper") {
+    describe("CatalogMapper") {
       it("should map all fields from schema to entity") {
         val catalog1Schema = catalogFactory.create()
 
