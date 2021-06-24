@@ -10,6 +10,8 @@ import org.beckn.one.sandbox.bap.configurations.TestDatabaseConfiguration
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
+import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
+import org.beckn.one.sandbox.bap.message.mappers.CatalogMapperImpl
 import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapper
 import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapperImpl
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
@@ -27,11 +29,13 @@ import java.time.ZoneId
     TestDatabaseConfiguration::class,
     DatabaseConfiguration::class,
     SearchResponseStoreService::class,
-    SearchResponseMapperImpl::class
+    SearchResponseMapperImpl::class,
+    CatalogMapperImpl::class
   ]
 )
 internal class SearchResponseStoreServiceSpec @Autowired constructor(
   val searchResponseMapper: SearchResponseMapper,
+  val catalogMapper: CatalogMapper,
   val searchResponseStoreService: SearchResponseStoreService,
   @Qualifier("search-repo") val searchResponseRepo: BecknResponseRepository<SearchResponse>
 ) : DescribeSpec() {
@@ -83,7 +87,7 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
         val response = searchResponseStoreService.findByMessageId(context.messageId)
 
         it("should respond with either.right containing the search results") {
-          response.shouldBeRight(listOf(searchResponse))
+          response.shouldBeRight(listOf(schemaSearchResponse))
         }
       }
 

@@ -1,14 +1,13 @@
 package org.beckn.one.sandbox.bap.client.services
 
-import arrow.core.Either.Right
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.dtos.ClientOnSearchResponse
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.services.MessageService
 import org.beckn.one.sandbox.bap.message.services.SearchResponseStoreService
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.beckn.one.sandbox.bap.schemas.Context
+import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -51,7 +50,7 @@ class SearchService(
     return messageService
       .findById(context.messageId)
       .flatMap { searchResponseStoreService.findByMessageId(context.messageId) }
-      .flatMap { resEntity -> Right(resEntity.map { res -> catalogMapper.entityToSchema(res.message) }) }
+      .map { it.mapNotNull { response -> response.message } }
       .fold(
         {
           log.error("Error when finding search response by message id. Error: {}", it)

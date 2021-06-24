@@ -29,11 +29,15 @@ class SearchResponseStoreService @Autowired constructor(
       }
     )
 
-
   fun findByMessageId(id: String) = Either
     .catch { searchResponseRepo.findByMessageId(id) }
+    .map { toSchema(it) }
     .mapLeft { e ->
       log.error("Exception while fetching search response", e)
       DatabaseError.OnRead
     }
+
+  private fun toSchema(allResponses: List<SearchResponse>) = allResponses.mapNotNull {
+    response -> if(response.error == null) searchResponseMapper.entityToSchema(response) else null
+  }
 }
