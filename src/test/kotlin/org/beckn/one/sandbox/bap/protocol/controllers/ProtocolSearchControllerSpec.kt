@@ -50,10 +50,10 @@ internal class ProtocolSearchControllerSpec : DescribeSpec() {
     ZoneId.of("Asia/Calcutta")
   )
 
-  private val context = org.beckn.one.sandbox.bap.schemas.Context(
+  private val context = org.beckn.one.sandbox.bap.schemas.ProtocolContext(
     domain = "LocalRetail",
     country = "IN",
-    action = org.beckn.one.sandbox.bap.schemas.Context.Action.SEARCH,
+    action = org.beckn.one.sandbox.bap.schemas.ProtocolContext.Action.SEARCH,
     city = "Pune",
     coreVersion = "0.9.1-draft03",
     bapId = "http://host.bap.com",

@@ -2,17 +2,18 @@ package org.beckn.one.sandbox.bap.client.services
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
+import org.beckn.one.sandbox.bap.client.external.gateway.GatewayServiceClient
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
-import org.beckn.one.sandbox.bap.schemas.Intent
-import org.beckn.one.sandbox.bap.schemas.Request
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
-import org.beckn.one.sandbox.bap.schemas.ResponseMessage.Companion.nack
-import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
-import org.beckn.one.sandbox.bap.client.external.gateway.GatewayServiceClient
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
+import org.beckn.one.sandbox.bap.schemas.Intent
+import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolSearchRequest
+import org.beckn.one.sandbox.bap.schemas.ProtocolSearchRequestMessage
+import org.beckn.one.sandbox.bap.schemas.ResponseMessage.Companion.nack
+import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.junit.jupiter.api.Assertions
 import org.mockito.Mockito.*
@@ -107,9 +108,9 @@ internal class GatewayServiceSpec : DescribeSpec() {
     }
   }
 
-  private fun getRequest() = Request(
+  private fun getRequest() = ProtocolSearchRequest(
     contextFactory.create(),
-    Intent(queryString = queryString)
+    ProtocolSearchRequestMessage(Intent(queryString = queryString))
   )
 
 }

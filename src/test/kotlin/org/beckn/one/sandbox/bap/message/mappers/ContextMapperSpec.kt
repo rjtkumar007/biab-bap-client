@@ -68,7 +68,7 @@ class ContextMapperSpec @Autowired constructor(
         mappedSchema.domain shouldBe entity.domain
         mappedSchema.country shouldBe entity.country
         mappedSchema.city shouldBe entity.city
-        mappedSchema.action shouldBe org.beckn.one.sandbox.bap.schemas.Context.Action.SEARCH
+        mappedSchema.action shouldBe org.beckn.one.sandbox.bap.schemas.ProtocolContext.Action.SEARCH
         mappedSchema.coreVersion shouldBe entity.coreVersion
         mappedSchema.bapId shouldBe entity.bapId
         mappedSchema.bapUri shouldBe entity.bapUri

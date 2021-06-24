@@ -5,10 +5,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
-import org.beckn.one.sandbox.bap.schemas.Intent
-import org.beckn.one.sandbox.bap.schemas.Request
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
-import org.beckn.one.sandbox.bap.schemas.ResponseStatus
+import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -34,7 +31,7 @@ class GatewayService @Autowired constructor(
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
       val httpResponse = gatewayServiceClient.search(
-        Request(contextFactory.create(), Intent(queryString = queryString))
+        ProtocolSearchRequest(contextFactory.create(), ProtocolSearchRequestMessage(Intent(queryString = queryString)))
       ).execute()
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       when {

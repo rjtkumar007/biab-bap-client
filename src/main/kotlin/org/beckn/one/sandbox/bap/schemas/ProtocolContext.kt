@@ -6,7 +6,7 @@ import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
 
-data class Context @Default constructor(
+data class ProtocolContext @Default constructor(
   val domain: String,
   val country: String,
   val city: String,

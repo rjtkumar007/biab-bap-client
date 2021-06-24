@@ -7,7 +7,7 @@ import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.services.MessageService
 import org.beckn.one.sandbox.bap.message.services.SearchResponseStoreService
-import org.beckn.one.sandbox.bap.schemas.Context
+import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.slf4j.Logger
@@ -26,7 +26,7 @@ class SearchService(
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun search(context: Context, queryString: String?): ResponseEntity<ProtocolResponse> {
+  fun search(context: ProtocolContext, queryString: String?): ResponseEntity<ProtocolResponse> {
     log.info("Got search request: {}", queryString)
     return registryService
       .lookupGateways()
@@ -46,7 +46,7 @@ class SearchService(
       )
   }
 
-  fun onSearch(context: Context): ResponseEntity<ClientSearchResponse> {
+  fun onSearch(context: ProtocolContext): ResponseEntity<ClientSearchResponse> {
     log.info("Got on search request for message id: {}", context.messageId)
     return messageService
       .findById(context.messageId)

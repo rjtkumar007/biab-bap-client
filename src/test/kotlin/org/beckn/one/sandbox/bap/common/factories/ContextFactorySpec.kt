@@ -6,7 +6,7 @@ import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
-import org.beckn.one.sandbox.bap.schemas.Context
+import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.mockito.Mockito.`when`
@@ -39,7 +39,7 @@ internal class ContextFactorySpec : DescribeSpec() {
         context.domain shouldBe Domain.Delivery.value
         context.country shouldBe Country.India.value
         context.city shouldBe City.Pune.value
-        context.action shouldBe Context.Action.SEARCH
+        context.action shouldBe ProtocolContext.Action.SEARCH
         context.coreVersion shouldBe ProtocolVersion.V0_9_1.value
         context.bapId shouldBe "bap 1"
         context.bapUri shouldBe "bap1.com"

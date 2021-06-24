@@ -1,16 +1,16 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
-import org.beckn.one.sandbox.bap.schemas.Context
+import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.Error
 import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
 
 interface ClientResponse {
-  val context: Context
+  val context: ProtocolContext
   val error: Error?
 }
 
 data class ClientSearchResponse(
-  override val context: Context,
+  override val context: ProtocolContext,
   val message: ClientSearchResponseMessage? = null,
   override val error: Error? = null,
 ) : ClientResponse

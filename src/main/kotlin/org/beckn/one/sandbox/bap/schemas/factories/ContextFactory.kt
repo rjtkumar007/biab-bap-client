@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.schemas.factories
 
 import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
-import org.beckn.one.sandbox.bap.schemas.Context
+import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -17,11 +17,11 @@ class ContextFactory @Autowired constructor(
   private val uuidFactory: UuidFactory,
   private val clock: Clock = Clock.systemUTC()
 ) {
-  fun create(transactionId: String = uuidFactory.create(), messageId: String = uuidFactory.create()) = Context(
+  fun create(transactionId: String = uuidFactory.create(), messageId: String = uuidFactory.create()) = ProtocolContext(
     domain = domain,
     country = country,
     city = city,
-    action = Context.Action.SEARCH,
+    action = ProtocolContext.Action.SEARCH,
     coreVersion = ProtocolVersion.V0_9_1.value,
     bapId = bapId,
     bapUri = bapUrl,
