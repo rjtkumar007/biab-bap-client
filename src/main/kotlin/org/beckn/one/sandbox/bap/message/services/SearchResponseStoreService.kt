@@ -19,15 +19,16 @@ class SearchResponseStoreService @Autowired constructor(
 ) {
   private val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun save(response: org.beckn.one.sandbox.bap.schemas.SearchResponse): Either<DatabaseError.OnWrite, org.beckn.one.sandbox.bap.schemas.SearchResponse> = Either
-    .catch { searchResponseRepo.insertOne(searchResponseMapper.schemaToEntity(response)) }
-    .bimap(
-      rightOperation = { response },
-      leftOperation = {
-        log.error("Exception while saving search response", it)
-        DatabaseError.OnWrite
-      }
-    )
+  fun save(response: org.beckn.one.sandbox.bap.schemas.SearchResponse): Either<DatabaseError.OnWrite, org.beckn.one.sandbox.bap.schemas.SearchResponse> =
+    Either
+      .catch { searchResponseRepo.insertOne(searchResponseMapper.schemaToEntity(response)) }
+      .bimap(
+        rightOperation = { response },
+        leftOperation = {
+          log.error("Exception while saving search response", it)
+          DatabaseError.OnWrite
+        }
+      )
 
   fun findByMessageId(id: String) = Either
     .catch { searchResponseRepo.findByMessageId(id) }
@@ -37,7 +38,8 @@ class SearchResponseStoreService @Autowired constructor(
       DatabaseError.OnRead
     }
 
-  private fun toSchema(allResponses: List<SearchResponse>) = allResponses.mapNotNull {
-    response -> if(response.error == null) searchResponseMapper.entityToSchema(response) else null
-  }
+  private fun toSchema(allResponses: List<SearchResponse>) =
+    allResponses.mapNotNull { response ->
+      if (response.error == null) searchResponseMapper.entityToSchema(response) else null
+    }
 }
