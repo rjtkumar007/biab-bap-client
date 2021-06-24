@@ -1,10 +1,16 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
+import org.beckn.one.sandbox.bap.client.dtos.ClientOnSearchResponse
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
+import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
+import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.mappers.ContextMapper
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
+import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.hamcrest.CoreMatchers.`is`
@@ -24,15 +30,20 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @TestPropertySource(locations = ["/application-test.yml"])
 class SearchControllerOnSearchSpec @Autowired constructor(
   val mockMvc: MockMvc,
+  val objectMapper: ObjectMapper,
   val uuidFactory: UuidFactory,
   val contextFactory: ContextFactory,
   val contextMapper: ContextMapper,
+  val catalogMapper: CatalogMapper,
   val messageRepository: GenericRepository<Message>,
   val searchResponseRepository: GenericRepository<SearchResponse>
 ) : DescribeSpec() {
+
   init {
 
     describe("On Search") {
+      val catalogFactory = CatalogFactory()
+
       it("should return error bad request response when message id is null") {
         mockMvc
           .perform(
@@ -53,6 +64,32 @@ class SearchControllerOnSearchSpec @Autowired constructor(
           .andExpect(jsonPath("$.error.code", `is`("BAP_008")))
           .andExpect(jsonPath("$.error.message", `is`("No message with the given ID")))
       }
+
+      it("should return search response when message id is valid") {
+        val message = messageRepository.insertOne(Message(id = uuidFactory.create(), type = Message.Type.Search))
+        val protocolCatalog1 = catalogFactory.create(index = 1)
+        val protocolCatalog2 = catalogFactory.create(index = 2)
+        mapToEntityAndPersist(message, protocolCatalog1)
+        mapToEntityAndPersist(message, protocolCatalog2)
+
+        val response = mockMvc
+          .perform(
+            get("/v1/on_search")
+              .param("messageId", message.id)
+          )
+          .andExpect(status().isOk)
+          .andExpect(jsonPath("$.message.length()", `is`(2)))
+          .andReturn()
+          .response
+        val onSearchResponse = objectMapper.readValue(response.contentAsString, ClientOnSearchResponse::class.java)
+        onSearchResponse.message shouldBe listOf(protocolCatalog1, protocolCatalog2)
+      }
     }
+  }
+
+  private fun mapToEntityAndPersist(message: Message, protocolCatalog: ProtocolCatalog) {
+    val context = contextMapper.fromSchema(contextFactory.create(messageId = message.id))
+    val entityCatalog = catalogMapper.schemaToEntity(protocolCatalog)
+    searchResponseRepository.insertOne(SearchResponse(context = context, message = entityCatalog))
   }
 }
