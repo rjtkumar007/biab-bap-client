@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.protocol.controllers
 
 import org.beckn.one.sandbox.bap.message.services.SearchResponseStoreService
-import org.beckn.one.sandbox.bap.schemas.BecknResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.beckn.one.sandbox.bap.schemas.SearchResponse
 import org.slf4j.LoggerFactory
@@ -32,11 +32,11 @@ class ProtocolSearchController @Autowired constructor(
         log.error("Error during persisting. Error: {}", it)
         ResponseEntity
           .status(it.status().value())
-          .body(BecknResponse(searchResponse.context, it.message(), it.error()))
+          .body(ProtocolResponse(searchResponse.context, it.message(), it.error()))
       },
       ifRight = {
         log.info("Successfully persisted response")
-        ResponseEntity.ok(BecknResponse(searchResponse.context, ResponseMessage.ack()))
+        ResponseEntity.ok(ProtocolResponse(searchResponse.context, ResponseMessage.ack()))
       }
     )
 

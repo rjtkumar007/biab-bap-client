@@ -13,6 +13,6 @@ data class ProtocolResponse(
 
 data class SearchResponse(
   override val context: Context,
-  val message: List<ProtocolCatalog>? = null,
+  val message: ProtocolCatalog? = null,
   override val error: Error? = null,
 ) : Response

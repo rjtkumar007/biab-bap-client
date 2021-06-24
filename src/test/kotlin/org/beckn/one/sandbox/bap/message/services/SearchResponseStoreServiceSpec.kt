@@ -62,7 +62,7 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
 
   init {
     describe("SearchResponseStore") {
-        val searchResponse = searchResponseMapper.fromSchema(schemaSearchResponse)
+        val searchResponse = searchResponseMapper.schemaToEntity(schemaSearchResponse)
 
       context("when save is called with search response") {
         searchResponseRepo.clear()
