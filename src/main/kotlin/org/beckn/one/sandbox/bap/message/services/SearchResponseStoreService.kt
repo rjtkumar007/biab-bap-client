@@ -19,7 +19,7 @@ class SearchResponseStoreService @Autowired constructor(
 ) {
   private val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun save(response: org.beckn.one.sandbox.bap.schemas.SearchResponse): Either<DatabaseError.OnWrite, org.beckn.one.sandbox.bap.schemas.SearchResponse> =
+  fun save(response: org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse): Either<DatabaseError.OnWrite, org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse> =
     Either
       .catch { searchResponseRepo.insertOne(searchResponseMapper.schemaToEntity(response)) }
       .bimap(

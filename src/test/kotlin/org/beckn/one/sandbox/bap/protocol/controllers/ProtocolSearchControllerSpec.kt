@@ -10,6 +10,7 @@ import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.services.SearchResponseStoreService
+import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -62,9 +63,9 @@ internal class ProtocolSearchControllerSpec : DescribeSpec() {
     timestamp = LocalDateTime.now(fixedClock)
   )
 
-  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.SearchResponse(
+  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse(
     context = context,
-    message = CatalogFactory().create(2)
+    message = ProtocolSearchResponseMessage(CatalogFactory().create(2))
   )
   init {
 

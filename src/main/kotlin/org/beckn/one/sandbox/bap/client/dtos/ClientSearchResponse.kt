@@ -9,7 +9,7 @@ interface ClientResponse {
   val error: Error?
 }
 
-data class ClientOnSearchResponse(
+data class ClientSearchResponse(
   override val context: Context,
   val message: List<ProtocolCatalog>? = null,
   override val error: Error? = null,

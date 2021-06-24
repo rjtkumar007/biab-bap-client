@@ -7,7 +7,7 @@ import org.beckn.one.sandbox.bap.configurations.TestDatabaseConfiguration
 import org.beckn.one.sandbox.bap.message.entities.Catalog
 import org.beckn.one.sandbox.bap.message.entities.Context
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
-import org.springframework.beans.factory.annotation.Autowired
+import org.beckn.one.sandbox.bap.message.entities.SearchResponseMessage
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.Clock
@@ -25,7 +25,7 @@ class BecknResponseRepositorySpec constructor(
       context("for SearchResponse") {
         val searchResponse = SearchResponse(
           context = context,
-          message = Catalog()
+          message = SearchResponseMessage(Catalog())
         )
 
         it("should fetch responses by message id") {

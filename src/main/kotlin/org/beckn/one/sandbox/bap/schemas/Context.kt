@@ -1,11 +1,12 @@
 package org.beckn.one.sandbox.bap.schemas
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import org.beckn.one.sandbox.bap.Default
 import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
 
-data class Context(
+data class Context @Default constructor(
   val domain: String,
   val country: String,
   val city: String,

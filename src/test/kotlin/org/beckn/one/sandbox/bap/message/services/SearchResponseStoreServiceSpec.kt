@@ -15,6 +15,7 @@ import org.beckn.one.sandbox.bap.message.mappers.CatalogMapperImpl
 import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapper
 import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapperImpl
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
+import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -59,14 +60,14 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
     timestamp = LocalDateTime.now(fixedClock)
   )
 
-  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.SearchResponse(
+  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse(
     context = context,
-    message = CatalogFactory().create(2)
+    message = ProtocolSearchResponseMessage(CatalogFactory().create(2))
   )
 
   init {
     describe("SearchResponseStore") {
-        val searchResponse = searchResponseMapper.schemaToEntity(schemaSearchResponse)
+      val searchResponse = searchResponseMapper.schemaToEntity(schemaSearchResponse)
 
       context("when save is called with search response") {
         searchResponseRepo.clear()
@@ -92,8 +93,8 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
       }
 
       context("when error is encountered while saving") {
-        val mockRepo = mock<BecknResponseRepository<SearchResponse>>{
-          onGeneric{ insertOne(searchResponse) }.thenThrow(MongoException("Write error"))
+        val mockRepo = mock<BecknResponseRepository<SearchResponse>> {
+          onGeneric { insertOne(searchResponse) }.thenThrow(MongoException("Write error"))
         }
         val failureSearchResponseService = SearchResponseStoreService(mockRepo, searchResponseMapper)
         val response = failureSearchResponseService.save(schemaSearchResponse)
@@ -104,8 +105,8 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
       }
 
       context("when error is encountered while fetching message by id") {
-        val mockRepo = mock<BecknResponseRepository<SearchResponse>>{
-          onGeneric{ findByMessageId(context.messageId) }.thenThrow(MongoException("Write error"))
+        val mockRepo = mock<BecknResponseRepository<SearchResponse>> {
+          onGeneric { findByMessageId(context.messageId) }.thenThrow(MongoException("Write error"))
         }
         val failureSearchResponseService = SearchResponseStoreService(mockRepo, searchResponseMapper)
         val response = failureSearchResponseService.findByMessageId(context.messageId)

@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.flatMap
-import org.beckn.one.sandbox.bap.client.dtos.ClientOnSearchResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.services.MessageService
@@ -45,23 +45,23 @@ class SearchService(
       )
   }
 
-  fun onSearch(context: Context): ResponseEntity<ClientOnSearchResponse> {
+  fun onSearch(context: Context): ResponseEntity<ClientSearchResponse> {
     log.info("Got on search request for message id: {}", context.messageId)
     return messageService
       .findById(context.messageId)
       .flatMap { searchResponseStoreService.findByMessageId(context.messageId) }
-      .map { it.mapNotNull { response -> response.message } }
+      .map { it.mapNotNull { response -> response.message?.catalog } }
       .fold(
         {
           log.error("Error when finding search response by message id. Error: {}", it)
           ResponseEntity
             .status(it.status().value())
-            .body(ClientOnSearchResponse(context = context, error = it.error()))
+            .body(ClientSearchResponse(context = context, error = it.error()))
         },
         {
           log.info("Found {} responses for message {}", it.size, context.messageId)
           ResponseEntity
-            .ok(ClientOnSearchResponse(context = context, message = it))
+            .ok(ClientSearchResponse(context = context, message = it))
         }
       )
   }

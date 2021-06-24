@@ -11,6 +11,6 @@ import org.mapstruct.ReportingPolicy
   injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
 interface SearchResponseMapper {
-  fun entityToSchema(entity: SearchResponse): org.beckn.one.sandbox.bap.schemas.SearchResponse
-  fun schemaToEntity(schema: org.beckn.one.sandbox.bap.schemas.SearchResponse): SearchResponse
+  fun entityToSchema(entity: SearchResponse): org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
+  fun schemaToEntity(schema: org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse): SearchResponse
 }

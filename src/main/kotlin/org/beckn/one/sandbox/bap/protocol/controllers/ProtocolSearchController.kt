@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.protocol.controllers
 import org.beckn.one.sandbox.bap.message.services.SearchResponseStoreService
 import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
-import org.beckn.one.sandbox.bap.schemas.SearchResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
@@ -25,7 +25,7 @@ class ProtocolSearchController @Autowired constructor(
     consumes = [MediaType.APPLICATION_JSON_VALUE],
     produces = [MediaType.APPLICATION_JSON_VALUE]
   )
-  fun onSearch(@RequestBody searchResponse: SearchResponse) = searchResponseStoreService
+  fun onSearch(@RequestBody searchResponse: ProtocolSearchResponse) = searchResponseStoreService
     .save(searchResponse)
     .fold(
       ifLeft = {

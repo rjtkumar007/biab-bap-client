@@ -3,9 +3,10 @@ package org.beckn.one.sandbox.bap.client.controllers
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.client.dtos.ClientOnSearchResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
+import org.beckn.one.sandbox.bap.message.entities.SearchResponseMessage
 import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
 import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.mappers.ContextMapper
@@ -81,7 +82,7 @@ class SearchControllerOnSearchSpec @Autowired constructor(
           .andExpect(jsonPath("$.message.length()", `is`(2)))
           .andReturn()
           .response
-        val onSearchResponse = objectMapper.readValue(response.contentAsString, ClientOnSearchResponse::class.java)
+        val onSearchResponse = objectMapper.readValue(response.contentAsString, ClientSearchResponse::class.java)
         onSearchResponse.message shouldBe listOf(protocolCatalog1, protocolCatalog2)
       }
     }
@@ -90,6 +91,11 @@ class SearchControllerOnSearchSpec @Autowired constructor(
   private fun mapToEntityAndPersist(message: Message, protocolCatalog: ProtocolCatalog) {
     val context = contextMapper.fromSchema(contextFactory.create(messageId = message.id))
     val entityCatalog = catalogMapper.schemaToEntity(protocolCatalog)
-    searchResponseRepository.insertOne(SearchResponse(context = context, message = entityCatalog))
+    searchResponseRepository.insertOne(
+      SearchResponse(
+        context = context,
+        message = SearchResponseMessage(entityCatalog)
+      )
+    )
   }
 }

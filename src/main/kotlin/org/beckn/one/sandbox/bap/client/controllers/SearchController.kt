@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
-import org.beckn.one.sandbox.bap.client.dtos.ClientOnSearchResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.services.SearchService
 import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
@@ -72,6 +72,6 @@ class SearchController @Autowired constructor(
 
   @RequestMapping("/v1/on_search")
   @ResponseBody
-  fun onSearchV1(@RequestParam messageId: String): ResponseEntity<ClientOnSearchResponse> =
+  fun onSearchV1(@RequestParam messageId: String): ResponseEntity<ClientSearchResponse> =
     searchService.onSearch(contextFactory.create(messageId = messageId))
 }
