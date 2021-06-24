@@ -28,14 +28,10 @@ import java.time.ZoneId
     SearchResponseStoreService::class
   ]
 )
-internal class SearchResponseStoreServiceSpec : DescribeSpec() {
-
-  @Autowired
-  private lateinit var searchResponseStoreService: SearchResponseStoreService
-
-  @Autowired
-  @Qualifier("search-repo")
-  private lateinit var searchResponseRepo: BecknResponseRepository<SearchResponse>
+internal class SearchResponseStoreServiceSpec @Autowired constructor(
+  val searchResponseStoreService: SearchResponseStoreService,
+  @Qualifier("search-repo") val searchResponseRepo: BecknResponseRepository<SearchResponse>
+) : DescribeSpec() {
 
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),

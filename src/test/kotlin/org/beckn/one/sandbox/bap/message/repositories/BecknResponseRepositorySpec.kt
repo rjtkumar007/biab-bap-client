@@ -16,11 +16,9 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 @SpringBootTest(classes = [TestDatabaseConfiguration::class, DatabaseConfiguration::class])
-class BecknResponseRepositorySpec : DescribeSpec() {
-  @Autowired
-  @Qualifier("search-repo")
-  private lateinit var repo: BecknResponseRepository<SearchResponse>
-
+class BecknResponseRepositorySpec constructor(
+  @Qualifier("search-repo") val repo: BecknResponseRepository<SearchResponse>
+) : DescribeSpec() {
   init {
     describe("Generic Repository") {
 

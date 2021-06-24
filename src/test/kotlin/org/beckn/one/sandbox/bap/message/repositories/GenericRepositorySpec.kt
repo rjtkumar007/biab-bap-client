@@ -12,16 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(classes = [TestDatabaseConfiguration::class])
-class GenericRepositorySpec : DescribeSpec() {
-  @Autowired
-  private lateinit var database: MongoDatabase
-
+class GenericRepositorySpec constructor(
+  val database: MongoDatabase
+) : DescribeSpec() {
   init {
     describe("Generic Repository") {
 
       context("for category") {
-        var categoryRepository = GenericRepository.create<Category>(database)
-
+        val categoryRepository = GenericRepository.create<Category>(database)
         val furniture = Category(
           id = "category/c1",
           descriptor = Descriptor(
