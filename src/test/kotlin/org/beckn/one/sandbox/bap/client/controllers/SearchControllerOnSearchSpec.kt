@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.entities.SearchResponseMessage
@@ -79,11 +80,11 @@ class SearchControllerOnSearchSpec @Autowired constructor(
               .param("messageId", message.id)
           )
           .andExpect(status().isOk)
-          .andExpect(jsonPath("$.message.length()", `is`(2)))
+          .andExpect(jsonPath("$.message.catalogs.length()", `is`(2)))
           .andReturn()
           .response
         val onSearchResponse = objectMapper.readValue(response.contentAsString, ClientSearchResponse::class.java)
-        onSearchResponse.message shouldBe listOf(protocolCatalog1, protocolCatalog2)
+        onSearchResponse.message shouldBe ClientSearchResponseMessage(listOf(protocolCatalog1, protocolCatalog2))
       }
     }
   }

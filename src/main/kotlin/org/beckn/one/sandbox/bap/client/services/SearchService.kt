@@ -2,6 +2,7 @@ package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.services.MessageService
@@ -61,7 +62,7 @@ class SearchService(
         {
           log.info("Found {} responses for message {}", it.size, context.messageId)
           ResponseEntity
-            .ok(ClientSearchResponse(context = context, message = it))
+            .ok(ClientSearchResponse(context = context, message = ClientSearchResponseMessage(it)))
         }
       )
   }

@@ -11,6 +11,10 @@ interface ClientResponse {
 
 data class ClientSearchResponse(
   override val context: Context,
-  val message: List<ProtocolCatalog>? = null,
+  val message: ClientSearchResponseMessage? = null,
   override val error: Error? = null,
 ) : ClientResponse
+
+data class ClientSearchResponseMessage(
+  val catalogs: List<ProtocolCatalog>? = null,
+)
