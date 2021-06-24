@@ -49,12 +49,6 @@ data class ProtocolItem @Default constructor(
   val tags: Map<String, String>? = null
 )
 
-data class ProtocolAddOn @Default constructor(
-  val id: String,
-  val descriptor: ProtocolDescriptor,
-  val price: ProtocolPrice
-)
-
 data class ProtocolPrice @Default constructor(
   val currency: String,
   val value: String,

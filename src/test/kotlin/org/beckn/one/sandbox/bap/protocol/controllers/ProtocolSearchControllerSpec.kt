@@ -43,7 +43,7 @@ internal class ProtocolSearchControllerSpec : DescribeSpec() {
   @Autowired
   @Qualifier("search-repo") private lateinit var searchResponseRepo: BecknResponseRepository<SearchResponse>
 
-  private val postOnSearchUrl = "/core/0.9.1-draft03/on_search"
+  private val postOnSearchUrl = "/v1/on_search"
 
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),
