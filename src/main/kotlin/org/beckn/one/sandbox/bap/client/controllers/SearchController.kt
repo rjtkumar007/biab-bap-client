@@ -16,7 +16,7 @@ class SearchController @Autowired constructor(
   val searchService: SearchService,
   val contextFactory: ContextFactory
 ) {
-  @RequestMapping("/v1/search")
+  @RequestMapping("/client/v1/search")
   @ResponseBody
   fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<ProtocolResponse> =
     searchService.search(contextFactory.create(), searchString)
@@ -70,7 +70,7 @@ class SearchController @Autowired constructor(
     )
   }
 
-  @RequestMapping("/v1/on_search")
+  @RequestMapping("/client/v1/on_search")
   @ResponseBody
   fun onSearchV1(@RequestParam messageId: String): ResponseEntity<ClientSearchResponse> =
     searchService.onSearch(contextFactory.create(messageId = messageId))

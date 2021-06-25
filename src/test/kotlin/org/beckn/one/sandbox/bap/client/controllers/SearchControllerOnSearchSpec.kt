@@ -49,7 +49,7 @@ class SearchControllerOnSearchSpec @Autowired constructor(
       it("should return error bad request response when message id is null") {
         mockMvc
           .perform(
-            get("/v1/on_search")
+            get("/client/v1/on_search")
               .param("messageId", null)
           )
           .andExpect(status().isBadRequest)
@@ -59,7 +59,7 @@ class SearchControllerOnSearchSpec @Autowired constructor(
         val nonExistentMessageId = uuidFactory.create()
         mockMvc
           .perform(
-            get("/v1/on_search")
+            get("/client/v1/on_search")
               .param("messageId", nonExistentMessageId)
           )
           .andExpect(status().isNotFound)
@@ -76,7 +76,7 @@ class SearchControllerOnSearchSpec @Autowired constructor(
 
         val response = mockMvc
           .perform(
-            get("/v1/on_search")
+            get("/client/v1/on_search")
               .param("messageId", message.id)
           )
           .andExpect(status().isOk)
