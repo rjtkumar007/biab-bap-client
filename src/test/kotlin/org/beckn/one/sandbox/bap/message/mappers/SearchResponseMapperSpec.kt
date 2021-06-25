@@ -37,10 +37,10 @@ class SearchResponseMapperSpec @Autowired constructor(
           message = ProtocolSearchResponseMessage(
             catalogFactory.create(1)
           ),
-          context = org.beckn.one.sandbox.bap.schemas.Context(
+          context = org.beckn.one.sandbox.bap.schemas.ProtocolContext(
             domain = "LocalRetail",
             country = "IN",
-            action = org.beckn.one.sandbox.bap.schemas.Context.Action.SEARCH,
+            action = org.beckn.one.sandbox.bap.schemas.ProtocolContext.Action.SEARCH,
             city = "Pune",
             coreVersion = "0.9.1-draft03",
             bapId = "http://host.bap.com",
