@@ -1,7 +1,6 @@
 package org.beckn.one.sandbox.bap.message.services
 
 import arrow.core.Either
-import org.beckn.one.sandbox.bap.client.services.SearchService
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.BecknResponse
 import org.beckn.one.sandbox.bap.message.mappers.GenericResponseMapper
@@ -17,7 +16,7 @@ class ResponseStoreService<Proto: ProtocolResponse, Entity: BecknResponse> @Auto
   val responseRepo: BecknResponseRepository<Entity>,
   val mapper: GenericResponseMapper<Proto, Entity>
 ) {
-  private val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
+  private val log: Logger = LoggerFactory.getLogger(ResponseStoreService::class.java)
 
   fun save(protoResponse: Proto): Either<DatabaseError.OnWrite, Proto> =
     Either
