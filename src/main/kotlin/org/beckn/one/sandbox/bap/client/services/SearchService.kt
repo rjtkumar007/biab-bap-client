@@ -4,9 +4,8 @@ import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.Message
-import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.services.MessageService
-import org.beckn.one.sandbox.bap.message.services.ResponseStoreService
+import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
@@ -20,7 +19,7 @@ class SearchService(
   @Autowired val registryService: RegistryService,
   @Autowired val gatewayService: GatewayService,
   @Autowired val messageService: MessageService,
-  @Autowired val searchResponseStoreService: ResponseStoreService<ProtocolSearchResponse, SearchResponse>
+  @Autowired val searchResponseStorageService: ResponseStorageService<ProtocolSearchResponse>
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
@@ -36,7 +35,7 @@ class SearchService(
     log.info("Got on search request for message id: {}", messageId)
     return messageService
       .findById(messageId)
-      .flatMap { searchResponseStoreService.findByMessageId(messageId) }
+      .flatMap { searchResponseStorageService.findByMessageId(messageId) }
       .map { it.mapNotNull { response -> response.message?.catalog } }
 
   }

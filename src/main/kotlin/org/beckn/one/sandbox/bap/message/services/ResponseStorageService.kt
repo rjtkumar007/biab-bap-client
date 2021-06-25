@@ -11,14 +11,19 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
+interface ResponseStorageService<Proto: ProtocolResponse> {
+  fun save(protoResponse: Proto): Either<DatabaseError.OnWrite, Proto>
+  fun findByMessageId(id: String): Either<DatabaseError.OnRead, List<Proto>>
+}
+
 @Service
-class ResponseStoreService<Proto: ProtocolResponse, Entity: BecknResponse> @Autowired constructor(
+class ResponseStorageServiceImpl<Proto: ProtocolResponse, Entity: BecknResponse> @Autowired constructor(
   val responseRepo: BecknResponseRepository<Entity>,
   val mapper: GenericResponseMapper<Proto, Entity>
-) {
-  private val log: Logger = LoggerFactory.getLogger(ResponseStoreService::class.java)
+): ResponseStorageService<Proto> {
+  private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  fun save(protoResponse: Proto): Either<DatabaseError.OnWrite, Proto> =
+  override fun save(protoResponse: Proto): Either<DatabaseError.OnWrite, Proto> =
     Either
       .catch { responseRepo.insertOne(mapper.protocolToEntity(protoResponse)) }
       .bimap(
@@ -29,7 +34,7 @@ class ResponseStoreService<Proto: ProtocolResponse, Entity: BecknResponse> @Auto
         }
       )
 
-  fun findByMessageId(id: String) = Either
+  override fun findByMessageId(id: String): Either<DatabaseError.OnRead, List<Proto>> = Either
     .catch { responseRepo.findByMessageId(id) }
     .map { toSchema(it) }
     .mapLeft { e ->
