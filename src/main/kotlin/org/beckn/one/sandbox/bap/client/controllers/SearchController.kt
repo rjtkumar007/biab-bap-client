@@ -18,13 +18,13 @@ class SearchController @Autowired constructor(
 ) {
   @RequestMapping("/client/v1/search")
   @ResponseBody
-  fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<ProtocolResponse> =
+  fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<ProtocolAckResponse> =
     searchService.search(contextFactory.create(), searchString)
 
   @RequestMapping("/v0/search")
   @ResponseBody
-  fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<ProtocolResponse> {
-    return ResponseEntity.ok(ProtocolResponse(context = contextFactory.create(), message = ResponseMessage.ack()))
+  fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<ProtocolAckResponse> {
+    return ResponseEntity.ok(ProtocolAckResponse(context = contextFactory.create(), message = ResponseMessage.ack()))
   }
 
   @RequestMapping("/v0/on_search")

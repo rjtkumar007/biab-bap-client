@@ -26,7 +26,7 @@ class GatewayService @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
 
-  fun search(gateway: SubscriberDto, queryString: String?): Either<GatewaySearchError, ProtocolResponse> {
+  fun search(gateway: SubscriberDto, queryString: String?): Either<GatewaySearchError, ProtocolAckResponse> {
     return try {
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
@@ -49,9 +49,9 @@ class GatewayService @Autowired constructor(
     }
   }
 
-  private fun isInternalServerError(httpResponse: retrofit2.Response<ProtocolResponse>) =
-    httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
+  private fun isInternalServerError(httpAckAckResponse: retrofit2.Response<ProtocolAckResponse>) =
+    httpAckAckResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
 
-  private fun isAckNegative(httpResponse: retrofit2.Response<ProtocolResponse>) =
-    httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
+  private fun isAckNegative(httpAckAckResponse: retrofit2.Response<ProtocolAckResponse>) =
+    httpAckAckResponse.body()!!.message.ack.status == ResponseStatus.NACK
 }

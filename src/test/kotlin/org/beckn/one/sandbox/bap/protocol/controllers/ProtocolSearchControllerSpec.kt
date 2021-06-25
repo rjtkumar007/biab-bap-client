@@ -9,7 +9,8 @@ import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
-import org.beckn.one.sandbox.bap.message.services.SearchResponseStoreService
+import org.beckn.one.sandbox.bap.message.services.ResponseStoreService
+import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
@@ -90,7 +91,7 @@ internal class ProtocolSearchControllerSpec : DescribeSpec() {
       }
 
       context("when error occurs when processing request") {
-        val mockService = mock<SearchResponseStoreService>{
+        val mockService = mock<ResponseStoreService<ProtocolSearchResponse, SearchResponse>>{
           onGeneric { save(schemaSearchResponse) }.thenReturn(Either.Left(DatabaseError.OnWrite))
         }
         val controller = ProtocolSearchController(mockService)

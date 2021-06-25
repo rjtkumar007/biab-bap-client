@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.schemas
 import kotlinx.serialization.Serializable
 import org.beckn.one.sandbox.bap.Default
 
-interface Response {
+interface ProtocolResponse {
   val context: ProtocolContext
   val error: Error?
 }
@@ -23,17 +23,17 @@ enum class ResponseStatus(
   NACK("NACK");
 }
 
-data class ProtocolResponse(
+data class ProtocolAckResponse(
   override val context: ProtocolContext,
   val message: ResponseMessage,
   override val error: Error? = null,
-) : Response
+) : ProtocolResponse
 
 data class ProtocolSearchResponse @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolSearchResponseMessage? = null,
   override val error: Error? = null,
-) : Response
+) : ProtocolResponse
 
 data class ProtocolSearchResponseMessage @Default constructor(
   val catalog: ProtocolCatalog? = null

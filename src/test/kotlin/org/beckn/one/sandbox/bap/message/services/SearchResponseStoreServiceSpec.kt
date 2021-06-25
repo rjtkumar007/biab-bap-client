@@ -10,11 +10,11 @@ import org.beckn.one.sandbox.bap.configurations.TestDatabaseConfiguration
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
-import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.mappers.CatalogMapperImpl
 import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapper
 import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapperImpl
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
+import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,15 +29,14 @@ import java.time.ZoneId
   classes = [
     TestDatabaseConfiguration::class,
     DatabaseConfiguration::class,
-    SearchResponseStoreService::class,
+    ResponseStoreService::class,
     SearchResponseMapperImpl::class,
     CatalogMapperImpl::class
   ]
 )
 internal class SearchResponseStoreServiceSpec @Autowired constructor(
   val searchResponseMapper: SearchResponseMapper,
-  val catalogMapper: CatalogMapper,
-  val searchResponseStoreService: SearchResponseStoreService,
+  val searchResponseStoreService: ResponseStoreService<ProtocolSearchResponse, SearchResponse>,
   @Qualifier("search-repo") val searchResponseRepo: BecknResponseRepository<SearchResponse>
 ) : DescribeSpec() {
 
@@ -67,7 +66,7 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
 
   init {
     describe("SearchResponseStore") {
-      val searchResponse = searchResponseMapper.schemaToEntity(schemaSearchResponse)
+      val searchResponse = searchResponseMapper.protocolToEntity(schemaSearchResponse)
 
       context("when save is called with search response") {
         searchResponseRepo.clear()
@@ -96,7 +95,7 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
         val mockRepo = mock<BecknResponseRepository<SearchResponse>> {
           onGeneric { insertOne(searchResponse) }.thenThrow(MongoException("Write error"))
         }
-        val failureSearchResponseService = SearchResponseStoreService(mockRepo, searchResponseMapper)
+        val failureSearchResponseService = ResponseStoreService(mockRepo, searchResponseMapper)
         val response = failureSearchResponseService.save(schemaSearchResponse)
 
         it("should return a left with write error") {
@@ -108,7 +107,7 @@ internal class SearchResponseStoreServiceSpec @Autowired constructor(
         val mockRepo = mock<BecknResponseRepository<SearchResponse>> {
           onGeneric { findByMessageId(context.messageId) }.thenThrow(MongoException("Write error"))
         }
-        val failureSearchResponseService = SearchResponseStoreService(mockRepo, searchResponseMapper)
+        val failureSearchResponseService = ResponseStoreService(mockRepo, searchResponseMapper)
         val response = failureSearchResponseService.findByMessageId(context.messageId)
 
         it("should return a left with write error") {

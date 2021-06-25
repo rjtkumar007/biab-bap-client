@@ -9,7 +9,7 @@ import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.schemas.Intent
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchRequest
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchRequestMessage
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage.Companion.nack
@@ -93,7 +93,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
       it("should return gateway error when gateway search returns negative acknowledgement") {
         val searchRequest = getRequest()
-        val nackResponse = Calls.response(ProtocolResponse(contextFactory.create(), nack()))
+        val nackResponse = Calls.response(ProtocolAckResponse(contextFactory.create(), nack()))
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(nackResponse)
 
         val response = gatewayService.search(gateway, queryString)

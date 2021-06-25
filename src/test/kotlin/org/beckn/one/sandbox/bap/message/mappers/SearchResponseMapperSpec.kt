@@ -50,7 +50,7 @@ class SearchResponseMapperSpec @Autowired constructor(
             timestamp = LocalDateTime.now(fixedClock)
           )
         )
-        val mappedEntity = mapper.schemaToEntity(protocolSearchResponse)
+        val mappedEntity = mapper.protocolToEntity(protocolSearchResponse)
 
         mappedEntity shouldBe SearchResponse(
           message = SearchResponseMessage(
