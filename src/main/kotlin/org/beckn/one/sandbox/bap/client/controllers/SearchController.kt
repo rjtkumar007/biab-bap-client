@@ -1,9 +1,12 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.client.services.SearchService
 import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
@@ -16,10 +19,28 @@ class SearchController @Autowired constructor(
   val searchService: SearchService,
   val contextFactory: ContextFactory
 ) {
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
+
   @RequestMapping("/client/v1/search")
   @ResponseBody
-  fun searchV1(@RequestParam(required = false) searchString: String?): ResponseEntity<ProtocolAckResponse> =
-    searchService.search(contextFactory.create(), searchString)
+  fun searchV1(
+    @RequestParam(required = false) searchString: String?
+  ): ResponseEntity<ProtocolAckResponse> {
+    val context = contextFactory.create()
+    return searchService.search(context, searchString)
+      .fold(
+        {
+          log.error("Error during search. Error: {}", it)
+          ResponseEntity
+            .status(it.status().value())
+            .body(ProtocolAckResponse(context, it.message(), it.error()))
+        },
+        {
+          log.info("Successfully initiated Search")
+          ResponseEntity.ok(ProtocolAckResponse(context, ResponseMessage.ack()))
+        }
+      )
+  }
 
   @RequestMapping("/v0/search")
   @ResponseBody
@@ -72,6 +93,26 @@ class SearchController @Autowired constructor(
 
   @RequestMapping("/client/v1/on_search")
   @ResponseBody
-  fun onSearchV1(@RequestParam messageId: String): ResponseEntity<ClientSearchResponse> =
-    searchService.onSearch(contextFactory.create(messageId = messageId))
+  fun onSearchV1(
+    @RequestParam messageId: String
+  ): ResponseEntity<ClientSearchResponse> = searchService
+    .onSearch(messageId)
+    .fold(
+      {
+        log.error("Error when finding search response by message id. Error: {}", it)
+        ResponseEntity
+          .status(it.status().value())
+          .body(ClientSearchResponse(context = contextFactory.create(messageId = messageId), error = it.error()))
+      },
+      {
+        log.info("Found {} responses for message {}", it.size, messageId)
+        ResponseEntity
+          .ok(
+            ClientSearchResponse(
+              context = contextFactory.create(messageId = messageId),
+              message = ClientSearchResponseMessage(it)
+            )
+          )
+      }
+    )
 }
