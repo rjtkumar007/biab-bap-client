@@ -10,12 +10,11 @@ import org.litote.kmongo.eq
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service
 class MessageService @Autowired constructor(
-  @Qualifier("message-repo") private val messageRepository: GenericRepository<Message>
+  private val messageRepository: GenericRepository<Message>
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 

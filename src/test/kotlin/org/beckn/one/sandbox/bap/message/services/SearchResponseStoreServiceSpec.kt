@@ -18,7 +18,6 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.Clock
 import java.time.Instant
@@ -37,7 +36,7 @@ import java.time.ZoneId
 internal class SearchResponseStoreServiceSpec @Autowired constructor(
   val searchResponseMapper: SearchResponseMapper,
   val searchResponseStoreService: ResponseStoreService<ProtocolSearchResponse, SearchResponse>,
-  @Qualifier("search-repo") val searchResponseRepo: BecknResponseRepository<SearchResponse>
+  val searchResponseRepo: BecknResponseRepository<SearchResponse>
 ) : DescribeSpec() {
 
 

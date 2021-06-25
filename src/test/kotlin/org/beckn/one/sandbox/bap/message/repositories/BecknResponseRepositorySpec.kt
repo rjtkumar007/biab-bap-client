@@ -8,7 +8,6 @@ import org.beckn.one.sandbox.bap.message.entities.Catalog
 import org.beckn.one.sandbox.bap.message.entities.Context
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.entities.SearchResponseMessage
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.Clock
 import java.time.Instant
@@ -17,7 +16,7 @@ import java.time.ZoneId
 
 @SpringBootTest(classes = [TestDatabaseConfiguration::class, DatabaseConfiguration::class])
 class BecknResponseRepositorySpec constructor(
-  @Qualifier("search-repo") val repo: BecknResponseRepository<SearchResponse>
+  val repo: BecknResponseRepository<SearchResponse>
 ) : DescribeSpec() {
   init {
     describe("Generic Repository") {

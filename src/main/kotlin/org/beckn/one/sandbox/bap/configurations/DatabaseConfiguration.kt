@@ -10,7 +10,6 @@ import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.litote.kmongo.KMongo
 import org.litote.kmongo.getCollectionOfName
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -30,12 +29,10 @@ class DatabaseConfiguration @Autowired constructor(
   }
 
   @Bean
-  @Qualifier("search-repo")
   fun searchResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<SearchResponse> =
     BecknResponseRepository(database.getCollectionOfName("search_responses"))
 
   @Bean
-  @Qualifier("message-repo")
   fun messageResponseRepo(@Autowired database: MongoDatabase): GenericRepository<Message> =
     GenericRepository.create(database, "message_responses")
 }

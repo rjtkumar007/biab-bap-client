@@ -14,7 +14,6 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
@@ -42,7 +41,7 @@ internal class ProtocolSearchControllerSpec : DescribeSpec() {
   private lateinit var mapper: ObjectMapper
 
   @Autowired
-  @Qualifier("search-repo") private lateinit var searchResponseRepo: BecknResponseRepository<SearchResponse>
+  private lateinit var searchResponseRepo: BecknResponseRepository<SearchResponse>
 
   private val postOnSearchUrl = "/v1/on_search"
 

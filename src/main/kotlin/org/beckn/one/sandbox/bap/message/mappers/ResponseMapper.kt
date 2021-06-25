@@ -8,9 +8,9 @@ import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
 
-interface GenericResponseMapper<ProtoResp: ProtocolResponse, EntityResp: BecknResponse> {
-  fun entityToProtocol(entity: EntityResp): ProtoResp
-  fun protocolToEntity(schema: ProtoResp): EntityResp
+interface GenericResponseMapper<Protocol: ProtocolResponse, Entity: BecknResponse> {
+  fun entityToProtocol(entity: Entity): Protocol
+  fun protocolToEntity(schema: Protocol): Entity
 }
 
 @Mapper(

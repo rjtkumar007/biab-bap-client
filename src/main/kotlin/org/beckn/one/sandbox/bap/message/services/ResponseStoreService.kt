@@ -13,13 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class ResponseStoreService<ProtoResp: ProtocolResponse, EntityResp: BecknResponse> @Autowired constructor(
-  val responseRepo: BecknResponseRepository<EntityResp>,
-  val mapper: GenericResponseMapper<ProtoResp, EntityResp>
+class ResponseStoreService<Proto: ProtocolResponse, Entity: BecknResponse> @Autowired constructor(
+  val responseRepo: BecknResponseRepository<Entity>,
+  val mapper: GenericResponseMapper<Proto, Entity>
 ) {
   private val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun save(protoResponse: ProtoResp): Either<DatabaseError.OnWrite, ProtoResp> =
+  fun save(protoResponse: Proto): Either<DatabaseError.OnWrite, Proto> =
     Either
       .catch { responseRepo.insertOne(mapper.protocolToEntity(protoResponse)) }
       .bimap(
@@ -38,7 +38,7 @@ class ResponseStoreService<ProtoResp: ProtocolResponse, EntityResp: BecknRespons
       DatabaseError.OnRead
     }
 
-  private fun toSchema(allResponses: List<EntityResp>) =
+  private fun toSchema(allResponses: List<Entity>) =
     allResponses.mapNotNull { response ->
       if (response.error == null) mapper.entityToProtocol(response) else null
     }
