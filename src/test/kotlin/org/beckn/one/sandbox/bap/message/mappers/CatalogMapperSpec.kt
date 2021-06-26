@@ -17,12 +17,11 @@ import org.springframework.test.context.TestPropertySource
 class CatalogMapperSpec @Autowired constructor(
   private val mapper: CatalogMapper
 ) : DescribeSpec() {
-  val catalogFactory = CatalogFactory()
 
   init {
     describe("CatalogMapper") {
       it("should map all fields from schema to entity") {
-        val catalog1Schema = catalogFactory.create()
+        val catalog1Schema = CatalogFactory.create()
 
         val mappedEntity = mapper.schemaToEntity(catalog1Schema)
 

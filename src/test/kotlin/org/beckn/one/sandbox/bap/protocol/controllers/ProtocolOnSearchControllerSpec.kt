@@ -32,7 +32,7 @@ import java.time.ZoneId
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class ProtocolSearchControllerSpec : DescribeSpec() {
+internal class ProtocolOnSearchControllerSpec : DescribeSpec() {
 
   @Autowired
   private lateinit var mockMvc: MockMvc
@@ -65,7 +65,7 @@ internal class ProtocolSearchControllerSpec : DescribeSpec() {
 
   val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse(
     context = context,
-    message = ProtocolSearchResponseMessage(CatalogFactory().create(2))
+    message = ProtocolSearchResponseMessage(CatalogFactory.create(2))
   )
   init {
 
@@ -93,7 +93,7 @@ internal class ProtocolSearchControllerSpec : DescribeSpec() {
         val mockService = mock<ResponseStorageService<ProtocolSearchResponse>>{
           onGeneric { save(schemaSearchResponse) }.thenReturn(Either.Left(DatabaseError.OnWrite))
         }
-        val controller = ProtocolSearchController(mockService)
+        val controller = ProtocolOnSearchController(mockService)
 
         it("should respond with internal server error"){
           val response = controller.onSearch(schemaSearchResponse)

@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.schemas.*
 
-class CatalogFactory {
+object CatalogFactory {
   fun create(index: Int = 1): ProtocolCatalog {
     return ProtocolCatalog(
       bppProviders = listOf(

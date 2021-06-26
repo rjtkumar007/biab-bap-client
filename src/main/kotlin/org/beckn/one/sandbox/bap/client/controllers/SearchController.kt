@@ -1,7 +1,6 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
-import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.client.services.SearchService
 import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
@@ -96,7 +95,7 @@ class SearchController @Autowired constructor(
   fun onSearchV1(
     @RequestParam messageId: String
   ): ResponseEntity<ClientSearchResponse> = searchService
-    .onSearch(messageId)
+    .onSearch(contextFactory.create(messageId = messageId))
     .fold(
       {
         log.error("Error when finding search response by message id. Error: {}", it)
@@ -105,14 +104,8 @@ class SearchController @Autowired constructor(
           .body(ClientSearchResponse(context = contextFactory.create(messageId = messageId), error = it.error()))
       },
       {
-        log.info("Found {} responses for message {}", it.size, messageId)
-        ResponseEntity
-          .ok(
-            ClientSearchResponse(
-              context = contextFactory.create(messageId = messageId),
-              message = ClientSearchResponseMessage(it)
-            )
-          )
+        log.info("Found {} responses for message {}", it.message?.catalogs?.size, messageId)
+        ResponseEntity.ok(it)
       }
     )
 }

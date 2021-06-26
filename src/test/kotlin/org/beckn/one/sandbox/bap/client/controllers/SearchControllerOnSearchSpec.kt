@@ -44,7 +44,6 @@ class SearchControllerOnSearchSpec @Autowired constructor(
   init {
 
     describe("On Search") {
-      val catalogFactory = CatalogFactory()
 
       it("should return error bad request response when message id is null") {
         mockMvc
@@ -69,8 +68,8 @@ class SearchControllerOnSearchSpec @Autowired constructor(
 
       it("should return search response when message id is valid") {
         val message = messageRepository.insertOne(Message(id = uuidFactory.create(), type = Message.Type.Search))
-        val protocolCatalog1 = catalogFactory.create(index = 1)
-        val protocolCatalog2 = catalogFactory.create(index = 2)
+        val protocolCatalog1 = CatalogFactory.create(index = 1)
+        val protocolCatalog2 = CatalogFactory.create(index = 2)
         mapToEntityAndPersist(message, protocolCatalog1)
         mapToEntityAndPersist(message, protocolCatalog2)
 

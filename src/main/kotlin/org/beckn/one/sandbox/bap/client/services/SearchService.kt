@@ -2,11 +2,12 @@ package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.Either
 import arrow.core.flatMap
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.services.MessageService
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
 import org.slf4j.Logger
@@ -19,7 +20,7 @@ class SearchService(
   @Autowired val registryService: RegistryService,
   @Autowired val gatewayService: GatewayService,
   @Autowired val messageService: MessageService,
-  @Autowired val searchResponseStorageService: ResponseStorageService<ProtocolSearchResponse>
+  @Autowired val responseStoreService: ResponseStorageService<ProtocolSearchResponse>
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
@@ -31,12 +32,17 @@ class SearchService(
       .flatMap { messageService.save(Message(id = context.messageId, type = Message.Type.Search)) }
   }
 
-  fun onSearch(messageId: String): Either<HttpError, List<ProtocolCatalog>> {
-    log.info("Got on search request for message id: {}", messageId)
+  fun onSearch(context: ProtocolContext): Either<HttpError, ClientSearchResponse> {
+    log.info("Got on search request for message id: {}", context.messageId)
     return messageService
-      .findById(messageId)
-      .flatMap { searchResponseStorageService.findByMessageId(messageId) }
+      .findById(context.messageId)
+      .flatMap { responseStoreService.findByMessageId(context.messageId) }
       .map { it.mapNotNull { response -> response.message?.catalog } }
-
+      .map {
+        ClientSearchResponse(
+          context = context,
+          message = ClientSearchResponseMessage(it)
+        )
+      }
   }
 }

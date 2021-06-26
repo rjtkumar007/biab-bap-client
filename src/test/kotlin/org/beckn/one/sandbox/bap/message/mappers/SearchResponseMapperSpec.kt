@@ -23,8 +23,6 @@ import java.time.ZoneId
 class SearchResponseMapperSpec @Autowired constructor(
   private val mapper: SearchResponseMapper
 ) : DescribeSpec() {
-  val catalogFactory = CatalogFactory()
-
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),
     ZoneId.of("Asia/Calcutta")
@@ -35,7 +33,7 @@ class SearchResponseMapperSpec @Autowired constructor(
       it("should map all fields from schema to entity") {
         val protocolSearchResponse = ProtocolSearchResponse(
           message = ProtocolSearchResponseMessage(
-            catalogFactory.create(1)
+            CatalogFactory.create(1)
           ),
           context = org.beckn.one.sandbox.bap.schemas.ProtocolContext(
             domain = "LocalRetail",

@@ -8,16 +8,13 @@ import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
 
 interface ResponseStorageService<Proto: ProtocolResponse> {
   fun save(protoResponse: Proto): Either<DatabaseError.OnWrite, Proto>
   fun findByMessageId(id: String): Either<DatabaseError.OnRead, List<Proto>>
 }
 
-@Service
-class ResponseStorageServiceImpl<Proto: ProtocolResponse, Entity: BecknResponse> @Autowired constructor(
+class ResponseStorageServiceImpl<Proto: ProtocolResponse, Entity: BecknResponse> constructor(
   val responseRepo: BecknResponseRepository<Entity>,
   val mapper: GenericResponseMapper<Proto, Entity>
 ): ResponseStorageService<Proto> {

@@ -5,34 +5,26 @@ import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
-import org.beckn.one.sandbox.bap.configurations.DatabaseConfiguration
-import org.beckn.one.sandbox.bap.configurations.TestDatabaseConfiguration
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
-import org.beckn.one.sandbox.bap.message.mappers.CatalogMapperImpl
 import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapper
-import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapperImpl
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-@SpringBootTest(
-  classes = [
-    TestDatabaseConfiguration::class,
-    DatabaseConfiguration::class,
-    ResponseStorageServiceImpl::class,
-    SearchResponseMapperImpl::class,
-    CatalogMapperImpl::class
-  ]
-)
+@SpringBootTest
+@ActiveProfiles(value = ["test"])
+@TestPropertySource(locations = ["/application-test.yml"])
 internal class ResponseStorageServiceSpec @Autowired constructor(
   val searchResponseMapper: SearchResponseMapper,
   val searchResponseStorageService: ResponseStorageService<ProtocolSearchResponse>,
@@ -60,7 +52,7 @@ internal class ResponseStorageServiceSpec @Autowired constructor(
 
   val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse(
     context = context,
-    message = ProtocolSearchResponseMessage(CatalogFactory().create(2))
+    message = ProtocolSearchResponseMessage(CatalogFactory.create(2))
   )
 
   init {
