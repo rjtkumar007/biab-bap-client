@@ -64,7 +64,7 @@ internal class GenericOnReplyServiceSpec @Autowired constructor(
       searchResultRepo.insertMany(entitySearchResults())
 
       it("should return search results for given message id in context") {
-        val response = onSearchPollService.onReply(context)
+        val response = onSearchPollService.onPoll(context)
         response.shouldBeRight(ClientSearchResponse(
           context = context,
           message = ClientSearchResponseMessage(
