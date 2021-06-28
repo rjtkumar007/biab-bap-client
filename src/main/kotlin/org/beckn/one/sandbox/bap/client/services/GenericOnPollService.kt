@@ -11,14 +11,14 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class GenericOnPollService<Protocol: ProtocolResponse, Output: ClientResponse> constructor(
+open class GenericOnPollService<Protocol: ProtocolResponse, Output: ClientResponse> constructor(
   private val messageService: MessageService,
   private val responseStorageService: ResponseStorageService<Protocol>,
   private val transformer: GenericOnPollTransformer<Protocol, Output>
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  fun onReply(context: ProtocolContext): Either<HttpError, Output> {
+  open fun onPoll(context: ProtocolContext): Either<HttpError, Output> {
     log.info("Got fetch request for message id: {}", context.messageId)
     return messageService
       .findById(context.messageId)

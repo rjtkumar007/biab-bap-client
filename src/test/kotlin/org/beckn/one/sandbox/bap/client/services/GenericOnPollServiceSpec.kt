@@ -22,7 +22,7 @@ import java.time.ZoneId
 @SpringBootTest
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class GenericOnReplyServiceSpec @Autowired constructor(
+internal class GenericOnPollServiceSpec @Autowired constructor(
   private val onSearchPollService: GenericOnPollService<ProtocolSearchResponse, ClientSearchResponse>,
   private val searchResultRepo: BecknResponseRepository<SearchResponse>,
   private val messageRepository: GenericRepository<Message>
@@ -65,12 +65,14 @@ internal class GenericOnReplyServiceSpec @Autowired constructor(
 
       it("should return search results for given message id in context") {
         val response = onSearchPollService.onPoll(context)
-        response.shouldBeRight(ClientSearchResponse(
-          context = context,
-          message = ClientSearchResponseMessage(
-            catalogs = listOf(ProtocolCatalog(), ProtocolCatalog())
+        response.shouldBeRight(
+          ClientSearchResponse(
+            context = context,
+            message = ClientSearchResponseMessage(
+              catalogs = listOf(ProtocolCatalog(), ProtocolCatalog())
+            )
           )
-        ))
+        )
       }
     }
   }
@@ -80,7 +82,11 @@ internal class GenericOnReplyServiceSpec @Autowired constructor(
       context = entityContext,
       message = SearchResponseMessage(Catalog())
     )
-    return listOf(entitySearchResponse, entitySearchResponse, entitySearchResponse.copy(context = entityContext.copy(messageId = "123")))
+    return listOf(
+      entitySearchResponse,
+      entitySearchResponse,
+      entitySearchResponse.copy(context = entityContext.copy(messageId = "123"))
+    )
   }
 
 }

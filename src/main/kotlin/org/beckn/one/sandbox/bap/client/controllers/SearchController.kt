@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
-import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.services.SearchService
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
+import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -46,66 +46,4 @@ class SearchController @Autowired constructor(
   fun searchV0(@RequestParam(required = false) searchString: String? = ""): ResponseEntity<ProtocolAckResponse> {
     return ResponseEntity.ok(ProtocolAckResponse(context = contextFactory.create(), message = ResponseMessage.ack()))
   }
-
-  @RequestMapping("/v0/on_search")
-  @ResponseBody
-  fun onSearchV0(@RequestParam(required = false) messageId: String? = ""): ResponseEntity<List<ProviderWithItems>> {
-    return ResponseEntity.ok(
-      listOf(
-        ProviderWithItems(
-          provider = Provider(
-            id = "p1", name = "LocalBaniya", locations = listOf("Camp", "Shastri Nagar"),
-            descriptor = "Your local grocery", images = listOf("/localbaniya")
-          ),
-          items = listOf(
-            ProtocolItem(
-              id = "it-1",
-              parentItemId = "pid-1",
-              descriptor = ProtocolDescriptor(name = "Very sweet", images = listOf("/imageA", "/imageB")),
-              price = ProtocolPrice(
-                currency = "Rupee",
-                value = "3",
-                estimatedValue = "1",
-                computedValue = "2",
-                listedValue = "3",
-                offeredValue = "4",
-                minimumValue = "5",
-                maximumValue = "6"
-              ),
-              categoryId = "cat-1",
-              tags = mapOf("classifiedAs" to "grocery"),
-              matched = true, related = true, recommended = true
-            )
-          ),
-          categories = listOf(
-            ProtocolCategory(id = "cat-1", descriptor = ProtocolDescriptor(name = "Grocery items")),
-            ProtocolCategory(
-              id = "cat-2",
-              descriptor = ProtocolDescriptor(name = "Perishable items")
-            )
-          ),
-          offers = listOf(),
-        )
-      )
-    )
-  }
-
-  @RequestMapping("/client/v1/on_search")
-  @ResponseBody
-  fun onSearchV1(
-    @RequestParam messageId: String
-  ): ResponseEntity<ClientSearchResponse> = searchService
-    .onSearch(contextFactory.create(messageId = messageId))
-    .fold(
-      {
-        log.error("Error when finding search response by message id. Error: {}", it)
-        ResponseEntity
-          .status(it.status().value())
-          .body(ClientSearchResponse(context = contextFactory.create(messageId = messageId), error = it.error()))
-      },
-      {
-        log.info("Found {} responses for message {}", it.message?.catalogs?.size, messageId)
-        ResponseEntity.ok(it)
-      }
-    )
 }

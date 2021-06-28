@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class OnSearchController @Autowired constructor(
+class OnSearchPollController @Autowired constructor(
   private val onPollService: GenericOnPollService<ProtocolSearchResponse, ClientSearchResponse>,
   private val contextFactory: ContextFactory
 ): BaseOnPollController<ProtocolSearchResponse, ClientSearchResponse>(onPollService, contextFactory) {
