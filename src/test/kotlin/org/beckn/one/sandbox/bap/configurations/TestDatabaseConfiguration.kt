@@ -15,6 +15,6 @@ class TestDatabaseConfiguration {
     val port = MongoContainer.instance.getMappedPort(MongoContainer.MONGODB_PORT)
     val connectionString = "mongodb://$host:$port"
     val client = KMongo.createClient(connectionString)
-    return client.getDatabase("sandbox_bpp")
+    return client.getDatabase("sandbox_bap")
   }
 }
