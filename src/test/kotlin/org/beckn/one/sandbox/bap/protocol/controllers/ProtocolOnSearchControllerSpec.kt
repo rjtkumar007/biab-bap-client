@@ -6,13 +6,13 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.SearchResponse
+import org.beckn.one.sandbox.bap.message.entities.OnSearch
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -38,13 +38,13 @@ internal class ProtocolOnSearchControllerSpec : DescribeSpec() {
   private lateinit var mapper: ObjectMapper
 
   @Autowired
-  private lateinit var searchResponseRepo: BecknResponseRepository<SearchResponse>
+  private lateinit var searchResponseRepo: BecknResponseRepository<OnSearch>
 
   private val postOnSearchUrl = "/v1/on_search"
 
-  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse(
+  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch(
     context = ProtocolContextFactory.fixed,
-    message = ProtocolSearchResponseMessage(ProtocolCatalogFactory.create(2))
+    message = ProtocolOnSearchMessage(ProtocolCatalogFactory.create(2))
   )
   init {
 
@@ -69,7 +69,7 @@ internal class ProtocolOnSearchControllerSpec : DescribeSpec() {
       }
 
       context("when error occurs when processing request") {
-        val mockService = mock<ResponseStorageService<ProtocolSearchResponse>>{
+        val mockService = mock<ResponseStorageService<ProtocolOnSearch>>{
           onGeneric { save(schemaSearchResponse) }.thenReturn(Either.Left(DatabaseError.OnWrite))
         }
         val controller = ProtocolOnSearchController(mockService)

@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.controllers
 import org.beckn.one.sandbox.bap.client.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.services.GenericOnPollService
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OnSearchPollController @Autowired constructor(
-  private val onPollService: GenericOnPollService<ProtocolSearchResponse, ClientSearchResponse>,
-  private val contextFactory: ContextFactory
-): BaseOnPollController<ProtocolSearchResponse, ClientSearchResponse>(onPollService, contextFactory) {
+    private val onPollService: GenericOnPollService<ProtocolOnSearch, ClientSearchResponse>,
+    private val contextFactory: ContextFactory
+): BaseOnPollController<ProtocolOnSearch, ClientSearchResponse>(onPollService, contextFactory) {
 
   @RequestMapping("/client/v1/on_search")
   @ResponseBody

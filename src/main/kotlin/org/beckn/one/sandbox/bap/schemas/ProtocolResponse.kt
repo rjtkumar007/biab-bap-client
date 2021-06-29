@@ -29,13 +29,13 @@ data class ProtocolAckResponse(
   override val error: Error? = null,
 ) : ProtocolResponse
 
-data class ProtocolSearchResponse @Default constructor(
+data class ProtocolOnSearch @Default constructor(
   override val context: ProtocolContext,
-  val message: ProtocolSearchResponseMessage? = null,
+  val message: ProtocolOnSearchMessage? = null,
   override val error: Error? = null,
 ) : ProtocolResponse
 
-data class ProtocolSearchResponseMessage @Default constructor(
+data class ProtocolOnSearchMessage @Default constructor(
   val catalog: ProtocolCatalog? = null
 )
 

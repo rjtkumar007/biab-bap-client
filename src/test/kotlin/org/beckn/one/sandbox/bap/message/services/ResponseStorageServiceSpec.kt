@@ -6,12 +6,12 @@ import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.SearchResponse
+import org.beckn.one.sandbox.bap.message.entities.OnSearch
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -26,9 +26,9 @@ import java.time.ZoneId
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class ResponseStorageServiceSpec @Autowired constructor(
-  val searchResponseMapper: SearchResponseMapper,
-  val searchResponseStorageService: ResponseStorageService<ProtocolSearchResponse>,
-  val searchResponseRepo: BecknResponseRepository<SearchResponse>
+    val searchResponseMapper: SearchResponseMapper,
+    val searchResponseStorageService: ResponseStorageService<ProtocolOnSearch>,
+    val searchResponseRepo: BecknResponseRepository<OnSearch>
 ) : DescribeSpec() {
 
 
@@ -50,9 +50,9 @@ internal class ResponseStorageServiceSpec @Autowired constructor(
     timestamp = LocalDateTime.now(fixedClock)
   )
 
-  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse(
+  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch(
     context = context,
-    message = ProtocolSearchResponseMessage(ProtocolCatalogFactory.create(2))
+    message = ProtocolOnSearchMessage(ProtocolCatalogFactory.create(2))
   )
 
   init {
@@ -83,7 +83,7 @@ internal class ResponseStorageServiceSpec @Autowired constructor(
       }
 
       context("when error is encountered while saving") {
-        val mockRepo = mock<BecknResponseRepository<SearchResponse>> {
+        val mockRepo = mock<BecknResponseRepository<OnSearch>> {
           onGeneric { insertOne(searchResponse) }.thenThrow(MongoException("Write error"))
         }
         val failureSearchResponseService = ResponseStorageServiceImpl(mockRepo, searchResponseMapper)
@@ -95,7 +95,7 @@ internal class ResponseStorageServiceSpec @Autowired constructor(
       }
 
       context("when error is encountered while fetching message by id") {
-        val mockRepo = mock<BecknResponseRepository<SearchResponse>> {
+        val mockRepo = mock<BecknResponseRepository<OnSearch>> {
           onGeneric { findByMessageId(context.messageId) }.thenThrow(MongoException("Write error"))
         }
         val failureSearchResponseService = ResponseStorageServiceImpl(mockRepo, searchResponseMapper)

@@ -4,8 +4,8 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.message.entities.*
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -29,8 +29,8 @@ class SearchResponseMapperSpec @Autowired constructor(
   init {
     describe("SearchResponseMapper") {
       it("should map all fields from schema to entity") {
-        val protocolSearchResponse = ProtocolSearchResponse(
-          message = ProtocolSearchResponseMessage(
+        val protocolSearchResponse = ProtocolOnSearch(
+          message = ProtocolOnSearchMessage(
             ProtocolCatalogFactory.create(1)
           ),
           context = org.beckn.one.sandbox.bap.schemas.ProtocolContext(
@@ -48,8 +48,8 @@ class SearchResponseMapperSpec @Autowired constructor(
         )
         val mappedEntity = mapper.protocolToEntity(protocolSearchResponse)
 
-        mappedEntity shouldBe SearchResponse(
-          message = SearchResponseMessage(
+        mappedEntity shouldBe OnSearch(
+          message = OnSearchMessage(
             catalog = Catalog(
               bppProviders = listOf(
                 ProviderCatalog(

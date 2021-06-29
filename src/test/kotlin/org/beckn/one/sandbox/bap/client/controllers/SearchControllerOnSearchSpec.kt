@@ -6,8 +6,8 @@ import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.message.entities.Message
-import org.beckn.one.sandbox.bap.message.entities.SearchResponse
-import org.beckn.one.sandbox.bap.message.entities.SearchResponseMessage
+import org.beckn.one.sandbox.bap.message.entities.OnSearch
+import org.beckn.one.sandbox.bap.message.entities.OnSearchMessage
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.mappers.ContextMapper
@@ -38,7 +38,7 @@ class SearchControllerOnSearchSpec @Autowired constructor(
   val contextMapper: ContextMapper,
   val catalogMapper: CatalogMapper,
   val messageRepository: GenericRepository<Message>,
-  val searchResponseRepository: GenericRepository<SearchResponse>
+  val searchResponseRepository: GenericRepository<OnSearch>
 ) : DescribeSpec() {
 
   init {
@@ -92,9 +92,9 @@ class SearchControllerOnSearchSpec @Autowired constructor(
     val context = contextMapper.fromSchema(contextFactory.create(messageId = message.id))
     val entityCatalog = catalogMapper.schemaToEntity(protocolCatalog)
     searchResponseRepository.insertOne(
-      SearchResponse(
+      OnSearch(
         context = context,
-        message = SearchResponseMessage(entityCatalog)
+        message = OnSearchMessage(entityCatalog)
       )
     )
   }

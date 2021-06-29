@@ -7,15 +7,15 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 
 interface GenericOnPollTransformer<in Protocol : ProtocolResponse, out Output: ClientResponse> {
   fun transform(input: List<Protocol>, context: ProtocolContext): Either<HttpError, Output>
 
   companion object {
     val forSearchResults =
-      object : GenericOnPollTransformer<ProtocolSearchResponse, ClientSearchResponse> {
-        override fun transform(input: List<ProtocolSearchResponse>, context: ProtocolContext): Either<HttpError, ClientSearchResponse> =
+      object : GenericOnPollTransformer<ProtocolOnSearch, ClientSearchResponse> {
+        override fun transform(input: List<ProtocolOnSearch>, context: ProtocolContext): Either<HttpError, ClientSearchResponse> =
           Either.Right(
             ClientSearchResponse(
               context = context,

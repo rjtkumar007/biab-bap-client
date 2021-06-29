@@ -9,7 +9,7 @@ import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -23,8 +23,8 @@ import java.time.ZoneId
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class GenericOnPollServiceSpec @Autowired constructor(
-  private val onSearchPollService: GenericOnPollService<ProtocolSearchResponse, ClientSearchResponse>,
-  private val searchResultRepo: BecknResponseRepository<SearchResponse>,
+  private val onSearchPollService: GenericOnPollService<ProtocolOnSearch, ClientSearchResponse>,
+  private val searchResultRepo: BecknResponseRepository<OnSearch>,
   private val messageRepository: GenericRepository<Message>
 ) : DescribeSpec() {
   private val fixedClock = Clock.fixed(
@@ -77,10 +77,10 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
     }
   }
 
-  fun entitySearchResults(): List<SearchResponse> {
-    val entitySearchResponse = SearchResponse(
+  fun entitySearchResults(): List<OnSearch> {
+    val entitySearchResponse = OnSearch(
       context = entityContext,
-      message = SearchResponseMessage(Catalog())
+      message = OnSearchMessage(Catalog())
     )
     return listOf(
       entitySearchResponse,

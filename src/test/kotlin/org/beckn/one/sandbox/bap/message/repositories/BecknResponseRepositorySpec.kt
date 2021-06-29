@@ -6,8 +6,8 @@ import org.beckn.one.sandbox.bap.configurations.DatabaseConfiguration
 import org.beckn.one.sandbox.bap.configurations.TestDatabaseConfiguration
 import org.beckn.one.sandbox.bap.message.entities.Catalog
 import org.beckn.one.sandbox.bap.message.entities.Context
-import org.beckn.one.sandbox.bap.message.entities.SearchResponse
-import org.beckn.one.sandbox.bap.message.entities.SearchResponseMessage
+import org.beckn.one.sandbox.bap.message.entities.OnSearch
+import org.beckn.one.sandbox.bap.message.entities.OnSearchMessage
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.Clock
 import java.time.Instant
@@ -16,15 +16,15 @@ import java.time.ZoneId
 
 @SpringBootTest(classes = [TestDatabaseConfiguration::class, DatabaseConfiguration::class])
 class BecknResponseRepositorySpec constructor(
-  val repo: BecknResponseRepository<SearchResponse>
+  val repo: BecknResponseRepository<OnSearch>
 ) : DescribeSpec() {
   init {
     describe("Generic Repository") {
 
       context("for SearchResponse") {
-        val searchResponse = SearchResponse(
+        val searchResponse = OnSearch(
           context = context,
-          message = SearchResponseMessage(Catalog())
+          message = OnSearchMessage(Catalog())
         )
 
         it("should fetch responses by message id") {

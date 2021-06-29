@@ -4,8 +4,8 @@ import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoDatabase
 import org.beckn.one.sandbox.bap.message.entities.Message
+import org.beckn.one.sandbox.bap.message.entities.OnSearch
 import org.beckn.one.sandbox.bap.message.entities.OnSelect
-import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.litote.kmongo.KMongo
@@ -30,7 +30,7 @@ class DatabaseConfiguration @Autowired constructor(
   }
 
   @Bean
-  fun searchResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<SearchResponse> =
+  fun searchResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnSearch> =
     BecknResponseRepository(database.getCollectionOfName("on_search"))
 
   @Bean

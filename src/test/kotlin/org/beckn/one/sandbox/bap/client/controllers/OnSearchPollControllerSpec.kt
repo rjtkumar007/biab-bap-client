@@ -10,7 +10,7 @@ import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.*
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -34,7 +34,7 @@ import java.time.ZoneId
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class OnSearchPollControllerSpec @Autowired constructor(
-  private val searchResponseRepo: BecknResponseRepository<SearchResponse>,
+  private val searchResponseRepo: BecknResponseRepository<OnSearch>,
   private val messageRepository: GenericRepository<Message>,
   private val contextFactory: ContextFactory,
   private val mapper: ObjectMapper,
@@ -86,7 +86,7 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
       }
 
       context("when failure occurs during request processing") {
-        val mockOnPollService = mock<GenericOnPollService<ProtocolSearchResponse, ClientSearchResponse>>{
+        val mockOnPollService = mock<GenericOnPollService<ProtocolOnSearch, ClientSearchResponse>>{
           onGeneric { onPoll(any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
         }
         val onSearchPollController = OnSearchPollController(mockOnPollService, contextFactory)
@@ -98,10 +98,10 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
     }
   }
 
-  fun entitySearchResults(): List<SearchResponse> {
-    val entitySearchResponse = SearchResponse(
+  fun entitySearchResults(): List<OnSearch> {
+    val entitySearchResponse = OnSearch(
       context = entityContext,
-      message = SearchResponseMessage(Catalog())
+      message = OnSearchMessage(Catalog())
     )
     return listOf(
       entitySearchResponse,

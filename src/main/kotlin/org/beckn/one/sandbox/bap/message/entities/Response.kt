@@ -8,13 +8,13 @@ interface BecknResponse {
   val error: Error?
 }
 
-data class SearchResponse @Default constructor(
+data class OnSearch @Default constructor(
   override val context: Context,
-  val message: SearchResponseMessage? = null,
+  val message: OnSearchMessage? = null,
   override val error: Error? = null
 ) : BecknResponse
 
-data class SearchResponseMessage @Default constructor(
+data class OnSearchMessage @Default constructor(
   val catalog: Catalog? = null
 )
 

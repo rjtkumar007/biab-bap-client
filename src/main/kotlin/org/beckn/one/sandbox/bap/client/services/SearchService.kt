@@ -9,7 +9,7 @@ import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.services.MessageService
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +20,7 @@ class SearchService(
   @Autowired val registryService: RegistryService,
   @Autowired val gatewayService: GatewayService,
   @Autowired val messageService: MessageService,
-  @Autowired val responseStoreService: ResponseStorageService<ProtocolSearchResponse>
+  @Autowired val responseStoreService: ResponseStorageService<ProtocolOnSearch>
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 

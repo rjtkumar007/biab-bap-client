@@ -6,8 +6,8 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -32,14 +32,14 @@ internal class GenericOnReplyTransformerSpec : DescribeSpec() {
   )
   private val catalog1 = ProtocolCatalogFactory.create(1)
   private val catalog2 = ProtocolCatalogFactory.create(2)
-  private val protocolSearchResponse1 = ProtocolSearchResponse(
-    message = ProtocolSearchResponseMessage(
+  private val protocolSearchResponse1 = ProtocolOnSearch(
+    message = ProtocolOnSearchMessage(
       catalog1,
     ),
     context = context
   )
-  private val protocolSearchResponse2 = ProtocolSearchResponse(
-    message = ProtocolSearchResponseMessage(
+  private val protocolSearchResponse2 = ProtocolOnSearch(
+    message = ProtocolOnSearchMessage(
       catalog2,
     ),
     context = context
