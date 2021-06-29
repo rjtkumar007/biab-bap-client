@@ -13,3 +13,8 @@ database:
   mongo:
     url: mongodb://localhost:27017
     name: sandbox_bap
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "configprops, env, health, loggers, metrics, mappings"
