@@ -3,11 +3,10 @@ package org.beckn.one.sandbox.bap.message.mappers
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.message.entities.*
-import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
@@ -17,7 +16,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 class SearchResponseMapperSpec @Autowired constructor(
@@ -33,7 +31,7 @@ class SearchResponseMapperSpec @Autowired constructor(
       it("should map all fields from schema to entity") {
         val protocolSearchResponse = ProtocolSearchResponse(
           message = ProtocolSearchResponseMessage(
-            CatalogFactory.create(1)
+            ProtocolCatalogFactory.create(1)
           ),
           context = org.beckn.one.sandbox.bap.schemas.ProtocolContext(
             domain = "LocalRetail",

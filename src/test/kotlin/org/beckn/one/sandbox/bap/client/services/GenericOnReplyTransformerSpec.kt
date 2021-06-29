@@ -4,7 +4,7 @@ import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
-import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponseMessage
@@ -30,8 +30,8 @@ internal class GenericOnReplyTransformerSpec : DescribeSpec() {
     messageId = "222",
     timestamp = LocalDateTime.now(fixedClock)
   )
-  private val catalog1 = CatalogFactory.create(1)
-  private val catalog2 = CatalogFactory.create(2)
+  private val catalog1 = ProtocolCatalogFactory.create(1)
+  private val catalog2 = ProtocolCatalogFactory.create(2)
   private val protocolSearchResponse1 = ProtocolSearchResponse(
     message = ProtocolSearchResponseMessage(
       catalog1,

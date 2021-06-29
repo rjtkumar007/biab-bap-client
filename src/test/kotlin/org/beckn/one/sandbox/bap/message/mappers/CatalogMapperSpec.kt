@@ -3,15 +3,13 @@ package org.beckn.one.sandbox.bap.message.mappers
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.message.entities.*
-import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 class CatalogMapperSpec @Autowired constructor(
@@ -21,7 +19,7 @@ class CatalogMapperSpec @Autowired constructor(
   init {
     describe("CatalogMapper") {
       it("should map all fields from schema to entity") {
-        val catalog1Schema = CatalogFactory.create()
+        val catalog1Schema = ProtocolCatalogFactory.create()
 
         val mappedEntity = mapper.schemaToEntity(catalog1Schema)
 

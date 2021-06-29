@@ -7,7 +7,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
-import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse
@@ -52,7 +52,7 @@ internal class ResponseStorageServiceSpec @Autowired constructor(
 
   val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolSearchResponse(
     context = context,
-    message = ProtocolSearchResponseMessage(CatalogFactory.create(2))
+    message = ProtocolSearchResponseMessage(ProtocolCatalogFactory.create(2))
   )
 
   init {

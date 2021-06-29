@@ -4,6 +4,7 @@ import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoDatabase
 import org.beckn.one.sandbox.bap.message.entities.Message
+import org.beckn.one.sandbox.bap.message.entities.OnSelect
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
@@ -30,9 +31,13 @@ class DatabaseConfiguration @Autowired constructor(
 
   @Bean
   fun searchResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<SearchResponse> =
-    BecknResponseRepository(database.getCollectionOfName("search_responses"))
+    BecknResponseRepository(database.getCollectionOfName("on_search"))
 
   @Bean
   fun messageResponseRepo(@Autowired database: MongoDatabase): GenericRepository<Message> =
     GenericRepository.create(database, "message_responses")
+
+  @Bean
+  fun onSelectResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnSelect> =
+    BecknResponseRepository(database.getCollectionOfName("on_select"))
 }

@@ -8,7 +8,7 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.entities.SearchResponse
 import org.beckn.one.sandbox.bap.message.entities.SearchResponseMessage
-import org.beckn.one.sandbox.bap.message.factories.CatalogFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.mappers.ContextMapper
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
@@ -68,8 +68,8 @@ class SearchControllerOnSearchSpec @Autowired constructor(
 
       it("should return search response when message id is valid") {
         val message = messageRepository.insertOne(Message(id = uuidFactory.create(), type = Message.Type.Search))
-        val protocolCatalog1 = CatalogFactory.create(index = 1)
-        val protocolCatalog2 = CatalogFactory.create(index = 2)
+        val protocolCatalog1 = ProtocolCatalogFactory.create(index = 1)
+        val protocolCatalog2 = ProtocolCatalogFactory.create(index = 2)
         mapToEntityAndPersist(message, protocolCatalog1)
         mapToEntityAndPersist(message, protocolCatalog2)
 

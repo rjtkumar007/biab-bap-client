@@ -17,3 +17,13 @@ data class SearchResponse @Default constructor(
 data class SearchResponseMessage @Default constructor(
   val catalog: Catalog? = null
 )
+
+data class OnSelect @Default constructor(
+  override val context: Context,
+  val message: OnSelectMessage? = null,
+  override val error: Error? = null
+): BecknResponse
+
+data class OnSelectMessage @Default constructor(
+  val selected: OnSelectMessageSelected? = null
+)

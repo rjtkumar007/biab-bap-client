@@ -38,3 +38,14 @@ data class ProtocolSearchResponse @Default constructor(
 data class ProtocolSearchResponseMessage @Default constructor(
   val catalog: ProtocolCatalog? = null
 )
+
+data class ProtocolOnSelect @Default constructor(
+  override val context: ProtocolContext,
+  val message: ProtocolOnSelectMessage? = null,
+  override val error: Error? = null
+): ProtocolResponse
+
+data class ProtocolOnSelectMessage @Default constructor(
+  val selected: ProtocolOnSelectMessageSelected? = null
+)
+
