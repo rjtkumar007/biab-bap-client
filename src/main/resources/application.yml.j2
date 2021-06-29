@@ -17,3 +17,8 @@ database:
   mongo:
     url: mongodb://{{ mongo_host }}:{{ mongo_port }}
     name: {{ bap_mongo_name }}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "configprops, env, health, loggers, metrics, mappings"
