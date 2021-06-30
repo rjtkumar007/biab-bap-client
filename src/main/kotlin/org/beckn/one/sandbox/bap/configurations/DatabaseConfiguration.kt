@@ -4,6 +4,7 @@ import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoDatabase
 import org.beckn.one.sandbox.bap.message.entities.Message
+import org.beckn.one.sandbox.bap.message.entities.OnInit
 import org.beckn.one.sandbox.bap.message.entities.OnSearch
 import org.beckn.one.sandbox.bap.message.entities.OnSelect
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
@@ -39,5 +40,9 @@ class DatabaseConfiguration @Autowired constructor(
 
   @Bean
   fun onSelectResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnSelect> =
+    BecknResponseRepository(database.getCollectionOfName("on_select"))
+
+  @Bean
+  fun onInitResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnInit> =
     BecknResponseRepository(database.getCollectionOfName("on_select"))
 }

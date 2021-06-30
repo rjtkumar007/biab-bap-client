@@ -8,7 +8,7 @@ import io.kotest.matchers.ints.shouldBeExactly
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.OnSearch
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
-import org.beckn.one.sandbox.bap.message.mappers.SearchResponseMapper
+import org.beckn.one.sandbox.bap.message.mappers.OnSearchResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
@@ -26,7 +26,7 @@ import java.time.ZoneId
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class ResponseStorageServiceSpec @Autowired constructor(
-    val searchResponseMapper: SearchResponseMapper,
+    val searchResponseMapper: OnSearchResponseMapper,
     val searchResponseStorageService: ResponseStorageService<ProtocolOnSearch>,
     val searchResponseRepo: BecknResponseRepository<OnSearch>
 ) : DescribeSpec() {

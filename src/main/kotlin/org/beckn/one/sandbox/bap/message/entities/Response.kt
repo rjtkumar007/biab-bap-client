@@ -27,3 +27,13 @@ data class OnSelect @Default constructor(
 data class OnSelectMessage @Default constructor(
   val selected: OnSelectMessageSelected? = null
 )
+
+data class OnInit @Default constructor(
+  override val context: Context,
+  val message: OnInitMessage? = null,
+  override val error: Error? = null
+): BecknResponse
+
+data class OnInitMessage @Default constructor(
+  val initialized: OnInitMessageInitialized? = null
+)

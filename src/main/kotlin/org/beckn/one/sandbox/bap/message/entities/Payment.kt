@@ -1,12 +1,14 @@
-package org.beckn.one.sandbox.bap.schemas
+package org.beckn.one.sandbox.bap.message.entities
 
-data class ProtocolPayment (
+import org.beckn.one.sandbox.bap.Default
+
+data class Payment  @Default constructor(
   val uri: java.net.URI? = null,
   val tlMethod: TlMethod? = null,
   val params: Map<String, String>? = null,
   val type: Type? = null,
   val status: Status? = null,
-  val time: ProtocolTime? = null
+  val time: Time? = null
 ) {
 
   /**

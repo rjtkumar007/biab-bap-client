@@ -6,10 +6,8 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelectMessageSelected
 object ProtocolOnSelectMessageSelectedFactory {
 
   fun create(index: Int, numberOfItems: Int = 2): ProtocolOnSelectMessageSelected {
-    val itemIds = generateSequence(
-      seedFunction = { 0 },
-      nextFunction = { (it + 1).takeIf { i -> i < numberOfItems } }
-    ).toList()
+    val provider = ProtocolProviderFactory.create(index)
+    val itemIds = IdFactory.forItems(provider.id!!, numberOfItems)
 
     return ProtocolOnSelectMessageSelected(
       provider = ProtocolProviderFactory.create(index),
@@ -17,7 +15,7 @@ object ProtocolOnSelectMessageSelectedFactory {
       items = itemIds.map { ProtocolItemFactory.create(it) },
       addOns = null,
       offers = null,
-      quote = ProtocolQuotationFactory.quoteForItems(listOf(1, 2))
+      quote = ProtocolQuotationFactory.quoteForItems(itemIds)
     )
   }
 
@@ -31,5 +29,21 @@ object ProtocolOnSelectMessageSelectedFactory {
       quote = ProtocolQuotationFactory.createAsEntity(protocol.quote)
     )
   }
+
+}
+
+fun seqTill(n: Int) = generateSequence(
+  seedFunction = { n },
+  nextFunction = { (it + 1).takeIf { i -> i < n } }
+).toList()
+
+
+object IdFactory {
+
+  fun forLocation(id: Int) = "location-$id"
+  fun forFulfillment(id: Int) = "fulfillment-$id"
+  fun forProvider(id: Int) = "provider-$id"
+  fun forCategory(providerId: String, numberOfCategories: Int) = seqTill(numberOfCategories).map { "$providerId-category-$it" }
+  fun forItems(providerId: String, numberOfItems: Int) = seqTill(numberOfItems).map { "$providerId-item-$it" }
 
 }

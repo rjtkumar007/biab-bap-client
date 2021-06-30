@@ -1,40 +1,43 @@
-package org.beckn.one.sandbox.bap.schemas
+package org.beckn.one.sandbox.bap.message.entities
 
-data class ProtocolOnInitMessageInitialized (
-  val provider: ProtocolOnInitMessageInitializedProvider? = null,
-  val providerLocation: ProtocolOnInitMessageInitializedProviderLocation? = null,
-  val items: List<ProtocolOnInitMessageInitializedItems>? = null,
-  val addOns: List<ProtocolOnInitMessageInitializedAddOns>? = null,
-  val offers: List<ProtocolOnInitMessageInitializedOffers>? = null,
-  val billing: ProtocolBilling? = null,
-  val fulfillment: ProtocolFulfillment? = null,
-  val quote: ProtocolQuotation? = null,
-  val payment: ProtocolPayment? = null
+import org.beckn.one.sandbox.bap.Default
+
+data class OnInitMessageInitialized @Default constructor(
+  val provider: OnInitMessageInitializedProvider? = null,
+  val providerLocation: OnInitMessageInitializedProviderLocation? = null,
+  val items: List<OnInitMessageInitializedItems>? = null,
+  val addOns: List<OnInitMessageInitializedAddOns>? = null,
+  val offers: List<OnInitMessageInitializedOffers>? = null,
+  val billing: Billing? = null,
+  val fulfillment: Fulfillment? = null,
+  val quote: Quotation? = null,
+  val payment: Payment? = null
 )
 
-data class ProtocolOnInitMessageInitializedProviderLocation (
+data class OnInitMessageInitializedProviderLocation @Default constructor(
   val id: String? = null
 )
 
-data class ProtocolOnInitMessageInitializedProvider (
+data class OnInitMessageInitializedProvider @Default constructor(
   val id: String? = null
 )
 
-data class ProtocolOnInitMessageInitializedItems (
+data class OnInitMessageInitializedItems @Default constructor(
   val id: String? = null,
-  val quantity: ProtocolItemQuantityAllocated? = null
-)
-// TODO: Example of inline declaration
-data class ProtocolItemQuantityAllocated (
-  val count: Int? = null,
-  val measure: ProtocolScalar? = null
+  val quantity: ItemQuantityAllocated? = null
 )
 
-data class ProtocolOnInitMessageInitializedAddOns (
+// TODO: Example of inline declaration
+data class ItemQuantityAllocated @Default constructor(
+  val count: Int? = null,
+  val measure: Scalar? = null
+)
+
+data class OnInitMessageInitializedAddOns @Default constructor(
   val id: String? = null
 )
 
-data class ProtocolOnInitMessageInitializedOffers (
+data class OnInitMessageInitializedOffers @Default constructor(
   val id: String? = null
 )
 

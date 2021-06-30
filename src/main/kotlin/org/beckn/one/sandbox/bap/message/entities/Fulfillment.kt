@@ -1,27 +1,29 @@
-package org.beckn.one.sandbox.bap.schemas
+package org.beckn.one.sandbox.bap.message.entities
 
-data class ProtocolFulfillment (
+import org.beckn.one.sandbox.bap.Default
+
+data class Fulfillment  @Default constructor(
   val id: String? = null,
   val type: String? = null,
-  val state: ProtocolState? = null,
+  val state: State? = null,
   val tracking: Boolean? = null,
-  val agent: ProtocolPerson? = null,
-  val vehicle: ProtocolVehicle? = null,
-  val start: ProtocolFulfillmentStart? = null,
-  val end: ProtocolFulfillmentEnd? = null,
+  val agent: Person? = null,
+  val vehicle: Vehicle? = null,
+  val start: FulfillmentStart? = null,
+  val end: FulfillmentEnd? = null,
   val purpose: String? = null,
   val tags: Map<String, String>? = null
 )
 
 
-data class ProtocolState (
-  val descriptor: ProtocolDescriptor? = null,
+data class State  @Default constructor(
+  val descriptor: Descriptor? = null,
   val updatedAt: java.time.OffsetDateTime? = null,
   val updatedBy: String? = null
 )
 
-data class ProtocolPerson (
-  val name: ProtocolName? = null,
+data class Person  @Default constructor(
+  val name: Name? = null,
   val image: String? = null,
   val dob: java.time.LocalDate? = null,
   val gender: String? = null,
@@ -29,7 +31,7 @@ data class ProtocolPerson (
   val tags: Map<String, String>? = null
 )
 
-data class ProtocolName (
+data class Name  @Default constructor(
   val full: String? = null,
   val additionalName: String? = null,
   val familyName: String? = null,
@@ -39,7 +41,7 @@ data class ProtocolName (
   val honorificSuffix: String? = null
 )
 
-data class ProtocolVehicle (
+data class Vehicle  @Default constructor(
   val category: String? = null,
   val capacity: Int? = null,
   val make: String? = null,
@@ -51,23 +53,23 @@ data class ProtocolVehicle (
   val registration: String? = null
 )
 // TODO Similar classes
-data class ProtocolFulfillmentStart (
-  val location: ProtocolLocation? = null,
-  val time: ProtocolTime? = null,
-  val instructions: ProtocolDescriptor? = null,
-  val contact: ProtocolContact? = null
+data class FulfillmentStart  @Default constructor(
+  val location: Location? = null,
+  val time: Time? = null,
+  val instructions: Descriptor? = null,
+  val contact: Contact? = null
 )
 
 // TODO Similar classes
-data class ProtocolFulfillmentEnd (
-  val location: ProtocolLocation? = null,
-  val time: ProtocolTime? = null,
-  val instructions: ProtocolDescriptor? = null,
-  val contact: ProtocolContact? = null
+data class FulfillmentEnd  @Default constructor(
+  val location: Location? = null,
+  val time: Time? = null,
+  val instructions: Descriptor? = null,
+  val contact: Contact? = null
 )
 
 
-data class ProtocolContact (
+data class Contact  @Default constructor(
   val phone: String? = null,
   val email: String? = null,
   val tags: Map<String, String>? = null

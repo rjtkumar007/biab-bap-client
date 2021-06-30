@@ -8,16 +8,10 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolProviderCatalog
 object ProtocolProviderCatalogFactory {
 
   fun create(index: Int) = ProtocolProviderCatalog(
-    id = "provider-$index",
-    descriptor = ProtocolDescriptorFactory.create("Retail-provider", index),
-    categories = listOf(
-      ProtocolCategory(
-        id = "provider-$index-category-$index",
-        descriptor = ProtocolDescriptorFactory.create("provider-$index-category", index),
-        tags = mapOf("category-tag1" to "category-value1")
-      )
-    ),
-    items = listOf(ProtocolItemFactory.create(1))
+    id = IdFactory.forProvider(index),
+    descriptor = ProtocolDescriptorFactory.create("Retail-provider", IdFactory.forProvider(index)),
+    categories = IdFactory.forCategory(IdFactory.forProvider(index), 1).map { ProtocolCategoryFactory.create(it) },
+    items = IdFactory.forItems(IdFactory.forProvider(index), 1).map { ProtocolItemFactory.create(it) }
   )
 
   fun createAsEntity(protocol: ProtocolProviderCatalog) = ProviderCatalog(
@@ -29,9 +23,9 @@ object ProtocolProviderCatalogFactory {
 }
 
 object ProtocolCategoryFactory{
-  fun create(index: Int) = ProtocolCategory(
-    id = "provider-$index-category-$index",
-    descriptor = ProtocolDescriptorFactory.create("provider-$index-category", index),
+  fun create(id: String) = ProtocolCategory(
+    id = id,
+    descriptor = ProtocolDescriptorFactory.create(id, id),
     tags = mapOf("category-tag1" to "category-value1")
   )
 

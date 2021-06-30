@@ -6,13 +6,13 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.OnSelect
+import org.beckn.one.sandbox.bap.message.entities.OnInit
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
-import org.beckn.one.sandbox.bap.message.factories.ProtocolOnSelectMessageSelectedFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolOnInitMessageInitializedFactory
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelect
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelectMessage
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnInitMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class ProtocolOnSelectControllerSpec : DescribeSpec() {
+internal class ProtocolOnInitControllerSpec : DescribeSpec() {
 
   @Autowired
   private lateinit var mockMvc: MockMvc
@@ -38,14 +38,14 @@ internal class ProtocolOnSelectControllerSpec : DescribeSpec() {
   private lateinit var mapper: ObjectMapper
 
   @Autowired
-  private lateinit var onSelectResponseRepo: BecknResponseRepository<OnSelect>
+  private lateinit var onInitResponseRepo: BecknResponseRepository<OnInit>
 
-  private val postOnSelectUrl = "/v1/on_select"
+  private val postOnInitUrl = "/v1/on_init"
 
-  val onSelectResponse = ProtocolOnSelect(
+  val onInitResponse = ProtocolOnInit(
     context = ProtocolContextFactory.fixed,
-    message = ProtocolOnSelectMessage(
-      selected = ProtocolOnSelectMessageSelectedFactory.create(1, 2)
+    message = ProtocolOnInitMessage(
+      initialized = ProtocolOnInitMessageInitializedFactory.create(1, 2)
     )
   )
   init {
@@ -53,31 +53,31 @@ internal class ProtocolOnSelectControllerSpec : DescribeSpec() {
     describe("Protocol OnSelect API") {
 
       context("when posted to with a valid response") {
-        onSelectResponseRepo.clear()
-        val postOnSelectResponse = mockMvc
+        onInitResponseRepo.clear()
+        val postOnInitResponse = mockMvc
           .perform(
-            post(postOnSelectUrl)
+            post(postOnInitUrl)
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .content(mapper.writeValueAsBytes(onSelectResponse))
+              .content(mapper.writeValueAsBytes(onInitResponse))
           )
 
         it("should respond with status as 200") {
-          postOnSelectResponse.andExpect(status().isOk)
+          postOnInitResponse.andExpect(status().isOk)
         }
 
-        it("should save on select response in db") {
-          onSelectResponseRepo.findByMessageId(onSelectResponse.context.messageId).size shouldBeExactly 1
+        it("should save on init response in db") {
+          onInitResponseRepo.findByMessageId(onInitResponse.context.messageId).size shouldBeExactly 1
         }
       }
 
       context("when error occurs when processing request") {
-        val mockService = mock<ResponseStorageService<ProtocolOnSelect>>{
-          onGeneric { save(onSelectResponse) }.thenReturn(Either.Left(DatabaseError.OnWrite))
+        val mockService = mock<ResponseStorageService<ProtocolOnInit>>{
+          onGeneric { save(onInitResponse) }.thenReturn(Either.Left(DatabaseError.OnWrite))
         }
-        val controller = ProtocolOnSelectController(mockService)
+        val controller = ProtocolOnInitController(mockService)
 
         it("should respond with internal server error"){
-          val response = controller.onSelect(onSelectResponse)
+          val response = controller.onInit(onInitResponse)
           response.statusCode shouldBe DatabaseError.OnWrite.status()
         }
       }

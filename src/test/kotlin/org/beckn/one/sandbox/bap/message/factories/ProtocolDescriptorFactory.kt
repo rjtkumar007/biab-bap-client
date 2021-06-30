@@ -5,15 +5,15 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolDescriptor
 
 object ProtocolDescriptorFactory {
 
-  fun create(type: String, index: Int) = ProtocolDescriptor(
-    name = "$type-$index name",
-    code = "$type-$index code",
-    symbol = "$type-$index symbol",
-    shortDesc = "A short description about $type-$index",
-    longDesc = "A long description about $type-$index",
-    images = listOf("uri:https://$type-$index-image-1.com", "uri:https://$type-$index-image-2.com"),
-    audio = "$type-$index-image-audio-file-path",
-    threeDRender = "$type-$index-3d"
+  fun create(type: String, id: String) = ProtocolDescriptor(
+    name = "$type-$id name",
+    code = "$type-$id code",
+    symbol = "$type-$id symbol",
+    shortDesc = "A short description about $type-$id",
+    longDesc = "A long description about $type-$id",
+    images = listOf("uri:https://$type-$id-image-1.com", "uri:https://$type-$id-image-2.com"),
+    audio = "$type-$id-image-audio-file-path",
+    threeDRender = "$type-$id-3d"
   )
 
   fun createAsEntity(protocol: ProtocolDescriptor?) = protocol?.let {

@@ -12,15 +12,15 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolLocation
 object ProtocolLocationFactory {
 
   fun cityLocation(id: Int) = ProtocolLocation(
-    id = "location-$id",
-    descriptor = ProtocolDescriptorFactory.create("location", id),
+    id = IdFactory.forLocation(id),
+    descriptor = ProtocolDescriptorFactory.create("location", IdFactory.forLocation(id)),
     city = ProtocolCityFactory.bangalore,
     country = ProtocolCountryFactory.india
   )
 
   fun addressLocation(id: Int) = ProtocolLocation(
-    id = "location-$id",
-    descriptor = ProtocolDescriptorFactory.create("location", id),
+    id = IdFactory.forLocation(id),
+    descriptor = ProtocolDescriptorFactory.create("location", IdFactory.forLocation(id)),
     address = ProtocolAddress(
       door = "A-11",
       building = "Vedanta",
@@ -29,20 +29,28 @@ object ProtocolLocationFactory {
     )
   )
 
-  fun locationEntity(protocol: ProtocolLocation) = Location(
-    id = protocol.id,
-    descriptor = ProtocolDescriptorFactory.createAsEntity(protocol.descriptor),
-    city = ProtocolCityFactory.cityAsEntity(protocol.city),
-    country = ProtocolCountryFactory.countryAsEntity(protocol.country),
-    address = protocol.address?.let {
-      Address(
-        door = "A-11",
-        building = "Vedanta",
-        street = "High Street",
-        areaCode = "435667"
-      )
-    }
-  )
+  fun locationEntity(protocol: ProtocolLocation?) = protocol?.let {
+    Location(
+      id = protocol.id,
+      descriptor = ProtocolDescriptorFactory.createAsEntity(protocol.descriptor),
+      city = ProtocolCityFactory.cityAsEntity(protocol.city),
+      country = ProtocolCountryFactory.countryAsEntity(protocol.country),
+      address = protocol.address?.let { a ->
+        Address(
+          door = a.door,
+          building = a.building,
+          street = a.street,
+          areaCode = a.areaCode,
+          name = a.name,
+          locality = a.locality,
+          ward = a.ward,
+          city = a.city,
+          state = a.state,
+          country = a.country
+        )
+      }
+    )
+  }
 }
 
 object ProtocolCityFactory {
@@ -68,7 +76,6 @@ object ProtocolCityFactory {
 }
 
 object ProtocolCountryFactory {
-
   val india = ProtocolCountry(
     name = "INDIA",
     code = "IN"

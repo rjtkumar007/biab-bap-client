@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.protocol.controllers
 
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelect
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping
-class ProtocolOnSelectController(
-  store: ResponseStorageService<ProtocolOnSelect>
-): BaseProtocolController<ProtocolOnSelect>(store) {
+class ProtocolOnInitController(
+  store: ResponseStorageService<ProtocolOnInit>
+): BaseProtocolController<ProtocolOnInit>(store) {
 
   @PostMapping(
-    "v1/on_select",
+    "v1/on_init",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
-  fun onSelect(@RequestBody selectResponse: ProtocolOnSelect) = onCallback(selectResponse)
+  fun onInit(@RequestBody initResponse: ProtocolOnInit) = onCallback(initResponse)
 
 }

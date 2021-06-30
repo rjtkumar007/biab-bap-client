@@ -1,7 +1,9 @@
 package org.beckn.one.sandbox.bap.schemas
 
+import org.beckn.one.sandbox.bap.Default
 
-data class ProtocolBilling (
+
+data class ProtocolBilling @Default constructor(
   val name: String,
   val phone: String,
   val organization: ProtocolOrganization? = null,
@@ -13,4 +15,8 @@ data class ProtocolBilling (
   val updatedAt: java.time.OffsetDateTime? = null
 )
 
+data class ProtocolOrganization @Default constructor(
+  val name: String? = null,
+  val cred: String? = null
+)
 

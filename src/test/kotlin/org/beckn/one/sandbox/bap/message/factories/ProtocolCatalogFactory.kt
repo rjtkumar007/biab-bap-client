@@ -1,8 +1,9 @@
 package org.beckn.one.sandbox.bap.message.factories
 
+import org.beckn.one.sandbox.bap.message.entities.Catalog
 import org.beckn.one.sandbox.bap.message.entities.Price
+import org.beckn.one.sandbox.bap.message.entities.ProviderCatalog
 import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
-import org.beckn.one.sandbox.bap.schemas.ProtocolCategory
 import org.beckn.one.sandbox.bap.schemas.ProtocolPrice
 import org.beckn.one.sandbox.bap.schemas.ProtocolProviderCatalog
 
@@ -11,23 +12,26 @@ object ProtocolCatalogFactory {
     return ProtocolCatalog(
       bppProviders = listOf(
         ProtocolProviderCatalog(
-          id = "provider-$index",
-          descriptor = ProtocolDescriptorFactory.create("Retail-provider", index),
-          categories = listOf(
-            ProtocolCategory(
-              id = "provider-$index-category-$index",
-              descriptor = ProtocolDescriptorFactory.create("provider-$index-category", index),
-              tags = mapOf("category-tag1" to "category-value1")
-            )
-          ),
-          items = listOf(ProtocolItemFactory.create(1))
+          id = IdFactory.forProvider(index),
+          descriptor = ProtocolDescriptorFactory.create("Retail-provider", IdFactory.forProvider(index)),
+          categories = IdFactory.forCategory(IdFactory.forProvider(index), 1).map { ProtocolCategoryFactory.create(it) },
+          items = IdFactory.forItems(IdFactory.forProvider(index), 1).map { ProtocolItemFactory.create(it) }
         )
       )
     )
   }
 
-  fun createAsEntity(protocol: ProtocolCatalog?) = protocol.let {
-
+  fun createAsEntity(protocol: ProtocolCatalog?) = protocol?.let {
+    Catalog(
+      bppProviders = it.bppProviders?.map { bpp ->
+        ProviderCatalog(
+          id = bpp.id,
+          descriptor = ProtocolDescriptorFactory.createAsEntity(bpp.descriptor),
+          categories = bpp.categories?.mapNotNull { c -> ProtocolCategoryFactory.createAsEntity(c) },
+          items = bpp.items?.map { i -> ProtocolItemFactory.createAsEntity(i) }
+        )
+      }
+    )
   }
 }
 

@@ -49,3 +49,13 @@ data class ProtocolOnSelectMessage @Default constructor(
   val selected: ProtocolOnSelectMessageSelected? = null
 )
 
+
+data class ProtocolOnInit @Default constructor(
+  override val context: ProtocolContext,
+  val message: ProtocolOnInitMessage? = null,
+  override val error: Error? = null
+): ProtocolResponse
+
+data class ProtocolOnInitMessage @Default constructor(
+  val initialized: ProtocolOnInitMessageInitialized? = null
+)

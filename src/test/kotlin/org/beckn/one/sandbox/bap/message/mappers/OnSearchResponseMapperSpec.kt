@@ -2,8 +2,11 @@ package org.beckn.one.sandbox.bap.message.mappers
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.message.entities.*
+import org.beckn.one.sandbox.bap.message.entities.Descriptor
+import org.beckn.one.sandbox.bap.message.entities.OnSearch
+import org.beckn.one.sandbox.bap.message.entities.OnSearchMessage
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,14 +15,13 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import java.time.Clock
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
 
 @SpringBootTest
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-class SearchResponseMapperSpec @Autowired constructor(
-  private val mapper: SearchResponseMapper
+class OnSearchResponseMapperSpec @Autowired constructor(
+  private val mapper: OnSearchResponseMapper
 ) : DescribeSpec() {
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),
@@ -33,72 +35,14 @@ class SearchResponseMapperSpec @Autowired constructor(
           message = ProtocolOnSearchMessage(
             ProtocolCatalogFactory.create(1)
           ),
-          context = org.beckn.one.sandbox.bap.schemas.ProtocolContext(
-            domain = "LocalRetail",
-            country = "IN",
-            action = org.beckn.one.sandbox.bap.schemas.ProtocolContext.Action.SEARCH,
-            city = "Pune",
-            coreVersion = "0.9.1-draft03",
-            bapId = "http://host.bap.com",
-            bapUri = "http://host.bap.com",
-            transactionId = "222",
-            messageId = "222",
-            timestamp = LocalDateTime.now(fixedClock)
-          )
+          context = ProtocolContextFactory.fixed
         )
         val mappedEntity = mapper.protocolToEntity(protocolSearchResponse)
-
         mappedEntity shouldBe OnSearch(
           message = OnSearchMessage(
-            catalog = Catalog(
-              bppProviders = listOf(
-                ProviderCatalog(
-                  id = "provider-1",
-                  descriptor = descriptor("Retail-provider", 1),
-                  categories = listOf(
-                    Category(
-                      id = "provider-1-category-1",
-                      descriptor = descriptor("provider-1-category", 1),
-                      tags = mapOf("category-tag1" to "category-value1")
-                    )
-                  ),
-                  items = listOf(
-                    Item(
-                      id = "Item_1",
-                      descriptor = descriptor("provider-1-item", 1),
-                      price = Price(
-                        currency = "Rupees",
-                        value = "99",
-                        minimumValue = "100",
-                        estimatedValue = "101",
-                        computedValue = "102",
-                        offeredValue = "103",
-                        listedValue = "104",
-                        maximumValue = "105",
-                      ),
-                      categoryId = "provider-1-category-1",
-                      tags = mapOf("item-tag1" to "item-value1"),
-                      matched = true,
-                      related = true,
-                      recommended = true
-                    )
-                  )
-                )
-              )
-            )
+            ProtocolCatalogFactory.createAsEntity(protocolSearchResponse.message?.catalog)
           ),
-          context = Context(
-            domain = "LocalRetail",
-            country = "IN",
-            action = Context.Action.SEARCH,
-            city = "Pune",
-            coreVersion = "0.9.1-draft03",
-            bapId = "http://host.bap.com",
-            bapUri = "http://host.bap.com",
-            transactionId = "222",
-            messageId = "222",
-            timestamp = LocalDateTime.now(fixedClock)
-          )
+          context = ProtocolContextFactory.fixedAsEntity(protocolSearchResponse.context)
         )
       }
     }

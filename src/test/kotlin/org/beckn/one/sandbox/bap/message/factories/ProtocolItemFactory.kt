@@ -5,11 +5,11 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolItem
 
 object ProtocolItemFactory {
 
-  fun create(index: Int) = ProtocolItem(
-    id = "Item_$index",
-    descriptor = ProtocolDescriptorFactory.create("provider-$index-item", index),
+  fun create(itemId: String) = ProtocolItem(
+    id = "Item_$itemId",
+    descriptor = ProtocolDescriptorFactory.create("provider-$itemId-item", itemId),
     price = ProtocolPriceFactory.create(),
-    categoryId = "provider-$index-category-$index",
+    categoryId = "provider-$itemId-category-$itemId",
     tags = mapOf("item-tag1" to "item-value1"),
     matched = true,
     related = true,
