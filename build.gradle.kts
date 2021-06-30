@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+  id("jacoco")
   id("org.springframework.boot") version "2.5.0"
   id("io.spring.dependency-management") version "1.0.11.RELEASE"
   id("org.jetbrains.kotlin.plugin.serialization") version "1.5.10"
@@ -57,4 +58,17 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
   useJUnitPlatform()
+}
+
+jacoco {
+  toolVersion = "0.8.7"
+}
+
+tasks.jacocoTestReport {
+  dependsOn("build")
+  reports {
+    xml.required.set(false)
+    csv.required.set(false)
+    html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+  }
 }

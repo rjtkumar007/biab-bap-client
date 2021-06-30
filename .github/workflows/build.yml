@@ -4,7 +4,7 @@ on: [ push ]
 
 jobs:
   build:
-    runs-on: [self-hosted, linux]
+    runs-on: [ self-hosted, linux ]
 
     steps:
       - uses: actions/checkout@v2
@@ -23,7 +23,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew clean jacocoTestReport
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: build/jacocoHtml
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
         # Restoring these files from a GitHub Actions cache might cause problems for future builds.
