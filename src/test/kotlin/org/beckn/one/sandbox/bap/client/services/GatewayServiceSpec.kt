@@ -10,6 +10,9 @@ import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.schemas.Intent
 import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolFulfillment
+import org.beckn.one.sandbox.bap.schemas.ProtocolFulfillmentEnd
+import org.beckn.one.sandbox.bap.schemas.ProtocolLocation
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchRequest
 import org.beckn.one.sandbox.bap.schemas.ProtocolSearchRequestMessage
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage.Companion.nack
@@ -25,6 +28,7 @@ import java.time.ZoneId
 
 internal class GatewayServiceSpec : DescribeSpec() {
   private val queryString = "Fictional mystery books"
+  private val locationString = "40.741895,-73.989308"
   private val gatewayServiceClientFactory = mock(GatewayServiceClientFactory::class.java)
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
@@ -67,7 +71,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
           Calls.failure(IOException("Timeout"))
         )
 
-        val response = gatewayService.search(gateway, queryString)
+        val response = gatewayService.search(gateway, queryString, locationString)
 
         response
           .fold(
@@ -81,7 +85,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
         val searchRequest = getRequest()
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(Calls.response(null))
 
-        val response = gatewayService.search(gateway, queryString)
+        val response = gatewayService.search(gateway, queryString, locationString)
 
         response
           .fold(
@@ -96,7 +100,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
         val nackResponse = Calls.response(ProtocolAckResponse(contextFactory.create(), nack()))
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(nackResponse)
 
-        val response = gatewayService.search(gateway, queryString)
+        val response = gatewayService.search(gateway, queryString, locationString)
 
         response
           .fold(
@@ -110,7 +114,12 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
   private fun getRequest() = ProtocolSearchRequest(
     contextFactory.create(),
-    ProtocolSearchRequestMessage(Intent(queryString = queryString))
+    ProtocolSearchRequestMessage(
+      Intent(
+        queryString = queryString,
+        fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString)))
+      )
+    )
   )
 
 }

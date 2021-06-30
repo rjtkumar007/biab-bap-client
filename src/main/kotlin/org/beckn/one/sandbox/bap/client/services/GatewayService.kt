@@ -26,12 +26,20 @@ class GatewayService @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
 
-  fun search(gateway: SubscriberDto, queryString: String?): Either<GatewaySearchError, ProtocolAckResponse> {
+  fun search(gateway: SubscriberDto, queryString: String?, locationString: String?): Either<GatewaySearchError, ProtocolAckResponse> {
     return try {
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
       val httpResponse = gatewayServiceClient.search(
-        ProtocolSearchRequest(contextFactory.create(), ProtocolSearchRequestMessage(Intent(queryString = queryString)))
+        ProtocolSearchRequest(
+          contextFactory.create(),
+          ProtocolSearchRequestMessage(
+            Intent(
+              queryString = queryString,
+              fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString)))
+            )
+          )
+        )
       ).execute()
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       when {

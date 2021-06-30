@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.*
+import org.beckn.one.sandbox.bap.message.entities.Fulfillment
 import org.beckn.one.sandbox.bap.schemas.*
 import java.time.LocalDate
 import java.time.OffsetDateTime

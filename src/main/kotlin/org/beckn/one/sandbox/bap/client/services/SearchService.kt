@@ -24,11 +24,11 @@ class SearchService(
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun search(context: ProtocolContext, queryString: String?): Either<HttpError, Message> {
+  fun search(context: ProtocolContext, queryString: String?, location: String?): Either<HttpError, Message> {
     log.info("Got search request: {}", queryString)
     return registryService
       .lookupGateways()
-      .flatMap { gatewayService.search(it.first(), queryString) }
+      .flatMap { gatewayService.search(it.first(), queryString, location) }
       .flatMap { messageService.save(Message(id = context.messageId, type = Message.Type.Search)) }
   }
 
@@ -45,4 +45,5 @@ class SearchService(
         )
       }
   }
+
 }

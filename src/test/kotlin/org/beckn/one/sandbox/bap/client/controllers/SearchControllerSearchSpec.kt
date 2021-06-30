@@ -59,6 +59,22 @@ class SearchControllerSearchSpec @Autowired constructor(
           .andExpect(jsonPath("$.error.message", `is`("Registry lookup returned error")))
       }
 
+      it("should return error response when registry lookup fails with location") {
+        MockNetwork.registry
+          .stubFor(post("/lookup").willReturn(serverError()))
+
+        mockMvc
+          .perform(
+            get("/client/v1/search")
+              .param("searchString", "Fictional mystery books")
+              .param("location", "40.741895,-73.989308")
+          )
+          .andExpect(status().is5xxServerError)
+          .andExpect(jsonPath("$.message.ack.status", `is`("NACK")))
+          .andExpect(jsonPath("$.error.code", `is`("BAP_001")))
+          .andExpect(jsonPath("$.error.message", `is`("Registry lookup returned error")))
+      }
+
       it("should invoke Beckn /search API on first gateway and persist message") {
         val gatewaysJson = objectMapper.writeValueAsString(MockNetwork.getAllGateways())
         MockNetwork.registry
@@ -89,6 +105,39 @@ class SearchControllerSearchSpec @Autowired constructor(
         savedMessage?.id shouldBe searchResponse.context.messageId
         savedMessage?.type shouldBe Message.Type.Search
       }
+
+      it("should invoke Beckn /search API on first gateway and persist message with location") {
+        val gatewaysJson = objectMapper.writeValueAsString(MockNetwork.getAllGateways())
+        MockNetwork.registry
+          .stubFor(post("/lookup").willReturn(okJson(gatewaysJson)))
+        MockNetwork.retailBengaluruBg
+          .stubFor(
+            post("/search").willReturn(
+              okJson(
+                objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory))
+              )
+            )
+          )
+
+        val result: MvcResult = mockMvc
+          .perform(
+            get("/client/v1/search")
+              .param("searchString", "Fictional mystery books")
+              .param("location", "40.741895,-73.989308")
+          )
+          .andExpect(status().is2xxSuccessful)
+          .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
+          .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
+          .andReturn()
+
+        MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
+        val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolAckResponse::class.java)
+        val savedMessage = messageRepository.findOne(Message::id eq searchResponse.context.messageId)
+        savedMessage shouldNotBe null
+        savedMessage?.id shouldBe searchResponse.context.messageId
+        savedMessage?.type shouldBe Message.Type.Search
+      }
+
     }
   }
 }
