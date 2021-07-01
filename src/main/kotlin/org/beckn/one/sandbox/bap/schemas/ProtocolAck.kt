@@ -1,5 +1,5 @@
 package org.beckn.one.sandbox.bap.schemas
 
-data class Ack(
+data class ProtocolAck(
   val status: ResponseStatus
 )

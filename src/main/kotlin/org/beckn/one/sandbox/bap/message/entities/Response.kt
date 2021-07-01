@@ -37,3 +37,13 @@ data class OnInit @Default constructor(
 data class OnInitMessage @Default constructor(
   val initialized: OnInitMessageInitialized? = null
 )
+
+data class OnConfirm @Default constructor(
+  override val context: Context,
+  val message: OnConfirmMessage? = null,
+  override val error: Error? = null
+): BecknResponse
+
+data class OnConfirmMessage @Default constructor(
+  val order: Order? = null
+)

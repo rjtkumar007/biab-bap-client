@@ -3,10 +3,7 @@ package org.beckn.one.sandbox.bap.configurations
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoDatabase
-import org.beckn.one.sandbox.bap.message.entities.Message
-import org.beckn.one.sandbox.bap.message.entities.OnInit
-import org.beckn.one.sandbox.bap.message.entities.OnSearch
-import org.beckn.one.sandbox.bap.message.entities.OnSelect
+import org.beckn.one.sandbox.bap.message.entities.*
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.litote.kmongo.KMongo
@@ -45,4 +42,8 @@ class DatabaseConfiguration @Autowired constructor(
   @Bean
   fun onInitResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnInit> =
     BecknResponseRepository(database.getCollectionOfName("on_select"))
+
+  @Bean
+  fun onConfirmResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnConfirm> =
+    BecknResponseRepository(database.getCollectionOfName("on_confirm"))
 }

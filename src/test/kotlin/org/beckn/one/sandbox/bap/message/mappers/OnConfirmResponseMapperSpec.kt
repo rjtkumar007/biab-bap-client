@@ -2,12 +2,12 @@ package org.beckn.one.sandbox.bap.message.mappers
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.message.entities.OnSelect
-import org.beckn.one.sandbox.bap.message.entities.OnSelectMessage
+import org.beckn.one.sandbox.bap.message.entities.OnConfirm
+import org.beckn.one.sandbox.bap.message.entities.OnConfirmMessage
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
-import org.beckn.one.sandbox.bap.message.factories.ProtocolOnSelectMessageSelectedFactory
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelect
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelectMessage
+import org.beckn.one.sandbox.bap.message.factories.ProtocolOrderFactory
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnConfirm
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnConfirmMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -16,25 +16,25 @@ import org.springframework.test.context.TestPropertySource
 @SpringBootTest
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-class OnSelectResponseMapperSpec @Autowired constructor(
-  private val mapper: OnSelectResponseMapper
+class OnConfirmResponseMapperSpec @Autowired constructor(
+  private val mapper: OnConfirmResponseMapper
 ): DescribeSpec() {
 
-  private val protocolResponse = ProtocolOnSelect(
+  private val protocolResponse = ProtocolOnConfirm(
     context = ProtocolContextFactory.fixed,
-    message = ProtocolOnSelectMessage(
-      ProtocolOnSelectMessageSelectedFactory.create(1, 2)
+    message = ProtocolOnConfirmMessage(
+      ProtocolOrderFactory.create(1, 2)
     )
   )
 
-  private val entityResponse = OnSelect(
+  private val entityResponse = OnConfirm(
     context = ProtocolContextFactory.fixedAsEntity(protocolResponse.context),
-    message = OnSelectMessage(
-      ProtocolOnSelectMessageSelectedFactory.createAsEntity(protocolResponse.message?.selected)
+    message = OnConfirmMessage(
+      ProtocolOrderFactory.createAsEntity(protocolResponse.message?.order)
     )
   )
   init {
-      describe("OnSelectResponseMapper") {
+      describe("OnConfirmResponseMapper") {
         it("should map properties from entity to schema") {
           mapper.protocolToEntity(protocolResponse) shouldBe entityResponse
         }

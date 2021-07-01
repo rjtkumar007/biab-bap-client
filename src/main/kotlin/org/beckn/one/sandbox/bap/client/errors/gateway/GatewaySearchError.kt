@@ -1,21 +1,21 @@
 package org.beckn.one.sandbox.bap.client.errors.gateway
 
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.schemas.Error
+import org.beckn.one.sandbox.bap.schemas.ProtocolError
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.springframework.http.HttpStatus
 
 sealed class GatewaySearchError : HttpError {
-  val gatewayError = Error("BAP_003", "Gateway search returned error")
-  val nullError = Error("BAP_004", "Gateway search returned null")
-  val nackError = Error("BAP_005", "Gateway search returned nack")
+  val gatewayError = ProtocolError("BAP_003", "Gateway search returned error")
+  val nullError = ProtocolError("BAP_004", "Gateway search returned null")
+  val nackError = ProtocolError("BAP_005", "Gateway search returned nack")
 
   object Internal : GatewaySearchError() {
     override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
 
-    override fun error(): Error = gatewayError
+    override fun error(): ProtocolError = gatewayError
   }
 
   object Nack : GatewaySearchError() {
@@ -23,7 +23,7 @@ sealed class GatewaySearchError : HttpError {
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
 
-    override fun error(): Error = nackError
+    override fun error(): ProtocolError = nackError
   }
 
   object NullResponse : GatewaySearchError() {
@@ -31,6 +31,6 @@ sealed class GatewaySearchError : HttpError {
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
 
-    override fun error(): Error = nullError
+    override fun error(): ProtocolError = nullError
   }
 }

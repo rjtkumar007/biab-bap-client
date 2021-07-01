@@ -1,13 +1,7 @@
 package org.beckn.one.sandbox.bap.message.mappers
 
-import org.beckn.one.sandbox.bap.message.entities.BecknResponse
-import org.beckn.one.sandbox.bap.message.entities.OnInit
-import org.beckn.one.sandbox.bap.message.entities.OnSearch
-import org.beckn.one.sandbox.bap.message.entities.OnSelect
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelect
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
+import org.beckn.one.sandbox.bap.message.entities.*
+import org.beckn.one.sandbox.bap.schemas.*
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
@@ -46,4 +40,14 @@ interface OnSelectResponseMapper : GenericResponseMapper<ProtocolOnSelect, OnSel
 interface OnInitResponseMapper : GenericResponseMapper<ProtocolOnInit, OnInit> {
   override fun entityToProtocol(entity: OnInit): ProtocolOnInit
   override fun protocolToEntity(schema: ProtocolOnInit): OnInit
+}
+
+@Mapper(
+  componentModel = "spring",
+  unmappedTargetPolicy = ReportingPolicy.WARN,
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+)
+interface OnConfirmResponseMapper : GenericResponseMapper<ProtocolOnConfirm, OnConfirm> {
+  override fun entityToProtocol(entity: OnConfirm): ProtocolOnConfirm
+  override fun protocolToEntity(schema: ProtocolOnConfirm): OnConfirm
 }

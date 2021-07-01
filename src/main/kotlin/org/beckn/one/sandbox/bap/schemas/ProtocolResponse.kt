@@ -6,13 +6,13 @@ import org.beckn.one.sandbox.bap.Default
 
 interface ProtocolResponse {
   val context: ProtocolContext
-  val error: Error?
+  val error: ProtocolError?
 }
 
-data class ResponseMessage @Default constructor(val ack: Ack) {
+data class ResponseMessage @Default constructor(val ack: ProtocolAck) {
   companion object {
-    fun ack(): ResponseMessage = ResponseMessage(Ack(ResponseStatus.ACK))
-    fun nack(): ResponseMessage = ResponseMessage(Ack(ResponseStatus.NACK))
+    fun ack(): ResponseMessage = ResponseMessage(ProtocolAck(ResponseStatus.ACK))
+    fun nack(): ResponseMessage = ResponseMessage(ProtocolAck(ResponseStatus.NACK))
   }
 }
 
@@ -27,14 +27,14 @@ enum class ResponseStatus(
 data class ProtocolAckResponse(
   override val context: ProtocolContext,
   val message: ResponseMessage,
-  override val error: Error? = null,
+  override val error: ProtocolError? = null,
 ) : ProtocolResponse
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ProtocolOnSearch @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolOnSearchMessage? = null,
-  override val error: Error? = null,
+  override val error: ProtocolError? = null,
 ) : ProtocolResponse
 
 data class ProtocolOnSearchMessage @Default constructor(
@@ -44,8 +44,8 @@ data class ProtocolOnSearchMessage @Default constructor(
 data class ProtocolOnSelect @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolOnSelectMessage? = null,
-  override val error: Error? = null
-) : ProtocolResponse
+  override val error: ProtocolError? = null
+): ProtocolResponse
 
 data class ProtocolOnSelectMessage @Default constructor(
   val selected: ProtocolOnSelectMessageSelected? = null
@@ -55,9 +55,20 @@ data class ProtocolOnSelectMessage @Default constructor(
 data class ProtocolOnInit @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolOnInitMessage? = null,
-  override val error: Error? = null
-) : ProtocolResponse
+  override val error: ProtocolError? = null
+): ProtocolResponse
 
 data class ProtocolOnInitMessage @Default constructor(
   val initialized: ProtocolOnInitMessageInitialized? = null
+)
+
+
+data class ProtocolOnConfirm @Default constructor(
+  override val context: ProtocolContext,
+  val message: ProtocolOnConfirmMessage? = null,
+  override val error: ProtocolError? = null
+): ProtocolResponse
+
+data class ProtocolOnConfirmMessage @Default constructor(
+  val order: ProtocolOrder? = null
 )

@@ -12,5 +12,5 @@ data class ProtocolSearchRequest @Default constructor(
 ) : ProtocolRequest
 
 data class ProtocolSearchRequestMessage @Default constructor(
-  val intent: Intent
+  val intent: ProtocolIntent
 )

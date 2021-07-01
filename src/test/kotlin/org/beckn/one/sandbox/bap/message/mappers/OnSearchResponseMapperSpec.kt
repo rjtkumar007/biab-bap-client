@@ -28,22 +28,29 @@ class OnSearchResponseMapperSpec @Autowired constructor(
     ZoneId.of("Asia/Calcutta")
   )
 
+  val protocolSearchResponse = ProtocolOnSearch(
+    message = ProtocolOnSearchMessage(
+      ProtocolCatalogFactory.create(1)
+    ),
+    context = ProtocolContextFactory.fixed
+  )
+
+  private val entitySearchResponse =  OnSearch(
+    message = OnSearchMessage(
+      ProtocolCatalogFactory.createAsEntity(protocolSearchResponse.message?.catalog)
+    ),
+    context = ProtocolContextFactory.fixedAsEntity(protocolSearchResponse.context)
+  )
   init {
     describe("SearchResponseMapper") {
       it("should map all fields from schema to entity") {
-        val protocolSearchResponse = ProtocolOnSearch(
-          message = ProtocolOnSearchMessage(
-            ProtocolCatalogFactory.create(1)
-          ),
-          context = ProtocolContextFactory.fixed
-        )
         val mappedEntity = mapper.protocolToEntity(protocolSearchResponse)
-        mappedEntity shouldBe OnSearch(
-          message = OnSearchMessage(
-            ProtocolCatalogFactory.createAsEntity(protocolSearchResponse.message?.catalog)
-          ),
-          context = ProtocolContextFactory.fixedAsEntity(protocolSearchResponse.context)
-        )
+        mappedEntity shouldBe entitySearchResponse
+      }
+
+      it("should map all fields from entity to schema") {
+        val mappedSchema = mapper.entityToProtocol(entitySearchResponse)
+        mappedSchema shouldBe protocolSearchResponse
       }
     }
   }

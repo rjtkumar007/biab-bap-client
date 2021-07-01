@@ -43,6 +43,7 @@ object IdFactory {
   fun forLocation(id: Int) = "location-$id"
   fun forFulfillment(id: Int) = "fulfillment-$id"
   fun forProvider(id: Int) = "provider-$id"
+  fun forOrder(id: Int) = "order-$id"
   fun forCategory(providerId: String, numberOfCategories: Int) = seqTill(numberOfCategories).map { "$providerId-category-$it" }
   fun forItems(providerId: String, numberOfItems: Int) = seqTill(numberOfItems).map { "$providerId-item-$it" }
 

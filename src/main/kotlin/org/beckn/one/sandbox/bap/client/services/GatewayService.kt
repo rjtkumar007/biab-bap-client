@@ -34,7 +34,7 @@ class GatewayService @Autowired constructor(
         ProtocolSearchRequest(
           contextFactory.create(),
           ProtocolSearchRequestMessage(
-            Intent(
+            ProtocolIntent(
               queryString = queryString,
               fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString)))
             )

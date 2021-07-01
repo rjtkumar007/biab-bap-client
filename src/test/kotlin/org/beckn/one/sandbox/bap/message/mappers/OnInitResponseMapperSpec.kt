@@ -18,7 +18,7 @@ import org.springframework.test.context.TestPropertySource
 @TestPropertySource(locations = ["/application-test.yml"])
 class OnInitResponseMapperSpec @Autowired constructor(
   private val mapper: OnInitResponseMapper
-): DescribeSpec() {
+) : DescribeSpec() {
 
   private val protocolResponse = ProtocolOnInit(
     context = ProtocolContextFactory.fixed,
@@ -26,16 +26,23 @@ class OnInitResponseMapperSpec @Autowired constructor(
       ProtocolOnInitMessageInitializedFactory.create(1, 2)
     )
   )
+
+  private val entityResponse = OnInit(
+    context = ProtocolContextFactory.fixedAsEntity(protocolResponse.context),
+    message = OnInitMessage(
+      initialized = ProtocolOnInitMessageInitializedFactory.createAsEntity(protocolResponse.message?.initialized)
+    )
+  )
+
   init {
-      describe("OnSelectResponseMapper") {
-        it("should map properties from entity to schema") {
-          mapper.protocolToEntity(protocolResponse) shouldBe OnInit(
-            context = ProtocolContextFactory.fixedAsEntity(protocolResponse.context),
-            message = OnInitMessage(
-              initialized = ProtocolOnInitMessageInitializedFactory.createAsEntity(protocolResponse.message?.initialized)
-            )
-          )
-        }
+    describe("OnSelectResponseMapper") {
+      it("should map properties from entity to schema") {
+        mapper.protocolToEntity(protocolResponse) shouldBe entityResponse
       }
+
+      it("should map properties from schema to entity") {
+        mapper.entityToProtocol(entityResponse) shouldBe protocolResponse
+      }
+    }
   }
 }

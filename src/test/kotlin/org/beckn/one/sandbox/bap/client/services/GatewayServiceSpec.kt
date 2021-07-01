@@ -8,7 +8,7 @@ import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
-import org.beckn.one.sandbox.bap.schemas.Intent
+import org.beckn.one.sandbox.bap.schemas.ProtocolIntent
 import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolFulfillment
 import org.beckn.one.sandbox.bap.schemas.ProtocolFulfillmentEnd
@@ -115,7 +115,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
   private fun getRequest() = ProtocolSearchRequest(
     contextFactory.create(),
     ProtocolSearchRequestMessage(
-      Intent(
+      ProtocolIntent(
         queryString = queryString,
         fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString)))
       )

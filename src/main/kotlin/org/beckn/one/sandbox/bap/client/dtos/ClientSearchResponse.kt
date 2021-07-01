@@ -1,23 +1,25 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
+import org.beckn.one.sandbox.bap.schemas.ProtocolError
+import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.Default
 import org.beckn.one.sandbox.bap.schemas.*
 import java.time.LocalDateTime
 
 interface ClientResponse {
   val context: ProtocolContext
-  val error: Error?
+  val error: ProtocolError?
 }
 
 data class ClientErrorResponse(
   override val context: ProtocolContext,
-  override val error: Error? = null
-) : ClientResponse
+  override val error: ProtocolError? = null
+): ClientResponse
 
 data class ClientSearchResponse(
   override val context: ProtocolContext,
   val message: ClientSearchResponseMessage? = null,
-  override val error: Error? = null,
+  override val error: ProtocolError? = null,
 ) : ClientResponse
 
 data class ClientSearchResponseMessage(
