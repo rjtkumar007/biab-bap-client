@@ -87,9 +87,6 @@
             }
           }
         },
-        "requestBody": {
-          "$ref": "#/components/requestBodies/Cart"
-        },
         "parameters": [],
         "externalDocs": {}
       },
