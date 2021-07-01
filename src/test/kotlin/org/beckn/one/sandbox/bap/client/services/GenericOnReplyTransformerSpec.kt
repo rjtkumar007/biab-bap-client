@@ -4,7 +4,9 @@ import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
+import org.beckn.one.sandbox.bap.client.mappers.ClientCatalogMapperImpl
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
+import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
@@ -44,22 +46,28 @@ internal class GenericOnReplyTransformerSpec : DescribeSpec() {
     ),
     context = context
   )
+  private val clientCatalogMapper = ClientCatalogMapperImpl()
 
   init {
     describe("GenericOnReplyTransformerSpec.forSearchResults") {
       context("when invoked") {
-        val clientSearchResponse = GenericOnPollTransformer.forSearchResults
-          .transform(listOf(protocolSearchResponse1, protocolSearchResponse2), context)
+        val clientSearchResponse =
+          SearchClientSearchResponseMapper(clientCatalogMapper)
+            .transform(listOf(protocolSearchResponse1, protocolSearchResponse2), context)
 
         it("should transform the protocol response to client response") {
           clientSearchResponse shouldBeRight ClientSearchResponse(
             context = context,
             message = ClientSearchResponseMessage(
-              catalogs = listOf(catalog1, catalog2)
+              catalogs = listOf(mapToClientCatalog(catalog1), mapToClientCatalog(catalog2))
             )
           )
         }
       }
     }
   }
+
+  private fun mapToClientCatalog(protocolCatalog: ProtocolCatalog) = clientCatalogMapper.protocolToClientDto(
+    protocolCatalog
+  )
 }

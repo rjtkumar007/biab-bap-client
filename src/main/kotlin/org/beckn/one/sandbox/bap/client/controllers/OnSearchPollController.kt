@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OnSearchPollController @Autowired constructor(
-    private val onPollService: GenericOnPollService<ProtocolOnSearch, ClientSearchResponse>,
-    private val contextFactory: ContextFactory
-): BaseOnPollController<ProtocolOnSearch, ClientSearchResponse>(onPollService, contextFactory) {
+  onPollService: GenericOnPollService<ProtocolOnSearch, ClientSearchResponse>,
+  contextFactory: ContextFactory
+) : BaseOnPollController<ProtocolOnSearch, ClientSearchResponse>(onPollService, contextFactory) {
 
   @RequestMapping("/client/v1/on_search")
   @ResponseBody

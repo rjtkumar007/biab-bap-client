@@ -2,6 +2,7 @@ package org.beckn.one.sandbox.bap.client.services
 
 import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
+import org.beckn.one.sandbox.bap.client.dtos.ClientCatalog
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.message.entities.*
@@ -69,7 +70,7 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
           ClientSearchResponse(
             context = context,
             message = ClientSearchResponseMessage(
-              catalogs = listOf(ProtocolCatalog(), ProtocolCatalog())
+              catalogs = listOf(ClientCatalog(), ClientCatalog())
             )
           )
         )

@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.schemas
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import kotlinx.serialization.Serializable
 import org.beckn.one.sandbox.bap.Default
 
@@ -29,6 +30,7 @@ data class ProtocolAckResponse(
   override val error: Error? = null,
 ) : ProtocolResponse
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class ProtocolOnSearch @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolOnSearchMessage? = null,
@@ -43,7 +45,7 @@ data class ProtocolOnSelect @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolOnSelectMessage? = null,
   override val error: Error? = null
-): ProtocolResponse
+) : ProtocolResponse
 
 data class ProtocolOnSelectMessage @Default constructor(
   val selected: ProtocolOnSelectMessageSelected? = null
@@ -54,7 +56,7 @@ data class ProtocolOnInit @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolOnInitMessage? = null,
   override val error: Error? = null
-): ProtocolResponse
+) : ProtocolResponse
 
 data class ProtocolOnInitMessage @Default constructor(
   val initialized: ProtocolOnInitMessageInitialized? = null

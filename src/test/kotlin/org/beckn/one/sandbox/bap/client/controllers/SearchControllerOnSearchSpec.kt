@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
+import org.beckn.one.sandbox.bap.client.mappers.ClientCatalogMapper
 import org.beckn.one.sandbox.bap.message.entities.Message
 import org.beckn.one.sandbox.bap.message.entities.OnSearch
 import org.beckn.one.sandbox.bap.message.entities.OnSearchMessage
@@ -37,6 +38,7 @@ class SearchControllerOnSearchSpec @Autowired constructor(
   val contextFactory: ContextFactory,
   val contextMapper: ContextMapper,
   val catalogMapper: CatalogMapper,
+  val clientCatalogMapper: ClientCatalogMapper,
   val messageRepository: GenericRepository<Message>,
   val searchResponseRepository: GenericRepository<OnSearch>
 ) : DescribeSpec() {
@@ -83,10 +85,15 @@ class SearchControllerOnSearchSpec @Autowired constructor(
           .andReturn()
           .response
         val onSearchResponse = objectMapper.readValue(response.contentAsString, ClientSearchResponse::class.java)
-        onSearchResponse.message shouldBe ClientSearchResponseMessage(listOf(protocolCatalog1, protocolCatalog2))
+        onSearchResponse.message shouldBe ClientSearchResponseMessage(
+          listOf(mapToClientCatalog(protocolCatalog1), mapToClientCatalog(protocolCatalog2))
+        )
       }
     }
   }
+
+  private fun mapToClientCatalog(protocolCatalog1: ProtocolCatalog) =
+    clientCatalogMapper.protocolToClientDto(protocolCatalog1)
 
   private fun mapToEntityAndPersist(message: Message, protocolCatalog: ProtocolCatalog) {
     val context = contextMapper.fromSchema(contextFactory.create(messageId = message.id))

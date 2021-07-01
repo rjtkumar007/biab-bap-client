@@ -24,7 +24,8 @@ class SearchController @Autowired constructor(
     @RequestParam location: String?
   ): ResponseEntity<ProtocolAckResponse> {
     val context = contextFactory.create()
-    return searchService.search(context, searchString, location)
+    return searchService.
+    search(context, searchString, location)
       .fold(
         {
           log.error("Error during search. Error: {}", it)
