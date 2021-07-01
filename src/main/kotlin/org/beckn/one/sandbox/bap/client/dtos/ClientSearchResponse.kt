@@ -1,7 +1,5 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
-import org.beckn.one.sandbox.bap.schemas.ProtocolError
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.Default
 import org.beckn.one.sandbox.bap.schemas.*
 import java.time.LocalDateTime
@@ -31,4 +29,8 @@ data class ClientCatalog @Default constructor(
   val bppProviders: List<ProtocolProviderCatalog>? = null,
   val bppCategories: List<ProtocolCategory>? = null,
   val exp: LocalDateTime? = null
+)
+
+data class ListWrapperResponseMessage<R>(
+  val response: List<R>? = null,
 )

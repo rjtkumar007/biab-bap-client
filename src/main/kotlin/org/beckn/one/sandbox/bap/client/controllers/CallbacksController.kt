@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.ClientErrorResponse
+import org.beckn.one.sandbox.bap.client.dtos.ListWrapperResponseMessage
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnConfirm
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
@@ -33,7 +34,7 @@ class CallbacksController @Autowired constructor(
           .body(ClientErrorResponse(context = contextFactory.create(), error = it.error()))
       },
       {
-        ResponseEntity.ok(it)
+        ResponseEntity.ok(ListWrapperResponseMessage(it))
       }
     )
 
@@ -48,7 +49,7 @@ class CallbacksController @Autowired constructor(
         .body(ClientErrorResponse(context = contextFactory.create(), error = it.error()))
     },
     {
-      ResponseEntity.ok(it)
+      ResponseEntity.ok(ListWrapperResponseMessage(it))
     }
   )
 
@@ -63,7 +64,7 @@ class CallbacksController @Autowired constructor(
         .body(ClientErrorResponse(context = contextFactory.create(), error = it.error()))
     },
     {
-      ResponseEntity.ok(it)
+      ResponseEntity.ok(ListWrapperResponseMessage(it))
     }
   )
 }
