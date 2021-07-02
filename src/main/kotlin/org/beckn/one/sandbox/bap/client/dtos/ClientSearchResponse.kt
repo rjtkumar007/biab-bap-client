@@ -4,16 +4,6 @@ import org.beckn.one.sandbox.bap.Default
 import org.beckn.one.sandbox.bap.schemas.*
 import java.time.LocalDateTime
 
-interface ClientResponse {
-  val context: ProtocolContext
-  val error: ProtocolError?
-}
-
-data class ClientErrorResponse(
-  override val context: ProtocolContext,
-  override val error: ProtocolError? = null
-): ClientResponse
-
 data class ClientSearchResponse(
   override val context: ProtocolContext,
   val message: ClientSearchResponseMessage? = null,

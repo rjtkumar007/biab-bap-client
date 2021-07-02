@@ -1,6 +1,18 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
+import org.beckn.one.sandbox.bap.schemas.ProtocolContext
+import org.beckn.one.sandbox.bap.schemas.ProtocolError
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
+
+data class GetCartResponse(
+  override val context: ProtocolContext,
+  val message: GetCartResponseMessage? = null,
+  override val error: ProtocolError? = null,
+) : ClientResponse
+
+data class GetCartResponseMessage(
+  val cart: Cart? = null,
+)
 
 data class Cart(
   val id: String? = null,

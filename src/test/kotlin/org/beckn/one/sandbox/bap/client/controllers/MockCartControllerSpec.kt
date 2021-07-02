@@ -3,10 +3,9 @@ package org.beckn.one.sandbox.bap.client.controllers
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.client.dtos.Cart
-import org.beckn.one.sandbox.bap.client.dtos.CartItem
-import org.beckn.one.sandbox.bap.client.dtos.CartItemProvider
+import org.beckn.one.sandbox.bap.client.dtos.*
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
+import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -21,17 +20,16 @@ import java.math.BigDecimal
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-class CartControllerSpec @Autowired constructor(
+class MockCartControllerSpec @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
 ) : DescribeSpec() {
   init {
-
     describe("Cart") {
       it("should return cart by id") {
         val cartId = "cart 1"
 
-        val getCartResponse = mockMvc
+        val getCartResponseString = mockMvc
           .perform(
             get("/client/v0/cart")
               .param("id", cartId)
@@ -40,38 +38,40 @@ class CartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
 
-        val cart = objectMapper.readValue(getCartResponse, Cart::class.java)
-        cart shouldBe Cart(
-          id = cartId, items = listOf(
-            CartItem(
-              bppId = "paisool",
-              provider = CartItemProvider(
-                id = "venugopala stores",
-                providerLocations = listOf("13.001581,77.5703686")
-              ),
-              itemId = "cothas-coffee-1",
-              quantity = 2,
-              measure = ProtocolScalar(
-                value = BigDecimal.valueOf(500),
-                unit = "gm"
-              )
-            ),
-            CartItem(
-              bppId = "paisool",
-              provider = CartItemProvider(
-                id = "maruthi-stores",
-                providerLocations = listOf("12.9995218,77.5704439")
-              ),
-              itemId = "malgudi-coffee-500-gms",
-              quantity = 1,
-              measure = ProtocolScalar(
-                value = BigDecimal.valueOf(1),
-                unit = "kg"
-              )
-            )
-          )
-        )
+        val getCartResponse = objectMapper.readValue(getCartResponseString, GetCartResponse::class.java)
+        getCartResponse.message shouldBe GetCartResponseMessage(cart = getCart(cartId))
       }
     }
   }
+
+  private fun getCart(cartId: String) = Cart(
+    id = cartId, items = listOf(
+      CartItem(
+        bppId = "paisool",
+        provider = CartItemProvider(
+          id = "venugopala stores",
+          providerLocations = listOf("13.001581,77.5703686")
+        ),
+        itemId = "cothas-coffee-1",
+        quantity = 2,
+        measure = ProtocolScalar(
+          value = BigDecimal.valueOf(500),
+          unit = "gm"
+        )
+      ),
+      CartItem(
+        bppId = "paisool",
+        provider = CartItemProvider(
+          id = "maruthi-stores",
+          providerLocations = listOf("12.9995218,77.5704439")
+        ),
+        itemId = "malgudi-coffee-500-gms",
+        quantity = 1,
+        measure = ProtocolScalar(
+          value = BigDecimal.valueOf(1),
+          unit = "kg"
+        )
+      )
+    )
+  )
 }
