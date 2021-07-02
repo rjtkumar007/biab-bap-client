@@ -1,29 +1,38 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.*
+import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
+import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 
 @RestController
 class MockCartController @Autowired constructor(
   private val contextFactory: ContextFactory
 ) {
-  @RequestMapping("/client/v0/cart")
+
+  @GetMapping("/client/v0/cart/{id}")
   @ResponseBody
-  fun cartV0(
-    @RequestParam id: String?
-  ): ResponseEntity<GetCartResponse> {
+  fun cartV0(@PathVariable id: String): ResponseEntity<GetCartResponse> {
     return ResponseEntity.ok(
       GetCartResponse(
         context = contextFactory.create(),
         message = GetCartResponseMessage(cart = getCart(id))
+      )
+    )
+  }
+
+  @PostMapping("/client/v0/cart")
+  @ResponseBody
+  fun createCartV0(@RequestParam id: String?): ResponseEntity<ProtocolAckResponse> {
+    return ResponseEntity.ok(
+      ProtocolAckResponse(
+        context = contextFactory.create(),
+        message = ResponseMessage.ack()
       )
     )
   }
