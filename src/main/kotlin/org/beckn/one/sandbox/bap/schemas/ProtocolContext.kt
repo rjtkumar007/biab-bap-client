@@ -10,7 +10,7 @@ data class ProtocolContext @Default constructor(
   val domain: String,
   val country: String,
   val city: String,
-  val action: Action,
+  val action: Action?,
   val coreVersion: String,
   val bapId: String? = null,
   val bapUri: String? = null,

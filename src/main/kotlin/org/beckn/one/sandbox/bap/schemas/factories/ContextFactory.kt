@@ -17,11 +17,15 @@ class ContextFactory @Autowired constructor(
   private val uuidFactory: UuidFactory,
   private val clock: Clock = Clock.systemUTC()
 ) {
-  fun create(transactionId: String = uuidFactory.create(), messageId: String = uuidFactory.create()) = ProtocolContext(
+  fun create(
+    transactionId: String = uuidFactory.create(),
+    messageId: String = uuidFactory.create(),
+    action: ProtocolContext.Action? = ProtocolContext.Action.SEARCH
+  ) = ProtocolContext(
     domain = domain,
     country = country,
     city = city,
-    action = ProtocolContext.Action.SEARCH,
+    action = action,
     coreVersion = ProtocolVersion.V0_9_1.value,
     bapId = bapId,
     bapUri = bapUrl,

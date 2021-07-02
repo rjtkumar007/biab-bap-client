@@ -20,7 +20,7 @@ class MockCartController @Autowired constructor(
   fun createCart(@RequestBody cart: Cart): ResponseEntity<ProtocolAckResponse> {
     return ResponseEntity.ok(
       ProtocolAckResponse(
-        context = contextFactory.create(),
+        context = getContext(),
         message = ResponseMessage.ack()
       )
     )
@@ -31,7 +31,7 @@ class MockCartController @Autowired constructor(
   fun getCart(@PathVariable id: String): ResponseEntity<GetCartResponse> {
     return ResponseEntity.ok(
       GetCartResponse(
-        context = contextFactory.create(),
+        context = getContext(),
         message = GetCartResponseMessage(cart = buildCart(id))
       )
     )
@@ -42,7 +42,7 @@ class MockCartController @Autowired constructor(
   fun updateCart(@PathVariable id: String, @RequestBody updatedCart: Cart): ResponseEntity<ProtocolAckResponse> {
     return ResponseEntity.ok(
       ProtocolAckResponse(
-        context = contextFactory.create(),
+        context = getContext(),
         message = ResponseMessage.ack()
       )
     )
@@ -53,11 +53,13 @@ class MockCartController @Autowired constructor(
   fun deleteCart(@PathVariable id: String): ResponseEntity<ProtocolAckResponse> {
     return ResponseEntity.ok(
       ProtocolAckResponse(
-        context = contextFactory.create(),
+        context = getContext(),
         message = ResponseMessage.ack()
       )
     )
   }
+
+  private fun getContext() = contextFactory.create(action = null)
 
   private fun buildCart(id: String?) = Cart(
     id = id, items = listOf(

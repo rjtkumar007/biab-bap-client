@@ -22,7 +22,7 @@ object ProtocolContextFactory {
   fun fixedAsEntity(context: ProtocolContext) = Context(
     domain = context.domain,
     country = context.country,
-    action = Context.Action.values().first { it.value == context.action.value },
+    action = Context.Action.values().first { it.value == context.action?.value },
     city = context.city,
     coreVersion = context.coreVersion,
     bapId = context.bapId,
