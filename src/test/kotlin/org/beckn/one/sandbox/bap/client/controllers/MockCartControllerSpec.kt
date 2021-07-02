@@ -11,11 +11,13 @@ import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.math.BigDecimal
 
@@ -36,6 +38,7 @@ class MockCartControllerSpec @Autowired constructor(
         val createCartResponseString = mockMvc
           .perform(
             post("/client/v0/cart")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
               .content(objectMapper.writeValueAsString(cart))
           )
           .andExpect(status().is2xxSuccessful)
@@ -61,6 +64,25 @@ class MockCartControllerSpec @Autowired constructor(
         val getCartResponse = objectMapper.readValue(getCartResponseString, GetCartResponse::class.java)
         getCartResponse.message shouldBe GetCartResponseMessage(cart = getCart(cartId))
       }
+
+      it("should update cart") {
+        val cart = getCart("cart 1")
+
+        val createCartResponseString = mockMvc
+          .perform(
+            put("/client/v0/cart/${cart.id}")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .content(objectMapper.writeValueAsString(cart))
+          )
+          .andExpect(status().is2xxSuccessful)
+          .andReturn()
+          .response.contentAsString
+
+        val createCartResponse = objectMapper.readValue(createCartResponseString, ProtocolAckResponse::class.java)
+        createCartResponse.context shouldNotBe null
+        createCartResponse.message.ack shouldNotBe ResponseMessage.ack()
+      }
+
     }
   }
 

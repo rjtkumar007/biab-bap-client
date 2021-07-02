@@ -15,6 +15,17 @@ class MockCartController @Autowired constructor(
   private val contextFactory: ContextFactory
 ) {
 
+  @PostMapping("/client/v0/cart")
+  @ResponseBody
+  fun createCartV0(@RequestBody cart: Cart): ResponseEntity<ProtocolAckResponse> {
+    return ResponseEntity.ok(
+      ProtocolAckResponse(
+        context = contextFactory.create(),
+        message = ResponseMessage.ack()
+      )
+    )
+  }
+
   @GetMapping("/client/v0/cart/{id}")
   @ResponseBody
   fun cartV0(@PathVariable id: String): ResponseEntity<GetCartResponse> {
@@ -26,9 +37,9 @@ class MockCartController @Autowired constructor(
     )
   }
 
-  @PostMapping("/client/v0/cart")
+  @PutMapping("/client/v0/cart/{id}")
   @ResponseBody
-  fun createCartV0(@RequestParam id: String?): ResponseEntity<ProtocolAckResponse> {
+  fun updateCartV0(@PathVariable id: String, @RequestBody updatedCart: Cart): ResponseEntity<ProtocolAckResponse> {
     return ResponseEntity.ok(
       ProtocolAckResponse(
         context = contextFactory.create(),
