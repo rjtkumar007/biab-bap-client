@@ -28,8 +28,9 @@ class CartControllerSpec @Autowired constructor(
   init {
 
     describe("Cart") {
-      it("should return acknowledgement response when create is called") {
+      it("should return cart by id") {
         val cartId = "cart 1"
+
         val getCartResponse = mockMvc
           .perform(
             get("/client/v0/cart")
