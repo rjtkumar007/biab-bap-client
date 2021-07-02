@@ -17,7 +17,7 @@ class MockCartController @Autowired constructor(
 
   @PostMapping("/client/v0/cart")
   @ResponseBody
-  fun createCartV0(@RequestBody cart: Cart): ResponseEntity<ProtocolAckResponse> {
+  fun createCart(@RequestBody cart: Cart): ResponseEntity<ProtocolAckResponse> {
     return ResponseEntity.ok(
       ProtocolAckResponse(
         context = contextFactory.create(),
@@ -28,18 +28,18 @@ class MockCartController @Autowired constructor(
 
   @GetMapping("/client/v0/cart/{id}")
   @ResponseBody
-  fun cartV0(@PathVariable id: String): ResponseEntity<GetCartResponse> {
+  fun getCart(@PathVariable id: String): ResponseEntity<GetCartResponse> {
     return ResponseEntity.ok(
       GetCartResponse(
         context = contextFactory.create(),
-        message = GetCartResponseMessage(cart = getCart(id))
+        message = GetCartResponseMessage(cart = buildCart(id))
       )
     )
   }
 
   @PutMapping("/client/v0/cart/{id}")
   @ResponseBody
-  fun updateCartV0(@PathVariable id: String, @RequestBody updatedCart: Cart): ResponseEntity<ProtocolAckResponse> {
+  fun updateCart(@PathVariable id: String, @RequestBody updatedCart: Cart): ResponseEntity<ProtocolAckResponse> {
     return ResponseEntity.ok(
       ProtocolAckResponse(
         context = contextFactory.create(),
@@ -48,7 +48,18 @@ class MockCartController @Autowired constructor(
     )
   }
 
-  private fun getCart(id: String?) = Cart(
+  @DeleteMapping("/client/v0/cart/{id}")
+  @ResponseBody
+  fun deleteCart(@PathVariable id: String): ResponseEntity<ProtocolAckResponse> {
+    return ResponseEntity.ok(
+      ProtocolAckResponse(
+        context = contextFactory.create(),
+        message = ResponseMessage.ack()
+      )
+    )
+  }
+
+  private fun buildCart(id: String?) = Cart(
     id = id, items = listOf(
       CartItem(
         bppId = "paisool",

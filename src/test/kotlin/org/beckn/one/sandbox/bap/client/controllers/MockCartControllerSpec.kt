@@ -17,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.math.BigDecimal
 
@@ -83,6 +82,13 @@ class MockCartControllerSpec @Autowired constructor(
         createCartResponse.message.ack shouldNotBe ResponseMessage.ack()
       }
 
+      it("should delete cart") {
+        mockMvc
+          .perform(
+            delete("/client/v0/cart/cart-id")
+          )
+          .andExpect(status().is2xxSuccessful)
+      }
     }
   }
 
