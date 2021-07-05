@@ -4,14 +4,20 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolError
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
 
-data class GetCartResponse(
+data class CreateCartResponse(
   override val context: ProtocolContext,
-  val message: GetCartResponseMessage? = null,
+  val message: CartResponseMessage,
   override val error: ProtocolError? = null,
 ) : ClientResponse
 
-data class GetCartResponseMessage(
-  val cart: Cart? = null,
+data class GetCartResponse(
+  override val context: ProtocolContext,
+  val message: CartResponseMessage,
+  override val error: ProtocolError? = null,
+) : ClientResponse
+
+data class CartResponseMessage(
+  val cart: Cart,
 )
 
 data class Cart(
@@ -20,14 +26,14 @@ data class Cart(
 )
 
 data class CartItem(
-  val bppId: String? = null,
-  val provider: CartItemProvider? = null,
-  val itemId: String? = null,
-  val quantity: Int? = null,
+  val bppId: String,
+  val provider: CartItemProvider,
+  val itemId: String,
+  val quantity: Int,
   val measure: ProtocolScalar? = null
 )
 
 data class CartItemProvider(
-  val id: String? = null,
+  val id: String,
   val providerLocations: List<String>? = null
 )

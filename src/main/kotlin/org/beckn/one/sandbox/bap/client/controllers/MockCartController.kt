@@ -17,11 +17,11 @@ class MockCartController @Autowired constructor(
 
   @PostMapping("/client/v0/cart")
   @ResponseBody
-  fun createCart(@RequestBody cart: Cart): ResponseEntity<ProtocolAckResponse> {
+  fun createCart(@RequestBody cart: Cart): ResponseEntity<CreateCartResponse> {
     return ResponseEntity.ok(
-      ProtocolAckResponse(
+      CreateCartResponse(
         context = getContext(),
-        message = ResponseMessage.ack()
+        message = CartResponseMessage(cart = cart)
       )
     )
   }
@@ -32,7 +32,7 @@ class MockCartController @Autowired constructor(
     return ResponseEntity.ok(
       GetCartResponse(
         context = getContext(),
-        message = GetCartResponseMessage(cart = buildCart(id))
+        message = CartResponseMessage(cart = buildCart(id))
       )
     )
   }
