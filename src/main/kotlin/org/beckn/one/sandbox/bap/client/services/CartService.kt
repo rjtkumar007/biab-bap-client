@@ -26,7 +26,7 @@ class CartService @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(CartService::class.java)
 
-  fun saveCart(context: ProtocolContext, cartDto: CartDto): CreateCartResponseDto {
+  fun saveCart(context: ProtocolContext, cartDto: CartDto): Either<DatabaseError, CreateCartResponseDto> {
     log.info("Got request to save cart: {}", cartDto)
     val cartId = cartDto.id ?: uuidFactory.create()
     log.info("Cart Id: {}", cartId)
@@ -34,9 +34,11 @@ class CartService @Autowired constructor(
     log.info("Persisting cart: {}", cartDao)
     val upsertResult = cartRepository.upsert(cartDao, CartDao::id eq cartDao.id)
     log.info("Cart {} persist result: {}", cartId, upsertResult)
-    return CreateCartResponseDto(
-      context = context,
-      message = CartResponseMessageDto(cart = cartDto.copy(id = cartId))
+    return Either.Right(
+      CreateCartResponseDto(
+        context = context,
+        message = CartResponseMessageDto(cart = cartDto.copy(id = cartId))
+      )
     )
   }
 

@@ -46,7 +46,7 @@ class MockCartControllerSpec @Autowired constructor(
 
         val createCartResponse = objectMapper.readValue(createCartResponseString, CreateCartResponseDto::class.java)
         createCartResponse.context shouldNotBe null
-        createCartResponse.message.cart shouldBe cart
+        createCartResponse.message?.cart shouldBe cart
       }
 
       it("should return cart by id") {

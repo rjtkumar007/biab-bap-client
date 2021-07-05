@@ -51,11 +51,12 @@ class CartControllerSpec @Autowired constructor(
           .response.contentAsString
 
         val createCartResponse = objectMapper.readValue(createCartResponseString, CreateCartResponseDto::class.java)
-        val expectedCartDto = cart.copy(id = createCartResponse.message.cart.id)
         createCartResponse.context shouldNotBe null
-        createCartResponse.message.cart.id shouldNotBe null
-        createCartResponse.message.cart shouldBe expectedCartDto
-        val cartFromDb = cartRepository.findOne(CartDto::id eq createCartResponse.message.cart.id)
+        createCartResponse.message shouldNotBe null
+        createCartResponse.message?.cart?.id shouldNotBe null
+        val expectedCartDto = cart.copy(id = createCartResponse.message?.cart?.id)
+        createCartResponse.message?.cart shouldBe expectedCartDto
+        val cartFromDb = cartRepository.findOne(CartDto::id eq createCartResponse.message?.cart?.id)
         cartFromDb shouldNotBe null
         cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe expectedCartDto
       }

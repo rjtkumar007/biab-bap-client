@@ -7,7 +7,7 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
 
 data class CreateCartResponseDto(
   override val context: ProtocolContext,
-  val message: CartResponseMessageDto,
+  val message: CartResponseMessageDto? = null,
   override val error: ProtocolError? = null,
 ) : ClientResponse
 

@@ -26,7 +26,17 @@ class CartController @Autowired constructor(
   @PostMapping("/client/v1/cart")
   @ResponseBody
   fun createCart(@RequestBody cart: CartDto): ResponseEntity<CreateCartResponseDto> {
-    return ResponseEntity.ok(cartService.saveCart(getContext(), cart))
+    val context = getContext()
+    return cartService.saveCart(context, cart)
+      .fold({
+        ResponseEntity.status(it.status()).body(
+          CreateCartResponseDto(
+            context = context, error = it.error()
+          )
+        )
+      }, {
+        ResponseEntity.ok(it)
+      })
   }
 
   @DeleteMapping("/client/v1/cart/{id}")
