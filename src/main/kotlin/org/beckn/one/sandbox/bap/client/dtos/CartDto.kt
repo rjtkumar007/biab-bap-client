@@ -1,39 +1,40 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
+import org.beckn.one.sandbox.bap.Default
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolError
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
 
-data class CreateCartResponse(
+data class CreateCartResponseDto(
   override val context: ProtocolContext,
-  val message: CartResponseMessage,
+  val message: CartResponseMessageDto,
   override val error: ProtocolError? = null,
 ) : ClientResponse
 
-data class GetCartResponse(
+data class GetCartResponseDto(
   override val context: ProtocolContext,
-  val message: CartResponseMessage,
+  val message: CartResponseMessageDto,
   override val error: ProtocolError? = null,
 ) : ClientResponse
 
-data class CartResponseMessage(
-  val cart: Cart,
+data class CartResponseMessageDto(
+  val cart: CartDto,
 )
 
-data class Cart(
+data class CartDto @Default constructor(
   val id: String? = null,
-  val items: List<CartItem>? = null
+  val items: List<CartItemDto>? = null
 )
 
-data class CartItem(
+data class CartItemDto @Default constructor(
   val bppId: String,
-  val provider: CartItemProvider,
+  val provider: CartItemProviderDto,
   val itemId: String,
   val quantity: Int,
   val measure: ProtocolScalar? = null
 )
 
-data class CartItemProvider(
+data class CartItemProviderDto @Default constructor(
   val id: String,
   val providerLocations: List<String>? = null
 )

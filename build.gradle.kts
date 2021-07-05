@@ -37,7 +37,7 @@ dependencies {
   implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
   implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
   implementation("com.squareup.retrofit2:retrofit-mock:$retrofitVersion")
-  implementation("org.litote.kmongo:kmongo:4.2.7")
+  implementation("org.litote.kmongo:kmongo:4.2.8")
   implementation("org.mapstruct:mapstruct:1.4.2.Final")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
