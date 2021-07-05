@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.OnInit
+import org.beckn.one.sandbox.bap.message.entities.OnInitDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnInitMessageInitializedFactory
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
@@ -38,7 +38,7 @@ internal class ProtocolOnInitControllerSpec : DescribeSpec() {
   private lateinit var mapper: ObjectMapper
 
   @Autowired
-  private lateinit var onInitResponseRepo: BecknResponseRepository<OnInit>
+  private lateinit var onInitResponseRepo: BecknResponseRepository<OnInitDao>
 
   private val postOnInitUrl = "/v1/on_init"
 

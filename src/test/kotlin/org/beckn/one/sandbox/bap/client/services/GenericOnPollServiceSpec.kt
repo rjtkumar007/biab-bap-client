@@ -8,7 +8,6 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.message.entities.*
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,17 +24,17 @@ import java.time.ZoneId
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class GenericOnPollServiceSpec @Autowired constructor(
   private val onSearchPollService: GenericOnPollService<ProtocolOnSearch, ClientSearchResponse>,
-  private val searchResultRepo: BecknResponseRepository<OnSearch>,
-  private val messageRepository: GenericRepository<Message>
+  private val searchResultRepo: BecknResponseRepository<OnSearchDao>,
+  private val messageRepository: GenericRepository<MessageDao>
 ) : DescribeSpec() {
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),
     ZoneId.of("Asia/Calcutta")
   )
-  private val entityContext = Context(
+  private val entityContext = ContextDao(
     domain = "LocalRetail",
     country = "IN",
-    action = Context.Action.SEARCH,
+    action = ContextDao.Action.SEARCH,
     city = "Pune",
     coreVersion = "0.9.1-draft03",
     bapId = "http://host.bap.com",
@@ -61,7 +60,7 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
   init {
     describe("GenericOnReplyService") {
       searchResultRepo.clear()
-      messageRepository.insertOne(Message(id = context.messageId, type = Message.Type.Search))
+      messageRepository.insertOne(MessageDao(id = context.messageId, type = MessageDao.Type.Search))
       searchResultRepo.insertMany(entitySearchResults())
 
       it("should return search results for given message id in context") {
@@ -78,10 +77,10 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
     }
   }
 
-  fun entitySearchResults(): List<OnSearch> {
-    val entitySearchResponse = OnSearch(
+  fun entitySearchResults(): List<OnSearchDao> {
+    val entitySearchResponse = OnSearchDao(
       context = entityContext,
-      message = OnSearchMessage(Catalog())
+      message = OnSearchMessageDao(CatalogDao())
     )
     return listOf(
       entitySearchResponse,

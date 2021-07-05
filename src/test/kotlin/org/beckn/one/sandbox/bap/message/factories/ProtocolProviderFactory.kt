@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Provider
+import org.beckn.one.sandbox.bap.message.entities.ProviderDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolProvider
 
 object ProtocolProviderFactory {
@@ -20,7 +20,7 @@ object ProtocolProviderFactory {
   }
 
   fun createAsEntity(protocol: ProtocolProvider?) = protocol?.let {
-    Provider(
+    ProviderDao(
       id = protocol.id,
       descriptor = ProtocolDescriptorFactory.createAsEntity(protocol.descriptor),
       time = ProtocolTimeFactory.timeAsEntity(protocol.time),

@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Context
+import org.beckn.one.sandbox.bap.message.entities.ContextDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import java.time.LocalDateTime
 
@@ -19,10 +19,10 @@ object ProtocolContextFactory {
     timestamp = LocalDateTime.now(fixedClock)
   )
 
-  fun fixedAsEntity(context: ProtocolContext) = Context(
+  fun fixedAsEntity(context: ProtocolContext) = ContextDao(
     domain = context.domain,
     country = context.country,
-    action = Context.Action.values().first { it.value == context.action?.value },
+    action = ContextDao.Action.values().first { it.value == context.action?.value },
     city = context.city,
     coreVersion = context.coreVersion,
     bapId = context.bapId,

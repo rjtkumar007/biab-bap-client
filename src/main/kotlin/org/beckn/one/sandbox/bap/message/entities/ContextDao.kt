@@ -5,7 +5,7 @@ import org.beckn.one.sandbox.bap.Default
 import java.time.Clock
 import java.time.LocalDateTime
 
-data class Context @Default constructor(
+data class ContextDao @Default constructor(
   val domain: Domain,
   val country: String,
   val city: String,

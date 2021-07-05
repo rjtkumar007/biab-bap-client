@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Quotation
-import org.beckn.one.sandbox.bap.message.entities.QuotationBreakup
+import org.beckn.one.sandbox.bap.message.entities.QuotationDao
+import org.beckn.one.sandbox.bap.message.entities.QuotationBreakupDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolQuotation
 import org.beckn.one.sandbox.bap.schemas.ProtocolQuotationBreakup
 
@@ -14,7 +14,7 @@ object ProtocolQuotationFactory {
   )
 
   fun createAsEntity(protocol: ProtocolQuotation?) = protocol?.let {
-    Quotation(
+    QuotationDao(
       price = ProtocolPriceFactory.createAsEntity(protocol.price),
       breakup = protocol.breakup?.mapNotNull { ProtocolQuotationBreakupFactory.createAsEntity(it) },
       ttl = protocol.ttl
@@ -36,8 +36,8 @@ object ProtocolQuotationBreakupFactory {
   fun forOffer(itemId: String) = create(itemId, ProtocolQuotationBreakup.Type.OFFER)
 
   fun createAsEntity(protocol: ProtocolQuotationBreakup?) = protocol?.let {
-    QuotationBreakup(
-      type = QuotationBreakup.Type.values().first { it.value == protocol.type?.value },
+    QuotationBreakupDao(
+      type = QuotationBreakupDao.Type.values().first { it.value == protocol.type?.value },
       refId = protocol.refId,
       price = ProtocolPriceFactory.createAsEntity(protocol.price)
     )

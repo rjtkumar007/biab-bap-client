@@ -2,8 +2,8 @@ package org.beckn.one.sandbox.bap.message.mappers
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.message.entities.OnSelect
-import org.beckn.one.sandbox.bap.message.entities.OnSelectMessage
+import org.beckn.one.sandbox.bap.message.entities.OnSelectDao
+import org.beckn.one.sandbox.bap.message.entities.OnSelectMessageDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnSelectMessageSelectedFactory
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelect
@@ -27,9 +27,9 @@ class OnSelectResponseMapperSpec @Autowired constructor(
     )
   )
 
-  private val entityResponse = OnSelect(
+  private val entityResponse = OnSelectDao(
     context = ProtocolContextFactory.fixedAsEntity(protocolResponse.context),
-    message = OnSelectMessage(
+    message = OnSelectMessageDao(
       ProtocolOnSelectMessageSelectedFactory.createAsEntity(protocolResponse.message?.selected)
     )
   )

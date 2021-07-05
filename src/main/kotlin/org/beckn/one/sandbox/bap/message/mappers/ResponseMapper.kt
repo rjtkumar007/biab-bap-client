@@ -6,7 +6,7 @@ import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
 
-interface GenericResponseMapper<Protocol: ProtocolResponse, Entity: BecknResponse> {
+interface GenericResponseMapper<Protocol: ProtocolResponse, Entity: BecknResponseDao> {
   fun entityToProtocol(entity: Entity): Protocol
   fun protocolToEntity(schema: Protocol): Entity
 }
@@ -16,9 +16,9 @@ interface GenericResponseMapper<Protocol: ProtocolResponse, Entity: BecknRespons
   unmappedTargetPolicy = ReportingPolicy.WARN,
   injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
-interface OnSearchResponseMapper : GenericResponseMapper<ProtocolOnSearch, OnSearch> {
-  override fun entityToProtocol(entity: OnSearch): ProtocolOnSearch
-  override fun protocolToEntity(schema: ProtocolOnSearch): OnSearch
+interface OnSearchResponseMapper : GenericResponseMapper<ProtocolOnSearch, OnSearchDao> {
+  override fun entityToProtocol(entity: OnSearchDao): ProtocolOnSearch
+  override fun protocolToEntity(schema: ProtocolOnSearch): OnSearchDao
 }
 
 
@@ -27,9 +27,9 @@ interface OnSearchResponseMapper : GenericResponseMapper<ProtocolOnSearch, OnSea
   unmappedTargetPolicy = ReportingPolicy.WARN,
   injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
-interface OnSelectResponseMapper : GenericResponseMapper<ProtocolOnSelect, OnSelect> {
-  override fun entityToProtocol(entity: OnSelect): ProtocolOnSelect
-  override fun protocolToEntity(schema: ProtocolOnSelect): OnSelect
+interface OnSelectResponseMapper : GenericResponseMapper<ProtocolOnSelect, OnSelectDao> {
+  override fun entityToProtocol(entity: OnSelectDao): ProtocolOnSelect
+  override fun protocolToEntity(schema: ProtocolOnSelect): OnSelectDao
 }
 
 @Mapper(
@@ -37,9 +37,9 @@ interface OnSelectResponseMapper : GenericResponseMapper<ProtocolOnSelect, OnSel
   unmappedTargetPolicy = ReportingPolicy.WARN,
   injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
-interface OnInitResponseMapper : GenericResponseMapper<ProtocolOnInit, OnInit> {
-  override fun entityToProtocol(entity: OnInit): ProtocolOnInit
-  override fun protocolToEntity(schema: ProtocolOnInit): OnInit
+interface OnInitResponseMapper : GenericResponseMapper<ProtocolOnInit, OnInitDao> {
+  override fun entityToProtocol(entity: OnInitDao): ProtocolOnInit
+  override fun protocolToEntity(schema: ProtocolOnInit): OnInitDao
 }
 
 @Mapper(

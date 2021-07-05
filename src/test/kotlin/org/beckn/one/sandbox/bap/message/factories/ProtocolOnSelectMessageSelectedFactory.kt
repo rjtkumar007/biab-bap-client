@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.OnSelectMessageSelected
+import org.beckn.one.sandbox.bap.message.entities.OnSelectMessageSelectedDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelectMessageSelected
 
 object ProtocolOnSelectMessageSelectedFactory {
@@ -20,7 +20,7 @@ object ProtocolOnSelectMessageSelectedFactory {
   }
 
   fun createAsEntity(protocol: ProtocolOnSelectMessageSelected?) = protocol?.let {
-    OnSelectMessageSelected(
+    OnSelectMessageSelectedDao(
       provider = ProtocolProviderFactory.createAsEntity(protocol.provider),
       providerLocation = null,
       items = protocol.items?.map { ProtocolItemFactory.createAsEntity(it) },

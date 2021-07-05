@@ -26,14 +26,14 @@ object ProtocolOnInitMessageInitializedFactory {
   }
 
   fun createAsEntity(protocol: ProtocolOnInitMessageInitialized?) = protocol?.let {
-    OnInitMessageInitialized(
-      provider = protocol.provider?.let { p -> OnInitMessageInitializedProvider(id = p.id) },
-      providerLocation = protocol.providerLocation?.let { l -> OnInitMessageInitializedProviderLocation(id = l.id) },
+    OnInitMessageInitializedDao(
+      provider = protocol.provider?.let { p -> OnInitMessageInitializedProviderDao(id = p.id) },
+      providerLocation = protocol.providerLocation?.let { l -> OnInitMessageInitializedProviderLocationDao(id = l.id) },
       items = protocol.items?.map { i ->
-        OnInitMessageInitializedItems(
+        OnInitMessageInitializedItemsDao(
           id = i.id,
           quantity = i.quantity?.let { q ->
-            ItemQuantityAllocated(count = q.count)
+            ItemQuantityAllocatedDao(count = q.count)
           }
         )
       },

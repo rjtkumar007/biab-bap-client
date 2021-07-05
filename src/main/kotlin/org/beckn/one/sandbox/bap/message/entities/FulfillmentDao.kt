@@ -2,28 +2,28 @@ package org.beckn.one.sandbox.bap.message.entities
 
 import org.beckn.one.sandbox.bap.Default
 
-data class Fulfillment  @Default constructor(
+data class FulfillmentDao  @Default constructor(
   val id: String? = null,
   val type: String? = null,
-  val state: State? = null,
+  val state: StateDao? = null,
   val tracking: Boolean? = null,
-  val agent: Person? = null,
-  val vehicle: Vehicle? = null,
-  val start: FulfillmentStart? = null,
-  val end: FulfillmentEnd? = null,
+  val agent: PersonDao? = null,
+  val vehicle: VehicleDao? = null,
+  val start: FulfillmentStartDao? = null,
+  val end: FulfillmentEndDao? = null,
   val purpose: String? = null,
   val tags: Map<String, String>? = null
 )
 
 
-data class State  @Default constructor(
-  val descriptor: Descriptor? = null,
+data class StateDao  @Default constructor(
+  val descriptor: DescriptorDao? = null,
   val updatedAt: java.time.OffsetDateTime? = null,
   val updatedBy: String? = null
 )
 
-data class Person  @Default constructor(
-  val name: Name? = null,
+data class PersonDao  @Default constructor(
+  val name: NameDao? = null,
   val image: String? = null,
   val dob: java.time.LocalDate? = null,
   val gender: String? = null,
@@ -31,7 +31,7 @@ data class Person  @Default constructor(
   val tags: Map<String, String>? = null
 )
 
-data class Name  @Default constructor(
+data class NameDao  @Default constructor(
   val full: String? = null,
   val additionalName: String? = null,
   val familyName: String? = null,
@@ -41,7 +41,7 @@ data class Name  @Default constructor(
   val honorificSuffix: String? = null
 )
 
-data class Vehicle  @Default constructor(
+data class VehicleDao  @Default constructor(
   val category: String? = null,
   val capacity: Int? = null,
   val make: String? = null,
@@ -53,23 +53,23 @@ data class Vehicle  @Default constructor(
   val registration: String? = null
 )
 // TODO Similar classes
-data class FulfillmentStart  @Default constructor(
-  val location: Location? = null,
-  val time: Time? = null,
-  val instructions: Descriptor? = null,
-  val contact: Contact? = null
+data class FulfillmentStartDao  @Default constructor(
+  val location: LocationDao? = null,
+  val time: TimeDao? = null,
+  val instructions: DescriptorDao? = null,
+  val contact: ContactDao? = null
 )
 
 // TODO Similar classes
-data class FulfillmentEnd  @Default constructor(
-  val location: Location? = null,
-  val time: Time? = null,
-  val instructions: Descriptor? = null,
-  val contact: Contact? = null
+data class FulfillmentEndDao  @Default constructor(
+  val location: LocationDao? = null,
+  val time: TimeDao? = null,
+  val instructions: DescriptorDao? = null,
+  val contact: ContactDao? = null
 )
 
 
-data class Contact  @Default constructor(
+data class ContactDao  @Default constructor(
   val phone: String? = null,
   val email: String? = null,
   val tags: Map<String, String>? = null

@@ -3,11 +3,11 @@ package org.beckn.one.sandbox.bap.message.entities
 import org.beckn.one.sandbox.bap.Default
 import java.time.LocalDateTime
 
-data class Category @Default constructor(
+data class CategoryDao @Default constructor(
   val _id: String? = null,
   val id: String? = null,
   val parentCategoryId: String? = null,
-  val descriptor: Descriptor? = null,
+  val descriptor: DescriptorDao? = null,
   val time: LocalDateTime? = null,
   val tags: Map<String, String>? = null
 )

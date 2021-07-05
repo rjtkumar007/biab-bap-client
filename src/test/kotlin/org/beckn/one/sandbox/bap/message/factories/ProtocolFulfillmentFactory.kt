@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.*
-import org.beckn.one.sandbox.bap.message.entities.Fulfillment
+import org.beckn.one.sandbox.bap.message.entities.FulfillmentDao
 import org.beckn.one.sandbox.bap.schemas.*
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -39,11 +39,11 @@ object ProtocolFulfillmentFactory {
   )
 
   fun createAsEntity(protocol: ProtocolFulfillment?) = protocol?.let {
-    Fulfillment(
+    FulfillmentDao(
       id = it.id,
       type = it.type,
       state = it.state?.let { s ->
-        State(
+        StateDao(
           descriptor = ProtocolDescriptorFactory.createAsEntity(s.descriptor),
           updatedAt = s.updatedAt,
           updatedBy = s.updatedBy
@@ -52,7 +52,7 @@ object ProtocolFulfillmentFactory {
       tracking = it.tracking,
       agent = ProtocolPersonFactory.createAsEntity(it.agent),
       vehicle = it.vehicle?.let { v ->
-        Vehicle(
+        VehicleDao(
           category = v.category,
           capacity = v.capacity,
           make = v.make,
@@ -65,20 +65,20 @@ object ProtocolFulfillmentFactory {
         )
       },
       start = it.start?.let { f ->
-        FulfillmentStart(
+        FulfillmentStartDao(
           location = ProtocolLocationFactory.locationEntity(f.location),
           time = ProtocolTimeFactory.timeAsEntity(f.time),
           contact = f.contact?.let { c ->
-            Contact(phone = c.phone, email = c.email, tags = c.tags)
+            ContactDao(phone = c.phone, email = c.email, tags = c.tags)
           }
         )
       },
       end = it.end?.let { f ->
-        FulfillmentEnd(
+        FulfillmentEndDao(
           location = ProtocolLocationFactory.locationEntity(f.location),
           time = ProtocolTimeFactory.timeAsEntity(f.time),
           contact = f.contact?.let { c ->
-            Contact(phone = c.phone, email = c.email, tags = c.tags)
+            ContactDao(phone = c.phone, email = c.email, tags = c.tags)
           }
         )
       }
@@ -98,9 +98,9 @@ object ProtocolPersonFactory {
   )
 
   fun createAsEntity(protocol: ProtocolPerson?) = protocol?.let {
-    Person(
+    PersonDao(
       name = it.name?.let { n ->
-        Name(
+        NameDao(
           full = n.full,
           additionalName = n.additionalName,
           familyName = n.familyName,

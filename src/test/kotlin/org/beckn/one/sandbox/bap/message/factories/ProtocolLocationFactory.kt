@@ -1,9 +1,9 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Address
-import org.beckn.one.sandbox.bap.message.entities.City
-import org.beckn.one.sandbox.bap.message.entities.Country
-import org.beckn.one.sandbox.bap.message.entities.Location
+import org.beckn.one.sandbox.bap.message.entities.AddressDao
+import org.beckn.one.sandbox.bap.message.entities.CityDao
+import org.beckn.one.sandbox.bap.message.entities.CountryDao
+import org.beckn.one.sandbox.bap.message.entities.LocationDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolAddress
 import org.beckn.one.sandbox.bap.schemas.ProtocolCity
 import org.beckn.one.sandbox.bap.schemas.ProtocolCountry
@@ -30,13 +30,13 @@ object ProtocolLocationFactory {
   )
 
   fun locationEntity(protocol: ProtocolLocation?) = protocol?.let {
-    Location(
+    LocationDao(
       id = protocol.id,
       descriptor = ProtocolDescriptorFactory.createAsEntity(protocol.descriptor),
       city = ProtocolCityFactory.cityAsEntity(protocol.city),
       country = ProtocolCountryFactory.countryAsEntity(protocol.country),
       address = protocol.address?.let { a ->
-        Address(
+        AddressDao(
           door = a.door,
           building = a.building,
           street = a.street,
@@ -67,7 +67,7 @@ object ProtocolCityFactory {
   )
 
   fun cityAsEntity(protocol: ProtocolCity?) = protocol?.let {
-    City(
+    CityDao(
       name = protocol.name,
       code = protocol.code
     )
@@ -82,7 +82,7 @@ object ProtocolCountryFactory {
   )
 
   fun countryAsEntity(protocol: ProtocolCountry?) = protocol?.let {
-    Country(
+    CountryDao(
       name = protocol.name,
       code = protocol.code
     )

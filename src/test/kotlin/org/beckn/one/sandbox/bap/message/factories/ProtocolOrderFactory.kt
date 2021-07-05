@@ -32,17 +32,17 @@ object ProtocolOrderFactory {
   }
 
   fun createAsEntity(protocol: ProtocolOrder?) = protocol.let {
-    Order(
+    OrderDao(
       provider = protocol?.provider?.let { p ->
-        SelectMessageSelectedProvider(
+        SelectMessageSelectedProviderDao(
           id = p.id,
-          locations = p.locations.map { l -> SelectMessageSelectedProviderLocations(l.id) }
+          locations = p.locations.map { l -> SelectMessageSelectedProviderLocationsDao(l.id) }
         )
       }!!,
       items = protocol.items.map { i ->
-        SelectMessageSelectedItems(
+        SelectMessageSelectedItemsDao(
           id = i.id,
-          quantity = ItemQuantityAllocated(count = i.quantity.count)
+          quantity = ItemQuantityAllocatedDao(count = i.quantity.count)
         )
       },
       addOns = listOf(),

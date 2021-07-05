@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.message.entities
 
 import org.beckn.one.sandbox.bap.Default
 
-data class Error @Default constructor(
+data class ErrorDao @Default constructor(
 
   val type: Type,
   val code: String,

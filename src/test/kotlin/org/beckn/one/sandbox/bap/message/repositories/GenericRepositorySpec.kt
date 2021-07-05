@@ -5,10 +5,9 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.longs.shouldBeExactly
 import org.beckn.one.sandbox.bap.configurations.TestDatabaseConfiguration
-import org.beckn.one.sandbox.bap.message.entities.Category
-import org.beckn.one.sandbox.bap.message.entities.Descriptor
+import org.beckn.one.sandbox.bap.message.entities.CategoryDao
+import org.beckn.one.sandbox.bap.message.entities.DescriptorDao
 import org.litote.kmongo.eq
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(classes = [TestDatabaseConfiguration::class])
@@ -19,18 +18,18 @@ class GenericRepositorySpec constructor(
     describe("Generic Repository") {
 
       context("for category") {
-        val categoryRepository = GenericRepository.create<Category>(database)
-        val furniture = Category(
+        val categoryRepository = GenericRepository.create<CategoryDao>(database)
+        val furniture = CategoryDao(
           id = "category/c1",
-          descriptor = Descriptor(
+          descriptor = DescriptorDao(
             name = "Furniture",
             longDesc = "Wooden, Iron, Plastic furniture for home"
           )
         )
-        val livingRoomFurniture = Category(
+        val livingRoomFurniture = CategoryDao(
           id = "category/c2",
           parentCategoryId = "category/c1",
-          descriptor = Descriptor(
+          descriptor = DescriptorDao(
             name = "Furniture",
             longDesc = "Wooden, Iron, Plastic furniture for home"
           )
@@ -51,7 +50,7 @@ class GenericRepositorySpec constructor(
         it("should filter all categories from collection based on query") {
           categoryRepository.clear()
           categoryRepository.insertMany(listOf(furniture, livingRoomFurniture))
-          categoryRepository.findAll(Category::id eq furniture.id).size shouldBeExactly 1
+          categoryRepository.findAll(CategoryDao::id eq furniture.id).size shouldBeExactly 1
         }
       }
     }

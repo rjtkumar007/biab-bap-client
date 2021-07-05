@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.OnSelect
+import org.beckn.one.sandbox.bap.message.entities.OnSelectDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnSelectMessageSelectedFactory
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
@@ -38,7 +38,7 @@ internal class ProtocolOnSelectControllerSpec : DescribeSpec() {
   private lateinit var mapper: ObjectMapper
 
   @Autowired
-  private lateinit var onSelectResponseRepo: BecknResponseRepository<OnSelect>
+  private lateinit var onSelectResponseRepo: BecknResponseRepository<OnSelectDao>
 
   private val postOnSelectUrl = "/v1/on_select"
 

@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Catalog
-import org.beckn.one.sandbox.bap.message.entities.Price
-import org.beckn.one.sandbox.bap.message.entities.ProviderCatalog
+import org.beckn.one.sandbox.bap.message.entities.CatalogDao
+import org.beckn.one.sandbox.bap.message.entities.PriceDao
+import org.beckn.one.sandbox.bap.message.entities.ProviderCatalogDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
 import org.beckn.one.sandbox.bap.schemas.ProtocolPrice
 import org.beckn.one.sandbox.bap.schemas.ProtocolProviderCatalog
@@ -22,9 +22,9 @@ object ProtocolCatalogFactory {
   }
 
   fun createAsEntity(protocol: ProtocolCatalog?) = protocol?.let {
-    Catalog(
+    CatalogDao(
       bppProviders = it.bppProviders?.map { bpp ->
-        ProviderCatalog(
+        ProviderCatalogDao(
           id = bpp.id,
           descriptor = ProtocolDescriptorFactory.createAsEntity(bpp.descriptor),
           categories = bpp.categories?.mapNotNull { c -> ProtocolCategoryFactory.createAsEntity(c) },
@@ -50,7 +50,7 @@ object ProtocolPriceFactory {
   )
 
   fun createAsEntity(protocol: ProtocolPrice?) = protocol?.let {
-    Price(
+    PriceDao(
       currency = protocol.currency,
       value = protocol.value,
       minimumValue = protocol.minimumValue,

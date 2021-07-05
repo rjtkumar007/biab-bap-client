@@ -4,10 +4,10 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import org.beckn.one.sandbox.bap.configurations.DatabaseConfiguration
 import org.beckn.one.sandbox.bap.configurations.TestDatabaseConfiguration
-import org.beckn.one.sandbox.bap.message.entities.Catalog
-import org.beckn.one.sandbox.bap.message.entities.Context
-import org.beckn.one.sandbox.bap.message.entities.OnSearch
-import org.beckn.one.sandbox.bap.message.entities.OnSearchMessage
+import org.beckn.one.sandbox.bap.message.entities.CatalogDao
+import org.beckn.one.sandbox.bap.message.entities.ContextDao
+import org.beckn.one.sandbox.bap.message.entities.OnSearchDao
+import org.beckn.one.sandbox.bap.message.entities.OnSearchMessageDao
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.Clock
 import java.time.Instant
@@ -16,15 +16,15 @@ import java.time.ZoneId
 
 @SpringBootTest(classes = [TestDatabaseConfiguration::class, DatabaseConfiguration::class])
 class BecknResponseRepositorySpec constructor(
-  val repo: BecknResponseRepository<OnSearch>
+  val repo: BecknResponseRepository<OnSearchDao>
 ) : DescribeSpec() {
   init {
     describe("Generic Repository") {
 
       context("for SearchResponse") {
-        val searchResponse = OnSearch(
+        val searchResponse = OnSearchDao(
           context = context,
-          message = OnSearchMessage(Catalog())
+          message = OnSearchMessageDao(CatalogDao())
         )
 
         it("should fetch responses by message id") {
@@ -47,10 +47,10 @@ class BecknResponseRepositorySpec constructor(
     ZoneId.of("Asia/Calcutta")
   )
 
-  private val context = Context(
+  private val context = ContextDao(
     domain = "LocalRetail",
     country = "IN",
-    action = Context.Action.SEARCH,
+    action = ContextDao.Action.SEARCH,
     city = "Pune",
     coreVersion = "0.9.1-draft03",
     bapId = "http://host.bap.com",

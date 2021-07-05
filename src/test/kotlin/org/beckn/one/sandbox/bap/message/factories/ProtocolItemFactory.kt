@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Item
+import org.beckn.one.sandbox.bap.message.entities.ItemDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolItem
 
 object ProtocolItemFactory {
@@ -16,7 +16,7 @@ object ProtocolItemFactory {
     recommended = true
   )
 
-  fun createAsEntity(protocol: ProtocolItem) = Item(
+  fun createAsEntity(protocol: ProtocolItem) = ItemDao(
     id = protocol.id,
     descriptor = ProtocolDescriptorFactory.createAsEntity(protocol.descriptor),
     price = ProtocolPriceFactory.createAsEntity(protocol.price),

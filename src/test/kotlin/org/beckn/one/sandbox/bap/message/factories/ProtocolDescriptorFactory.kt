@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Descriptor
+import org.beckn.one.sandbox.bap.message.entities.DescriptorDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolDescriptor
 
 object ProtocolDescriptorFactory {
@@ -17,7 +17,7 @@ object ProtocolDescriptorFactory {
   )
 
   fun createAsEntity(protocol: ProtocolDescriptor?) = protocol?.let {
-    Descriptor(
+    DescriptorDao(
       name = protocol.name,
       code = protocol.code,
       symbol = protocol.symbol,

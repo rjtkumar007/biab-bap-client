@@ -6,7 +6,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.OnSearch
+import org.beckn.one.sandbox.bap.message.entities.OnSearchDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
@@ -38,7 +38,7 @@ internal class ProtocolOnSearchControllerSpec : DescribeSpec() {
   private lateinit var mapper: ObjectMapper
 
   @Autowired
-  private lateinit var searchResponseRepo: BecknResponseRepository<OnSearch>
+  private lateinit var searchResponseRepo: BecknResponseRepository<OnSearchDao>
 
   private val postOnSearchUrl = "/v1/on_search"
 

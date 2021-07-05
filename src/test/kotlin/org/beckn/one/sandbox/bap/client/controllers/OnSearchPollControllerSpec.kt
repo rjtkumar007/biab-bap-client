@@ -34,8 +34,8 @@ import java.time.ZoneId
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class OnSearchPollControllerSpec @Autowired constructor(
-  private val searchResponseRepo: BecknResponseRepository<OnSearch>,
-  private val messageRepository: GenericRepository<Message>,
+  private val searchResponseRepo: BecknResponseRepository<OnSearchDao>,
+  private val messageRepository: GenericRepository<MessageDao>,
   private val contextFactory: ContextFactory,
   private val mapper: ObjectMapper,
   private val mockMvc: MockMvc
@@ -45,10 +45,10 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
     Instant.parse("2018-11-30T18:35:24.00Z"),
     ZoneId.of("Asia/Calcutta")
   )
-  private val entityContext = Context(
+  private val entityContext = ContextDao(
     domain = "LocalRetail",
     country = "IN",
-    action = Context.Action.SEARCH,
+    action = ContextDao.Action.SEARCH,
     city = "Pune",
     coreVersion = "0.9.1-draft03",
     bapId = "http://host.bap.com",
@@ -62,7 +62,7 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
   init {
     describe("OnSearch callback") {
       searchResponseRepo.clear()
-      messageRepository.insertOne(Message(id = entityContext.messageId, type = Message.Type.Search))
+      messageRepository.insertOne(MessageDao(id = entityContext.messageId, type = MessageDao.Type.Search))
       searchResponseRepo.insertMany(entitySearchResults())
 
       context("when called for given message id") {
@@ -98,10 +98,10 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
     }
   }
 
-  fun entitySearchResults(): List<OnSearch> {
-    val entitySearchResponse = OnSearch(
+  fun entitySearchResults(): List<OnSearchDao> {
+    val entitySearchResponse = OnSearchDao(
       context = entityContext,
-      message = OnSearchMessage(Catalog())
+      message = OnSearchMessageDao(CatalogDao())
     )
     return listOf(
       entitySearchResponse,

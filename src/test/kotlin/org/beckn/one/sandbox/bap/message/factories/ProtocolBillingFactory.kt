@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Address
-import org.beckn.one.sandbox.bap.message.entities.Billing
-import org.beckn.one.sandbox.bap.message.entities.Organization
+import org.beckn.one.sandbox.bap.message.entities.AddressDao
+import org.beckn.one.sandbox.bap.message.entities.BillingDao
+import org.beckn.one.sandbox.bap.message.entities.OrganizationDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolAddress
 import org.beckn.one.sandbox.bap.schemas.ProtocolBilling
 import org.beckn.one.sandbox.bap.schemas.ProtocolOrganization
@@ -24,14 +24,14 @@ object ProtocolBillingFactory {
   )
 
   fun createAsEntity(protocol: ProtocolBilling?) = protocol?.let {
-    Billing(
+    BillingDao(
       name = protocol.name,
       phone = protocol.phone,
       organization = protocol.organization?.let {
-        Organization(name = it.name, cred = it.cred)
+        OrganizationDao(name = it.name, cred = it.cred)
       },
       address = protocol.address?.let {
-        Address(
+        AddressDao(
           door = it.door,
           building = it.building,
           street = it.street,

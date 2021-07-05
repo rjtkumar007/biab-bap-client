@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Payment
+import org.beckn.one.sandbox.bap.message.entities.PaymentDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolPayment
 import java.net.URI
 
@@ -16,12 +16,12 @@ object ProtocolPaymentFactory {
   )
 
   fun createAsEntity(protocol: ProtocolPayment?) = protocol?.let {
-    Payment(
+    PaymentDao(
       uri = protocol.uri,
-      tlMethod = Payment.TlMethod.values().first { it.value == protocol.tlMethod?.value },
+      tlMethod = PaymentDao.TlMethod.values().first { it.value == protocol.tlMethod?.value },
       params = protocol.params,
-      type = Payment.Type.values().first { it.value == protocol.type?.value },
-      status = Payment.Status.values().first { it.value == protocol.status?.value },
+      type = PaymentDao.Type.values().first { it.value == protocol.type?.value },
+      status = PaymentDao.Status.values().first { it.value == protocol.status?.value },
       time = ProtocolTimeFactory.timeAsEntity(protocol.time)
     )
   }

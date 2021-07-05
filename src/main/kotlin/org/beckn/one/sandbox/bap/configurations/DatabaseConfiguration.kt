@@ -28,19 +28,19 @@ class DatabaseConfiguration @Autowired constructor(
   }
 
   @Bean
-  fun searchResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnSearch> =
+  fun searchResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnSearchDao> =
     BecknResponseRepository(database.getCollectionOfName("on_search"))
 
   @Bean
-  fun messageResponseRepo(@Autowired database: MongoDatabase): GenericRepository<Message> =
+  fun messageResponseRepo(@Autowired database: MongoDatabase): GenericRepository<MessageDao> =
     GenericRepository.create(database, "message_responses")
 
   @Bean
-  fun onSelectResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnSelect> =
+  fun onSelectResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnSelectDao> =
     BecknResponseRepository(database.getCollectionOfName("on_select"))
 
   @Bean
-  fun onInitResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnInit> =
+  fun onInitResponseRepo(@Autowired database: MongoDatabase): BecknResponseRepository<OnInitDao> =
     BecknResponseRepository(database.getCollectionOfName("on_select"))
 
   @Bean

@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
-import org.beckn.one.sandbox.bap.message.entities.Message
+import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
 import org.beckn.one.sandbox.bap.schemas.ResponseStatus.ACK
@@ -34,7 +34,7 @@ class SearchControllerSearchSpec @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
   val contextFactory: ContextFactory,
-  val messageRepository: GenericRepository<Message>
+  val messageRepository: GenericRepository<MessageDao>
 ) : DescribeSpec() {
   init {
 
@@ -100,10 +100,10 @@ class SearchControllerSearchSpec @Autowired constructor(
 
         MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
         val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolAckResponse::class.java)
-        val savedMessage = messageRepository.findOne(Message::id eq searchResponse.context.messageId)
+        val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context.messageId)
         savedMessage shouldNotBe null
         savedMessage?.id shouldBe searchResponse.context.messageId
-        savedMessage?.type shouldBe Message.Type.Search
+        savedMessage?.type shouldBe MessageDao.Type.Search
       }
 
       it("should invoke Beckn /search API on first gateway and persist message with location") {
@@ -132,10 +132,10 @@ class SearchControllerSearchSpec @Autowired constructor(
 
         MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
         val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolAckResponse::class.java)
-        val savedMessage = messageRepository.findOne(Message::id eq searchResponse.context.messageId)
+        val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context.messageId)
         savedMessage shouldNotBe null
         savedMessage?.id shouldBe searchResponse.context.messageId
-        savedMessage?.type shouldBe Message.Type.Search
+        savedMessage?.type shouldBe MessageDao.Type.Search
       }
 
     }

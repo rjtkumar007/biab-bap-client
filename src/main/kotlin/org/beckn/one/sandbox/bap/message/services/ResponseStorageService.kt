@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.message.services
 
 import arrow.core.Either
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.BecknResponse
+import org.beckn.one.sandbox.bap.message.entities.BecknResponseDao
 import org.beckn.one.sandbox.bap.message.mappers.GenericResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
@@ -14,7 +14,7 @@ interface ResponseStorageService<Proto: ProtocolResponse> {
   fun findByMessageId(id: String): Either<DatabaseError.OnRead, List<Proto>>
 }
 
-class ResponseStorageServiceImpl<Proto: ProtocolResponse, Entity: BecknResponse> constructor(
+class ResponseStorageServiceImpl<Proto: ProtocolResponse, Entity: BecknResponseDao> constructor(
   val responseRepo: BecknResponseRepository<Entity>,
   val mapper: GenericResponseMapper<Proto, Entity>
 ): ResponseStorageService<Proto> {

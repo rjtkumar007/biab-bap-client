@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Time
-import org.beckn.one.sandbox.bap.message.entities.TimeRange
+import org.beckn.one.sandbox.bap.message.entities.TimeDao
+import org.beckn.one.sandbox.bap.message.entities.TimeRangeDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolTime
 import org.beckn.one.sandbox.bap.schemas.ProtocolTimeRange
 import java.time.Clock
@@ -34,13 +34,13 @@ object ProtocolTimeFactory {
   )
 
   fun timeAsEntity(protocol: ProtocolTime?) = protocol?.let {
-    Time(
+    TimeDao(
       label = protocol.label,
       timestamp = protocol.timestamp,
       duration = protocol.duration,
       days = protocol.days,
       range = protocol.range?.let {
-        TimeRange(
+        TimeRangeDao(
           start = it.start,
           end = it.end
         )

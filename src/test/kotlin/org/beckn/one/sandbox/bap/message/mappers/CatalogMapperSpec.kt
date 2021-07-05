@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.message.mappers
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.message.entities.Descriptor
+import org.beckn.one.sandbox.bap.message.entities.DescriptorDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -26,7 +26,7 @@ class CatalogMapperSpec @Autowired constructor(
     }
   }
 
-  fun descriptor(type: String, index: Int) = Descriptor(
+  fun descriptor(type: String, index: Int) = DescriptorDao(
     name = "$type-$index name",
     code = "$type-$index code",
     symbol = "$type-$index symbol",

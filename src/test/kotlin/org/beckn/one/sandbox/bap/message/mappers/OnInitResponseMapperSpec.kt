@@ -2,8 +2,8 @@ package org.beckn.one.sandbox.bap.message.mappers
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.message.entities.OnInit
-import org.beckn.one.sandbox.bap.message.entities.OnInitMessage
+import org.beckn.one.sandbox.bap.message.entities.OnInitDao
+import org.beckn.one.sandbox.bap.message.entities.OnInitMessageDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnInitMessageInitializedFactory
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
@@ -27,9 +27,9 @@ class OnInitResponseMapperSpec @Autowired constructor(
     )
   )
 
-  private val entityResponse = OnInit(
+  private val entityResponse = OnInitDao(
     context = ProtocolContextFactory.fixedAsEntity(protocolResponse.context),
-    message = OnInitMessage(
+    message = OnInitMessageDao(
       initialized = ProtocolOnInitMessageInitializedFactory.createAsEntity(protocolResponse.message?.initialized)
     )
   )

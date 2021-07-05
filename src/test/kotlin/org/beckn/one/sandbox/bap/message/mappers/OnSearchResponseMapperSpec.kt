@@ -2,9 +2,9 @@ package org.beckn.one.sandbox.bap.message.mappers
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.message.entities.Descriptor
-import org.beckn.one.sandbox.bap.message.entities.OnSearch
-import org.beckn.one.sandbox.bap.message.entities.OnSearchMessage
+import org.beckn.one.sandbox.bap.message.entities.DescriptorDao
+import org.beckn.one.sandbox.bap.message.entities.OnSearchDao
+import org.beckn.one.sandbox.bap.message.entities.OnSearchMessageDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
@@ -35,8 +35,8 @@ class OnSearchResponseMapperSpec @Autowired constructor(
     context = ProtocolContextFactory.fixed
   )
 
-  private val entitySearchResponse =  OnSearch(
-    message = OnSearchMessage(
+  private val entitySearchResponse =  OnSearchDao(
+    message = OnSearchMessageDao(
       ProtocolCatalogFactory.createAsEntity(protocolSearchResponse.message?.catalog)
     ),
     context = ProtocolContextFactory.fixedAsEntity(protocolSearchResponse.context)
@@ -55,7 +55,7 @@ class OnSearchResponseMapperSpec @Autowired constructor(
     }
   }
 
-  fun descriptor(type: String, index: Int) = Descriptor(
+  fun descriptor(type: String, index: Int) = DescriptorDao(
     name = "$type-$index name",
     code = "$type-$index code",
     symbol = "$type-$index symbol",

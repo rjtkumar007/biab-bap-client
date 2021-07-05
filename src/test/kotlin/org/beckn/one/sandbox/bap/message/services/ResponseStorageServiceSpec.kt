@@ -6,7 +6,7 @@ import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.OnSearch
+import org.beckn.one.sandbox.bap.message.entities.OnSearchDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.mappers.OnSearchResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
@@ -28,7 +28,7 @@ import java.time.ZoneId
 internal class ResponseStorageServiceSpec @Autowired constructor(
     val searchResponseMapper: OnSearchResponseMapper,
     val searchResponseStorageService: ResponseStorageService<ProtocolOnSearch>,
-    val searchResponseRepo: BecknResponseRepository<OnSearch>
+    val searchResponseRepo: BecknResponseRepository<OnSearchDao>
 ) : DescribeSpec() {
 
 
@@ -83,7 +83,7 @@ internal class ResponseStorageServiceSpec @Autowired constructor(
       }
 
       context("when error is encountered while saving") {
-        val mockRepo = mock<BecknResponseRepository<OnSearch>> {
+        val mockRepo = mock<BecknResponseRepository<OnSearchDao>> {
           onGeneric { insertOne(searchResponse) }.thenThrow(MongoException("Write error"))
         }
         val failureSearchResponseService = ResponseStorageServiceImpl(mockRepo, searchResponseMapper)
@@ -95,7 +95,7 @@ internal class ResponseStorageServiceSpec @Autowired constructor(
       }
 
       context("when error is encountered while fetching message by id") {
-        val mockRepo = mock<BecknResponseRepository<OnSearch>> {
+        val mockRepo = mock<BecknResponseRepository<OnSearchDao>> {
           onGeneric { findByMessageId(context.messageId) }.thenThrow(MongoException("Write error"))
         }
         val failureSearchResponseService = ResponseStorageServiceImpl(mockRepo, searchResponseMapper)

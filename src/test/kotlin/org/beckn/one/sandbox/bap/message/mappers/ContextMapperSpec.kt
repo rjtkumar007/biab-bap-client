@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.message.mappers
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.message.entities.Context
+import org.beckn.one.sandbox.bap.message.entities.ContextDao
 import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
@@ -35,7 +35,7 @@ class ContextMapperSpec @Autowired constructor(
         mappedEntity.domain shouldBe schema.domain
         mappedEntity.country shouldBe schema.country
         mappedEntity.city shouldBe schema.city
-        mappedEntity.action shouldBe Context.Action.SEARCH
+        mappedEntity.action shouldBe ContextDao.Action.SEARCH
         mappedEntity.coreVersion shouldBe schema.coreVersion
         mappedEntity.bapId shouldBe schema.bapId
         mappedEntity.bapUri shouldBe schema.bapUri
@@ -49,11 +49,11 @@ class ContextMapperSpec @Autowired constructor(
       }
 
       it("should map all fields from entity to schema") {
-        val entity = Context(
+        val entity = ContextDao(
           domain = domain,
           country = country,
           city = city,
-          action = Context.Action.SEARCH,
+          action = ContextDao.Action.SEARCH,
           coreVersion = ProtocolVersion.V0_9_1.value,
           bapId = bapId,
           bapUri = bapUri,

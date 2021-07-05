@@ -7,7 +7,7 @@ import org.litote.kmongo.newId
 import java.time.Clock
 import java.time.LocalDateTime
 
-data class Message(
+data class MessageDao(
   @field:BsonId private val _id: Id<String> = newId(),
   val id: String,
   val type: Type,

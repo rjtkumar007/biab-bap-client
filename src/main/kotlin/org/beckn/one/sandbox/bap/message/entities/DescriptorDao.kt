@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.message.entities
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
 
-data class Descriptor @Default constructor(
+data class DescriptorDao @Default constructor(
   val name: String?,
   val code: String? = null,
   val symbol: String? = null,

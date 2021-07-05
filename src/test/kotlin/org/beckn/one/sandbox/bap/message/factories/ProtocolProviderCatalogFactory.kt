@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
-import org.beckn.one.sandbox.bap.message.entities.Category
-import org.beckn.one.sandbox.bap.message.entities.ProviderCatalog
+import org.beckn.one.sandbox.bap.message.entities.CategoryDao
+import org.beckn.one.sandbox.bap.message.entities.ProviderCatalogDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolCategory
 import org.beckn.one.sandbox.bap.schemas.ProtocolProviderCatalog
 
@@ -14,7 +14,7 @@ object ProtocolProviderCatalogFactory {
     items = IdFactory.forItems(IdFactory.forProvider(index), 1).map { ProtocolItemFactory.create(it) }
   )
 
-  fun createAsEntity(protocol: ProtocolProviderCatalog) = ProviderCatalog(
+  fun createAsEntity(protocol: ProtocolProviderCatalog) = ProviderCatalogDao(
     id = protocol.id,
     descriptor = ProtocolDescriptorFactory.createAsEntity(protocol.descriptor),
     categories = protocol.categories?.mapNotNull { ProtocolCategoryFactory.createAsEntity(it) },
@@ -30,7 +30,7 @@ object ProtocolCategoryFactory{
   )
 
   fun createAsEntity(protocol: ProtocolCategory?) = protocol?.let {
-    Category(
+    CategoryDao(
       id = protocol.id,
       descriptor = ProtocolDescriptorFactory.createAsEntity(protocol.descriptor),
       tags = protocol.tags

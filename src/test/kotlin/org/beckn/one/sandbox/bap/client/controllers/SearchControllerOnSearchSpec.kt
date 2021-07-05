@@ -6,9 +6,9 @@ import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.client.mappers.ClientCatalogMapper
-import org.beckn.one.sandbox.bap.message.entities.Message
-import org.beckn.one.sandbox.bap.message.entities.OnSearch
-import org.beckn.one.sandbox.bap.message.entities.OnSearchMessage
+import org.beckn.one.sandbox.bap.message.entities.MessageDao
+import org.beckn.one.sandbox.bap.message.entities.OnSearchDao
+import org.beckn.one.sandbox.bap.message.entities.OnSearchMessageDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.mappers.CatalogMapper
 import org.beckn.one.sandbox.bap.message.mappers.ContextMapper
@@ -39,8 +39,8 @@ class SearchControllerOnSearchSpec @Autowired constructor(
   val contextMapper: ContextMapper,
   val catalogMapper: CatalogMapper,
   val clientCatalogMapper: ClientCatalogMapper,
-  val messageRepository: GenericRepository<Message>,
-  val searchResponseRepository: GenericRepository<OnSearch>
+  val messageRepository: GenericRepository<MessageDao>,
+  val searchResponseRepository: GenericRepository<OnSearchDao>
 ) : DescribeSpec() {
 
   init {
@@ -69,7 +69,7 @@ class SearchControllerOnSearchSpec @Autowired constructor(
       }
 
       it("should return search response when message id is valid") {
-        val message = messageRepository.insertOne(Message(id = uuidFactory.create(), type = Message.Type.Search))
+        val message = messageRepository.insertOne(MessageDao(id = uuidFactory.create(), type = MessageDao.Type.Search))
         val protocolCatalog1 = ProtocolCatalogFactory.create(index = 1)
         val protocolCatalog2 = ProtocolCatalogFactory.create(index = 2)
         mapToEntityAndPersist(message, protocolCatalog1)
@@ -95,13 +95,13 @@ class SearchControllerOnSearchSpec @Autowired constructor(
   private fun mapToClientCatalog(protocolCatalog1: ProtocolCatalog) =
     clientCatalogMapper.protocolToClientDto(protocolCatalog1)
 
-  private fun mapToEntityAndPersist(message: Message, protocolCatalog: ProtocolCatalog) {
+  private fun mapToEntityAndPersist(message: MessageDao, protocolCatalog: ProtocolCatalog) {
     val context = contextMapper.fromSchema(contextFactory.create(messageId = message.id))
     val entityCatalog = catalogMapper.schemaToEntity(protocolCatalog)
     searchResponseRepository.insertOne(
-      OnSearch(
+      OnSearchDao(
         context = context,
-        message = OnSearchMessage(entityCatalog)
+        message = OnSearchMessageDao(entityCatalog)
       )
     )
   }

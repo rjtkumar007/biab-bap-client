@@ -2,18 +2,18 @@ package org.beckn.one.sandbox.bap.message.entities
 
 import org.beckn.one.sandbox.bap.Default
 
-data class Quotation @Default constructor(
-  val price: Price? = null,
-  val breakup: List<QuotationBreakup>? = null,
+data class QuotationDao @Default constructor(
+  val price: PriceDao? = null,
+  val breakup: List<QuotationBreakupDao>? = null,
   val ttl: String? = null
 )
 
 
-data class QuotationBreakup @Default constructor(
+data class QuotationBreakupDao @Default constructor(
   val type: Type? = null,
   val refId: String? = null,
   val title: String? = null,
-  val price: Price? = null
+  val price: PriceDao? = null
 ) {
 
   enum class Type(val value: String) {
