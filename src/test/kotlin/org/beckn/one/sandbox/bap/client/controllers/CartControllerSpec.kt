@@ -40,25 +40,14 @@ class CartControllerSpec @Autowired constructor(
       it("should create cart") {
         val cart = CartFactory.create(null)
 
-        val createCartResponseString = mockMvc
-          .perform(
-            post("/client/v1/cart")
-              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .content(objectMapper.writeValueAsString(cart))
-          )
+        val createCartResponseString = invokeCreateApi(cart)
           .andExpect(status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
 
         val createCartResponse = objectMapper.readValue(createCartResponseString, CartResponseDto::class.java)
-        createCartResponse.context shouldNotBe null
-        createCartResponse.message shouldNotBe null
-        createCartResponse.message?.cart?.id shouldNotBe null
-        val expectedCartDto = cart.copy(id = createCartResponse.message?.cart?.id)
-        createCartResponse.message?.cart shouldBe expectedCartDto
-        val cartFromDb = cartRepository.findOne(CartDto::id eq createCartResponse.message?.cart?.id)
-        cartFromDb shouldNotBe null
-        cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe expectedCartDto
+        assertCreateCartResponse(createCartResponse, cart)
+        assertCartIsPersistedInDb(createCartResponse, cart)
       }
 
       it("should delete cart") {
@@ -82,5 +71,27 @@ class CartControllerSpec @Autowired constructor(
       }
     }
   }
+
+  private fun assertCreateCartResponse(createCartResponse: CartResponseDto, cartToBeCreated: CartDto) {
+    createCartResponse.context shouldNotBe null
+    createCartResponse.message shouldNotBe null
+    createCartResponse.message?.cart?.id shouldNotBe null
+    val expectedCartDto = cartToBeCreated.copy(id = createCartResponse.message?.cart?.id)
+    createCartResponse.message?.cart shouldBe expectedCartDto
+  }
+
+  private fun assertCartIsPersistedInDb(createCartResponse: CartResponseDto, cartDto: CartDto) {
+    val cartFromDb = cartRepository.findOne(CartDto::id eq createCartResponse.message?.cart?.id)
+    cartFromDb shouldNotBe null
+    val expectedCartDto = cartDto.copy(id = createCartResponse.message?.cart?.id)
+    cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe expectedCartDto
+  }
+
+  private fun invokeCreateApi(cart: CartDto) = mockMvc
+    .perform(
+      post("/client/v1/cart")
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .content(objectMapper.writeValueAsString(cart))
+    )
 
 }
