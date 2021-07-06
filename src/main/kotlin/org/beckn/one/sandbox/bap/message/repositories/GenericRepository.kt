@@ -31,7 +31,7 @@ open class GenericRepository<R : Any>(private val collection: MongoCollection<R>
     return document;
   }
 
-  fun upsert(document: R, filter: Bson) = collection.replaceOne(filter, document, ReplaceOptions().upsert(true))
+  open fun upsert(document: R?, filter: Bson?) = collection.replaceOne(filter!!, document!!, ReplaceOptions().upsert(true))
 
   fun upsertById(document: R) = collection.save(document)
 

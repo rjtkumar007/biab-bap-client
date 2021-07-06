@@ -7,16 +7,10 @@ import org.beckn.one.sandbox.bap.client.external.gateway.GatewayServiceClient
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
+import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
-import org.beckn.one.sandbox.bap.schemas.ProtocolIntent
-import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
-import org.beckn.one.sandbox.bap.schemas.ProtocolFulfillment
-import org.beckn.one.sandbox.bap.schemas.ProtocolFulfillmentEnd
-import org.beckn.one.sandbox.bap.schemas.ProtocolLocation
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchRequest
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchRequestMessage
+import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage.Companion.nack
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.junit.jupiter.api.Assertions
 import org.mockito.Mockito.*
@@ -33,15 +27,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
   private val gatewayServiceClient: GatewayServiceClient = mock(GatewayServiceClient::class.java)
-  private val contextFactory = ContextFactory(
-    domain = Domain.LocalRetail.value,
-    city = City.Bengaluru.value,
-    country = Country.India.value,
-    bapId = "beckn_in_a_box_bap",
-    bapUrl = "beckn_in_a_box_bap.com",
-    uuidFactory = uuidFactory,
-    clock = clock
-  )
+  private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
   private val gatewayService: GatewayService =
     GatewayService(
       domain = Domain.LocalRetail.value,

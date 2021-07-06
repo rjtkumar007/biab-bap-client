@@ -24,23 +24,31 @@ class CartService @Autowired constructor(
   private val cartMapper: CartMapper,
   private val cartRepository: GenericRepository<CartDao>,
 ) {
-  val log: Logger = LoggerFactory.getLogger(CartService::class.java)
+  private val log: Logger = LoggerFactory.getLogger(CartService::class.java)
 
   fun saveCart(context: ProtocolContext, cartDto: CartDto): Either<DatabaseError, CreateCartResponseDto> {
-    log.info("Got request to save cart: {}", cartDto)
-    val cartId = cartDto.id ?: uuidFactory.create()
-    log.info("Cart Id: {}", cartId)
-    val cartDao = cartMapper.dtoToDao(cartDto.copy(id = cartId))
-    log.info("Persisting cart: {}", cartDao)
-    val upsertResult = cartRepository.upsert(cartDao, CartDao::id eq cartDao.id)
-    log.info("Cart {} persist result: {}", cartId, upsertResult)
-    return Either.Right(
-      CreateCartResponseDto(
-        context = context,
-        message = CartResponseMessageDto(cart = cartDto.copy(id = cartId))
+    return Either.catch {
+      log.info("Got request to save cart: {}", cartDto)
+      val cartId = getOrGenerateCartId(cartDto)
+      val cartDao = cartMapper.dtoToDao(cartDto.copy(id = cartId))
+      log.info("Persisting cart: {}", cartDao)
+      val upsertResult = cartRepository.upsert(cartDao, CartDao::id eq cartDao.id)
+      log.info("Cart {} persist result: {}", cartId, upsertResult)
+      return Either.Right(
+        CreateCartResponseDto(
+          context = context,
+          message = CartResponseMessageDto(cart = cartDto.copy(id = cartId))
+        )
       )
-    )
+    }
+      .mapLeft {
+        log.error("Error when saving cart $cartDto", it)
+        return Either.Left(DatabaseError.OnWrite)
+      }
   }
+
+  private fun getOrGenerateCartId(cartDto: CartDto) =
+    cartDto.id ?: uuidFactory.create()
 
   fun deleteCart(context: ProtocolContext, cartId: String): Either<HttpError, DeleteCartResponseDto> {
     return Either.catch {

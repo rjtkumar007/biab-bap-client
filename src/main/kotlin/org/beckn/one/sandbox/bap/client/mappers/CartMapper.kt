@@ -14,7 +14,8 @@ import org.mapstruct.ReportingPolicy
 )
 interface CartMapper {
   @Mapping(
-    target = "_id", expression = "java(org.litote.kmongo.IdsKt.newId())"
+    target = "_id",
+    expression = "java(org.beckn.one.sandbox.bap.client.factories.DbIdFactory.Companion.instance().createStringId())"
   )
   fun dtoToDao(source: CartDto): CartDao
   fun daoToDto(dao: CartDao): CartDto
