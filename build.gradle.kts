@@ -5,6 +5,7 @@ plugins {
   id("org.springframework.boot") version "2.5.0"
   id("io.spring.dependency-management") version "1.0.11.RELEASE"
   id("org.jetbrains.kotlin.plugin.serialization") version "1.5.10"
+  id("org.jetbrains.kotlin.plugin.allopen") version ("1.5.20")
   kotlin("jvm") version "1.4.31"
   kotlin("plugin.spring") version "1.4.31"
   kotlin("kapt") version "1.4.31"
@@ -13,6 +14,10 @@ plugins {
 group = "org.beckn.one.sandbox"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
+
+allOpen {
+  annotation("org.beckn.one.sandbox.bap.Open")
+}
 
 repositories {
   mavenCentral()

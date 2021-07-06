@@ -10,16 +10,12 @@ import org.beckn.one.sandbox.bap.client.factories.CartFactory
 import org.beckn.one.sandbox.bap.client.mappers.CartMapperImpl
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.junit.runner.RunWith
 import org.litote.kmongo.eq
-import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-@RunWith(MockitoJUnitRunner::class)
 internal class CartRepositorySpec : DescribeSpec() {
-
   init {
     describe("Save Cart") {
       val cartMapper = CartMapperImpl()

@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.message.repositories
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.ReplaceOptions
+import org.beckn.one.sandbox.bap.Open
 import org.bson.Document
 import org.bson.conversions.Bson
 import org.litote.kmongo.findOne
@@ -10,7 +11,8 @@ import org.litote.kmongo.getCollection
 import org.litote.kmongo.getCollectionOfName
 import org.litote.kmongo.save
 
-open class GenericRepository<R : Any>(private val collection: MongoCollection<R>) {
+@Open
+class GenericRepository<R : Any>(private val collection: MongoCollection<R>) {
 
   companion object {
     inline fun <reified T : Any> create(database: MongoDatabase): GenericRepository<T> {
@@ -26,12 +28,12 @@ open class GenericRepository<R : Any>(private val collection: MongoCollection<R>
 
   fun insertMany(documents: List<R>) = collection.insertMany(documents)
 
-  open fun insertOne(document: R): R {
+  fun insertOne(document: R): R {
     collection.insertOne(document)
     return document;
   }
 
-  open fun upsert(document: R, filter: Bson) = collection.replaceOne(filter, document, ReplaceOptions().upsert(true))
+  fun upsert(document: R, filter: Bson) = collection.replaceOne(filter, document, ReplaceOptions().upsert(true))
 
   fun upsertById(document: R) = collection.save(document)
 
