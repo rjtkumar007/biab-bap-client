@@ -18,7 +18,7 @@ class CartController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @PostMapping("/client/v1/cart")
+  @PutMapping("/client/v1/cart")
   @ResponseBody
   fun createCart(@RequestBody cart: CartDto): ResponseEntity<CartResponseDto> {
     val context = getContext()

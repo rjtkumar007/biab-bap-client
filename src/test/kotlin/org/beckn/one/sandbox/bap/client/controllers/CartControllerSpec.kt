@@ -20,7 +20,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -40,7 +40,7 @@ class CartControllerSpec @Autowired constructor(
       it("should create cart") {
         val cart = CartFactory.create(null)
 
-        val createCartResponseString = invokeCreateApi(cart)
+        val createCartResponseString = invokeCartCreateOrUpdateApi(cart)
           .andExpect(status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
@@ -87,9 +87,9 @@ class CartControllerSpec @Autowired constructor(
     cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe expectedCartDto
   }
 
-  private fun invokeCreateApi(cart: CartDto) = mockMvc
+  private fun invokeCartCreateOrUpdateApi(cart: CartDto) = mockMvc
     .perform(
-      post("/client/v1/cart")
+      put("/client/v1/cart")
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .content(objectMapper.writeValueAsString(cart))
     )
