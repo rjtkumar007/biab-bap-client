@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class RepositoryConfiguration {
   @Bean
-  fun cartRepository(@Autowired database: MongoDatabase): GenericRepository<CartDao> {
+  fun cartGenericRepository(@Autowired database: MongoDatabase): GenericRepository<CartDao> {
     return GenericRepository(database.getCollectionOfName(CartDao.collectionName))
   }
 }
