@@ -17,6 +17,11 @@ data class GetCartResponseDto(
   override val error: ProtocolError? = null,
 ) : ClientResponse
 
+data class DeleteCartResponseDto(
+  override val context: ProtocolContext,
+  override val error: ProtocolError? = null,
+): ClientResponse
+
 data class CartResponseMessageDto(
   val cart: CartDto,
 )

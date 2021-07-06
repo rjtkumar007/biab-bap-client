@@ -5,10 +5,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.daos.CartDao
-import org.beckn.one.sandbox.bap.client.dtos.CartDto
-import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
-import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDto
-import org.beckn.one.sandbox.bap.client.dtos.CreateCartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.*
 import org.beckn.one.sandbox.bap.client.mappers.CartMapper
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
@@ -21,7 +18,9 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.math.BigDecimal
 
@@ -59,6 +58,26 @@ class CartControllerSpec @Autowired constructor(
         val cartFromDb = cartRepository.findOne(CartDto::id eq createCartResponse.message.cart.id)
         cartFromDb shouldNotBe null
         cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe expectedCartDto
+      }
+
+      it("should delete cart") {
+        val cartId = "abc-123-ne"
+        val cartToBeInsertedDao = cartMapper.dtoToDao(getCart(cartId).copy(id = cartId))
+        cartRepository.findOne(cartToBeInsertedDao::id eq cartToBeInsertedDao.id) shouldBe null
+        val insertedCartDao = cartRepository.insertOne(cartToBeInsertedDao)
+        val cartFromDb = cartRepository.findOne(insertedCartDao::id eq cartToBeInsertedDao.id)
+        cartFromDb shouldNotBe null
+        cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe getCart(cartId)
+        val createCartResponseString = mockMvc
+          .perform(
+            MockMvcRequestBuilders.delete("/client/v1/cart/$cartId")
+          )
+          .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+          .andReturn()
+          .response.contentAsString
+        cartRepository.findOne(insertedCartDao::id eq cartToBeInsertedDao.id) shouldBe null
+        //todo: figure out if response body needs to be validated(don't see any use of doing it but check once)
+        //todo: add edge case tests at service level to check for DB failure errors and any other exceptions.
       }
     }
   }

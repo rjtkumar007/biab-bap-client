@@ -1,10 +1,14 @@
 package org.beckn.one.sandbox.bap.client.services
 
+import arrow.core.Either
 import org.beckn.one.sandbox.bap.client.daos.CartDao
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
 import org.beckn.one.sandbox.bap.client.dtos.CartResponseMessageDto
 import org.beckn.one.sandbox.bap.client.dtos.CreateCartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDto
 import org.beckn.one.sandbox.bap.client.mappers.CartMapper
+import org.beckn.one.sandbox.bap.errors.HttpError
+import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
@@ -34,5 +38,18 @@ class CartService @Autowired constructor(
       context = context,
       message = CartResponseMessageDto(cart = cartDto.copy(id = cartId))
     )
+  }
+
+  fun deleteCart(context: ProtocolContext, cartId: String): Either<HttpError, DeleteCartResponseDto> {
+    return Either.catch {
+      return when (cartRepository.deleteOne(CartDao::id eq cartId)) {
+        null -> Either.Left(DatabaseError.NotFound)
+        else -> Either.Right(DeleteCartResponseDto(context = context))
+      }
+    }
+      .mapLeft { e ->
+        log.error("Error when deleting cart with id $cartId", e)
+        DatabaseError.OnDelete
+      }
   }
 }

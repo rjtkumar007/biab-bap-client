@@ -43,5 +43,6 @@ open class GenericRepository<R : Any>(private val collection: MongoCollection<R>
 
   fun clear() = collection.deleteMany(Document())
 
+  fun deleteOne(filter: Bson) = collection.findOneAndDelete(filter)
 
 }
