@@ -50,7 +50,7 @@ class CartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
 
-        val createCartResponse = objectMapper.readValue(createCartResponseString, CreateCartResponseDto::class.java)
+        val createCartResponse = objectMapper.readValue(createCartResponseString, CartResponseDto::class.java)
         createCartResponse.context shouldNotBe null
         createCartResponse.message shouldNotBe null
         createCartResponse.message?.cart?.id shouldNotBe null

@@ -17,9 +17,9 @@ class MockCartController @Autowired constructor(
 
   @PostMapping("/client/v0/cart")
   @ResponseBody
-  fun createCart(@RequestBody cart: CartDto): ResponseEntity<CreateCartResponseDto> {
+  fun createCart(@RequestBody cart: CartDto): ResponseEntity<CartResponseDto> {
     return ResponseEntity.ok(
-      CreateCartResponseDto(
+      CartResponseDto(
         context = getContext(),
         message = CartResponseMessageDto(cart = cart)
       )
@@ -28,9 +28,9 @@ class MockCartController @Autowired constructor(
 
   @GetMapping("/client/v0/cart/{id}")
   @ResponseBody
-  fun getCart(@PathVariable id: String): ResponseEntity<GetCartResponseDto> {
+  fun getCart(@PathVariable id: String): ResponseEntity<CartResponseDto> {
     return ResponseEntity.ok(
-      GetCartResponseDto(
+      CartResponseDto(
         context = getContext(),
         message = CartResponseMessageDto(cart = buildCart(id))
       )

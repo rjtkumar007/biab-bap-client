@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
-import org.beckn.one.sandbox.bap.client.dtos.CreateCartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseDto
 import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDto
 import org.beckn.one.sandbox.bap.client.services.CartService
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
@@ -20,13 +20,13 @@ class CartController @Autowired constructor(
 
   @PostMapping("/client/v1/cart")
   @ResponseBody
-  fun createCart(@RequestBody cart: CartDto): ResponseEntity<CreateCartResponseDto> {
+  fun createCart(@RequestBody cart: CartDto): ResponseEntity<CartResponseDto> {
     val context = getContext()
     return cartService.saveCart(context, cart)
       .fold({
         ResponseEntity
           .status(it.status())
-          .body(CreateCartResponseDto(context = context, error = it.error()))
+          .body(CartResponseDto(context = context, error = it.error()))
       }, {
         ResponseEntity.ok(it)
       })

@@ -5,7 +5,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
 import org.beckn.one.sandbox.bap.client.dtos.CartResponseMessageDto
-import org.beckn.one.sandbox.bap.client.dtos.CreateCartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseDto
 import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDto
 import org.beckn.one.sandbox.bap.client.mappers.CartMapper
 import org.beckn.one.sandbox.bap.client.repositories.CartRepository
@@ -25,7 +25,7 @@ class CartService @Autowired constructor(
   private val cartRepository: CartRepository,
   private val log: Logger = LoggerFactory.getLogger(CartService::class.java)
 ) {
-  fun saveCart(context: ProtocolContext, cartDto: CartDto): Either<HttpError, CreateCartResponseDto> {
+  fun saveCart(context: ProtocolContext, cartDto: CartDto): Either<HttpError, CartResponseDto> {
     log.info("Got request to save cart: {}", cartDto)
     val cartDtoWithId = getCartWithNewIdIfNotPresent(cartDto)
     val cartToPersist = cartMapper.dtoToDao(cartDtoWithId)
@@ -33,7 +33,7 @@ class CartService @Autowired constructor(
       .fold({ Left(it) },
         {
           Right(
-            CreateCartResponseDto(context = context, message = CartResponseMessageDto(cart = cartMapper.daoToDto(it)))
+            CartResponseDto(context = context, message = CartResponseMessageDto(cart = cartMapper.daoToDto(it)))
           )
         })
   }

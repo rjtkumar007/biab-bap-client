@@ -44,7 +44,7 @@ class MockCartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
 
-        val createCartResponse = objectMapper.readValue(createCartResponseString, CreateCartResponseDto::class.java)
+        val createCartResponse = objectMapper.readValue(createCartResponseString, CartResponseDto::class.java)
         createCartResponse.context shouldNotBe null
         createCartResponse.message?.cart shouldBe cart
       }
@@ -60,7 +60,7 @@ class MockCartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
 
-        val getCartResponse = objectMapper.readValue(getCartResponseString, GetCartResponseDto::class.java)
+        val getCartResponse = objectMapper.readValue(getCartResponseString, CartResponseDto::class.java)
         getCartResponse.message shouldBe CartResponseMessageDto(cart = getCart(cartId))
       }
 

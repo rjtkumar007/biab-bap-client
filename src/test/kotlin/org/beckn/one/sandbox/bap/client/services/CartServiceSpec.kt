@@ -5,7 +5,7 @@ import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.dtos.CartResponseMessageDto
-import org.beckn.one.sandbox.bap.client.dtos.CreateCartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseDto
 import org.beckn.one.sandbox.bap.client.factories.CartFactory
 import org.beckn.one.sandbox.bap.client.factories.DbIdFactory
 import org.beckn.one.sandbox.bap.client.mappers.CartMapperImpl
@@ -53,7 +53,7 @@ internal class CartServiceSpec : DescribeSpec() {
         val response = cartService.saveCart(context, cartDto)
 
         verify(cartRepository).saveCart(cartDao)
-        response shouldBeRight CreateCartResponseDto(
+        response shouldBeRight CartResponseDto(
           context = context, message = CartResponseMessageDto(cart = cartDto)
         )
       }

@@ -5,22 +5,16 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolError
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
 
-data class CreateCartResponseDto(
+data class CartResponseDto(
   override val context: ProtocolContext,
   val message: CartResponseMessageDto? = null,
-  override val error: ProtocolError? = null,
-) : ClientResponse
-
-data class GetCartResponseDto(
-  override val context: ProtocolContext,
-  val message: CartResponseMessageDto,
   override val error: ProtocolError? = null,
 ) : ClientResponse
 
 data class DeleteCartResponseDto(
   override val context: ProtocolContext,
   override val error: ProtocolError? = null,
-): ClientResponse
+) : ClientResponse
 
 data class CartResponseMessageDto(
   val cart: CartDto,
