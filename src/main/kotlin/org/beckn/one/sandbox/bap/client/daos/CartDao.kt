@@ -2,13 +2,9 @@ package org.beckn.one.sandbox.bap.client.daos
 
 import org.beckn.one.sandbox.bap.Default
 import org.bson.codecs.pojo.annotations.BsonId
-import org.litote.kmongo.Id
-import org.litote.kmongo.newId
-
 
 data class CartDao @Default constructor(
-  @field:BsonId val _id: Id<String> = newId(),
-  val id: String? = null,
+  @field:BsonId val id: String? = null,
   val items: List<CartItemDao>? = null
 ) {
   companion object {

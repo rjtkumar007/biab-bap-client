@@ -20,7 +20,7 @@ class CartController @Autowired constructor(
 
   @PutMapping("/client/v1/cart")
   @ResponseBody
-  fun createCart(@RequestBody cart: CartDto): ResponseEntity<CartResponseDto> {
+  fun saveCart(@RequestBody cart: CartDto): ResponseEntity<CartResponseDto> {
     val context = getContext()
     return cartService.saveCart(context, cart)
       .fold({

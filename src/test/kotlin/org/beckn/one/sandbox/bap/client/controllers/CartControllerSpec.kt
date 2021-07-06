@@ -6,10 +6,15 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.daos.CartDao
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
+import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
+import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDto
 import org.beckn.one.sandbox.bap.client.dtos.CartResponseDto
 import org.beckn.one.sandbox.bap.client.factories.CartFactory
 import org.beckn.one.sandbox.bap.client.mappers.CartMapper
+import org.beckn.one.sandbox.bap.client.repositories.CartRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
+import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
+import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.litote.kmongo.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -23,6 +28,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.math.BigDecimal
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,13 +37,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 class CartControllerSpec @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
-  val cartRepository: GenericRepository<CartDao>,
+  val uuidFactory: UuidFactory,
+  val cartRepository: CartRepository,
+  val genericRepository: GenericRepository<CartDao>,
   val cartMapper: CartMapper
 ) : DescribeSpec() {
   init {
     describe("Cart") {
 
-      it("should create cart") {
+      it("should create cart if it does not exist") {
         val cart = CartFactory.create(null)
 
         val createCartResponseString = invokeCartCreateOrUpdateApi(cart)
@@ -50,12 +58,44 @@ class CartControllerSpec @Autowired constructor(
         assertCartIsPersistedInDb(createCartResponse, cart)
       }
 
+      it("should update cart if it exists") {
+        val existingCartDto = CartFactory.create(uuidFactory.create())
+        val existingCartDao = cartMapper.dtoToDao(existingCartDto)
+        cartRepository.saveCart(existingCartDao)
+
+        val updatedCartDto = existingCartDto.copy(
+          items = listOf(
+            CartItemDto(
+              bppId = "paisool",
+              provider = CartItemProviderDto(
+                id = "venugopala stores",
+                providerLocations = listOf("13.001581,77.5703686")
+              ),
+              itemId = "cothas-coffee-1",
+              quantity = 2,
+              measure = ProtocolScalar(
+                value = BigDecimal.valueOf(500),
+                unit = "gm"
+              )
+            )
+          )
+        )
+        val updateCartResponseString = invokeCartCreateOrUpdateApi(updatedCartDto)
+          .andExpect(status().`is`(200))
+          .andReturn()
+          .response.contentAsString
+
+        val updateCartResponse = objectMapper.readValue(updateCartResponseString, CartResponseDto::class.java)
+        assertCreateCartResponse(updateCartResponse, updatedCartDto)
+        assertCartIsPersistedInDb(updateCartResponse, updatedCartDto)
+      }
+
       it("should delete cart") {
         val cartId = "abc-123-ne"
         val cartToBeInsertedDao = cartMapper.dtoToDao(CartFactory.create(cartId).copy(id = cartId))
-        cartRepository.findOne(cartToBeInsertedDao::id eq cartToBeInsertedDao.id) shouldBe null
-        val insertedCartDao = cartRepository.insertOne(cartToBeInsertedDao)
-        val cartFromDb = cartRepository.findOne(insertedCartDao::id eq cartToBeInsertedDao.id)
+        genericRepository.findOne(cartToBeInsertedDao::id eq cartToBeInsertedDao.id) shouldBe null
+        val insertedCartDao = genericRepository.insertOne(cartToBeInsertedDao)
+        val cartFromDb = genericRepository.findOne(insertedCartDao::id eq cartToBeInsertedDao.id)
         cartFromDb shouldNotBe null
         cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe CartFactory.create(cartId)
         val createCartResponseString = mockMvc
@@ -65,7 +105,7 @@ class CartControllerSpec @Autowired constructor(
           .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
-        cartRepository.findOne(insertedCartDao::id eq cartToBeInsertedDao.id) shouldBe null
+        genericRepository.findOne(insertedCartDao::id eq cartToBeInsertedDao.id) shouldBe null
         //todo: figure out if response body needs to be validated(don't see any use of doing it but check once)
         //todo: add edge case tests at service level to check for DB failure errors and any other exceptions.
       }
@@ -81,7 +121,7 @@ class CartControllerSpec @Autowired constructor(
   }
 
   private fun assertCartIsPersistedInDb(createCartResponse: CartResponseDto, cartDto: CartDto) {
-    val cartFromDb = cartRepository.findOne(CartDto::id eq createCartResponse.message?.cart?.id)
+    val cartFromDb = genericRepository.findOne(CartDao::id eq createCartResponse.message?.cart?.id)
     cartFromDb shouldNotBe null
     val expectedCartDto = cartDto.copy(id = createCartResponse.message?.cart?.id)
     cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe expectedCartDto
