@@ -12,7 +12,7 @@ context:
   city: Bengaluru
   country: IND
   bap_id: qa.api.box.beckn.org
-  bap_uri: http://qa.api.box.beckn.org/v1
+  bap_uri: http://qa.api.box.beckn.org/bap/v1
 database:
   mongo:
     url: mongodb://localhost:27017
