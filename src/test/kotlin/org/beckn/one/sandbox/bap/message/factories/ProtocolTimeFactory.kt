@@ -36,13 +36,13 @@ object ProtocolTimeFactory {
   fun timeAsEntity(protocol: ProtocolTime?) = protocol?.let {
     TimeDao(
       label = protocol.label,
-      timestamp = protocol.timestamp,
+      timestamp = protocol.timestamp?.toInstant(),
       duration = protocol.duration,
       days = protocol.days,
       range = protocol.range?.let {
         TimeRangeDao(
-          start = it.start,
-          end = it.end
+          start = it.start?.toInstant(),
+          end = it.end?.toInstant()
         )
       }
     )

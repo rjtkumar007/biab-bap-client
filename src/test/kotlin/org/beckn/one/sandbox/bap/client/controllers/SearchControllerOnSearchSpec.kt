@@ -69,6 +69,8 @@ class SearchControllerOnSearchSpec @Autowired constructor(
       }
 
       it("should return search response when message id is valid") {
+        messageRepository.clear()
+        searchResponseRepository.clear()
         val message = messageRepository.insertOne(MessageDao(id = uuidFactory.create(), type = MessageDao.Type.Search))
         val protocolCatalog1 = ProtocolCatalogFactory.create(index = 1)
         val protocolCatalog2 = ProtocolCatalogFactory.create(index = 2)

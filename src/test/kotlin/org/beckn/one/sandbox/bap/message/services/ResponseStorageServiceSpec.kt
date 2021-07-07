@@ -7,7 +7,9 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.OnSearchDao
+import org.beckn.one.sandbox.bap.message.entities.OnSearchMessageDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.mappers.OnSearchResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
@@ -17,10 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
-import java.time.Clock
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 @SpringBootTest
 @ActiveProfiles(value = ["test"])
@@ -32,32 +30,21 @@ internal class ResponseStorageServiceSpec @Autowired constructor(
 ) : DescribeSpec() {
 
 
-  private val fixedClock = Clock.fixed(
-    Instant.parse("2018-11-30T18:35:24.00Z"),
-    ZoneId.of("Asia/Calcutta")
-  )
+  private val context = ProtocolContextFactory.fixed
 
-  private val context = org.beckn.one.sandbox.bap.schemas.ProtocolContext(
-    domain = "LocalRetail",
-    country = "IN",
-    action = org.beckn.one.sandbox.bap.schemas.ProtocolContext.Action.SEARCH,
-    city = "Pune",
-    coreVersion = "0.9.1-draft03",
-    bapId = "http://host.bap.com",
-    bapUri = "http://host.bap.com",
-    transactionId = "222",
-    messageId = "222",
-    timestamp = LocalDateTime.now(fixedClock)
-  )
-
-  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch(
-    context = context,
+  val schemaSearchResponse = ProtocolOnSearch(
+    context = ProtocolContextFactory.fixed,
     message = ProtocolOnSearchMessage(ProtocolCatalogFactory.create(2))
   )
 
   init {
     describe("SearchResponseStore") {
-      val searchResponse = searchResponseMapper.protocolToEntity(schemaSearchResponse)
+      val searchResponse = OnSearchDao(
+        context = ProtocolContextFactory.fixedAsEntity(context),
+        message = OnSearchMessageDao(
+          catalog = ProtocolCatalogFactory.createAsEntity(schemaSearchResponse.message?.catalog)
+        )
+      )
 
       context("when save is called with search response") {
         searchResponseRepo.clear()
@@ -74,7 +61,7 @@ internal class ResponseStorageServiceSpec @Autowired constructor(
 
       context("when findByMessageID is called with id") {
         searchResponseRepo.clear()
-        searchResponseRepo.insertOne(searchResponse)
+        searchResponseStorageService.save(schemaSearchResponse)
         val response = searchResponseStorageService.findByMessageId(context.messageId)
 
         it("should respond with either.right containing the search results") {

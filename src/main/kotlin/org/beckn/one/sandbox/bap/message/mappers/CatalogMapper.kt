@@ -9,7 +9,8 @@ import org.mapstruct.ReportingPolicy
 @Mapper(
   componentModel = "spring",
   unmappedTargetPolicy = ReportingPolicy.WARN,
-  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
 )
 interface CatalogMapper {
   fun entityToSchema(source: CatalogDao): ProtocolCatalog

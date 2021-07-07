@@ -13,7 +13,8 @@ object ProtocolItemFactory {
     tags = mapOf("item-tag1" to "item-value1"),
     matched = true,
     related = true,
-    recommended = true
+    recommended = true,
+    time = ProtocolTimeFactory.fixedRange("range")
   )
 
   fun createAsEntity(protocol: ProtocolItem) = ItemDao(
@@ -24,6 +25,7 @@ object ProtocolItemFactory {
     tags = protocol.tags,
     matched = protocol.matched,
     related = protocol.related,
-    recommended = protocol.recommended
+    recommended = protocol.recommended,
+    time = ProtocolTimeFactory.timeAsEntity(protocol.time)
   )
 }

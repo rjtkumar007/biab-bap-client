@@ -5,6 +5,10 @@ import org.beckn.one.sandbox.bap.schemas.*
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
+import org.springframework.stereotype.Component
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneId
 
 interface GenericResponseMapper<Protocol: ProtocolResponse, Entity: BecknResponseDao> {
   fun entityToProtocol(entity: Entity): Protocol
@@ -14,7 +18,8 @@ interface GenericResponseMapper<Protocol: ProtocolResponse, Entity: BecknRespons
 @Mapper(
   componentModel = "spring",
   unmappedTargetPolicy = ReportingPolicy.WARN,
-  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
 )
 interface OnSearchResponseMapper : GenericResponseMapper<ProtocolOnSearch, OnSearchDao> {
   override fun entityToProtocol(entity: OnSearchDao): ProtocolOnSearch
@@ -25,7 +30,8 @@ interface OnSearchResponseMapper : GenericResponseMapper<ProtocolOnSearch, OnSea
 @Mapper(
   componentModel = "spring",
   unmappedTargetPolicy = ReportingPolicy.WARN,
-  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
 )
 interface OnSelectResponseMapper : GenericResponseMapper<ProtocolOnSelect, OnSelectDao> {
   override fun entityToProtocol(entity: OnSelectDao): ProtocolOnSelect
@@ -35,7 +41,8 @@ interface OnSelectResponseMapper : GenericResponseMapper<ProtocolOnSelect, OnSel
 @Mapper(
   componentModel = "spring",
   unmappedTargetPolicy = ReportingPolicy.WARN,
-  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
 )
 interface OnInitResponseMapper : GenericResponseMapper<ProtocolOnInit, OnInitDao> {
   override fun entityToProtocol(entity: OnInitDao): ProtocolOnInit
@@ -45,9 +52,21 @@ interface OnInitResponseMapper : GenericResponseMapper<ProtocolOnInit, OnInitDao
 @Mapper(
   componentModel = "spring",
   unmappedTargetPolicy = ReportingPolicy.WARN,
-  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
 )
 interface OnConfirmResponseMapper : GenericResponseMapper<ProtocolOnConfirm, OnConfirm> {
   override fun entityToProtocol(entity: OnConfirm): ProtocolOnConfirm
   override fun protocolToEntity(schema: ProtocolOnConfirm): OnConfirm
+}
+
+@Component
+class DateMapper {
+  fun map(instant: Instant?): OffsetDateTime? {
+    return instant?.let { OffsetDateTime.ofInstant(it, ZoneId.of("UTC")) }
+  }
+
+  fun map(offset: OffsetDateTime?): Instant? {
+    return offset?.toInstant()
+  }
 }

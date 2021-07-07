@@ -42,7 +42,7 @@ internal class ProtocolOnSearchControllerSpec : DescribeSpec() {
 
   private val postOnSearchUrl = "/v1/on_search"
 
-  val schemaSearchResponse = org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch(
+  val schemaSearchResponse = ProtocolOnSearch(
     context = ProtocolContextFactory.fixed,
     message = ProtocolOnSearchMessage(ProtocolCatalogFactory.create(2))
   )
