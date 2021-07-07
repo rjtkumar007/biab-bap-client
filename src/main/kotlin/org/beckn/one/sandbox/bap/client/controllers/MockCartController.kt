@@ -1,10 +1,9 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.*
-import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
-import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
-import org.beckn.one.sandbox.bap.schemas.ResponseMessage
+import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -12,83 +11,91 @@ import java.math.BigDecimal
 
 @RestController
 class MockCartController @Autowired constructor(
-  private val contextFactory: ContextFactory
+  private val contextFactory: ContextFactory,
+  private val uuidFactory: UuidFactory
 ) {
 
-  @PostMapping("/client/v0/cart")
+  @PutMapping("/client/v0/cart")
   @ResponseBody
-  fun createCart(@RequestBody cart: CartDtoV0): ResponseEntity<CartResponseDtoV0> {
+  fun createOrUpdateCart(@RequestBody cart: CartDto): ResponseEntity<ProtocolAckResponse> {
     return ResponseEntity.ok(
-      CartResponseDtoV0(
+      ProtocolAckResponse(
         context = getContext(),
-        message = CartResponseMessageDtoV0(cart = cart)
+        message = ResponseMessage.ack()
+      )
+    )
+  }
+
+  @GetMapping("/client/v0/on_cart")
+  @ResponseBody
+  fun onCart(@RequestParam(name = "message_id") messageId: String): ResponseEntity<CartResponseDto> {
+    return ResponseEntity.ok(
+      CartResponseDto(
+        context = getContext(messageId = messageId),
+        message = CartResponseMessageDto(cart = buildCart("cart 1"))
       )
     )
   }
 
   @GetMapping("/client/v0/cart/{id}")
   @ResponseBody
-  fun getCart(@PathVariable id: String): ResponseEntity<CartResponseDtoV0> {
+  fun getCart(@PathVariable id: String): ResponseEntity<CartResponseDto> {
     return ResponseEntity.ok(
-      CartResponseDtoV0(
+      CartResponseDto(
         context = getContext(),
-        message = CartResponseMessageDtoV0(cart = buildCart(id))
+        message = CartResponseMessageDto(cart = buildCart(id))
       )
     )
   }
 
-  @PutMapping("/client/v0/cart/{id}")
-  @ResponseBody
-  fun updateCart(@PathVariable id: String, @RequestBody updatedCart: CartDtoV0): ResponseEntity<ProtocolAckResponse> {
-    return ResponseEntity.ok(
-      ProtocolAckResponse(
-        context = getContext(),
-        message = ResponseMessage.ack()
-      )
-    )
-  }
+  private fun getContext(messageId: String = uuidFactory.create()) =
+    contextFactory.create(action = null, messageId = messageId)
 
-  @DeleteMapping("/client/v0/cart/{id}")
-  @ResponseBody
-  fun deleteCart(@PathVariable id: String): ResponseEntity<ProtocolAckResponse> {
-    return ResponseEntity.ok(
-      ProtocolAckResponse(
-        context = getContext(),
-        message = ResponseMessage.ack()
-      )
-    )
-  }
-
-  private fun getContext() = contextFactory.create(action = null)
-
-  private fun buildCart(id: String?) = CartDtoV0(
-    id = id, items = listOf(
-      CartItemDtoV0(
+  private fun buildCart(id: String?) = CartDto(
+    id = id,
+    items = listOf(
+      CartItemDto(
+        descriptor = ProtocolDescriptor(
+          name = "Cothas Coffee 1 kg",
+          images = listOf("https://i.ibb.co/rZqPDd2/Coffee-2-Cothas.jpg"),
+        ),
+        price = ProtocolPrice(
+          currency = "INR",
+          value = "500"
+        ),
+        id = "cothas-coffee-1",
         bppId = "paisool",
-        provider = CartItemProviderDtoV0(
+        provider = CartItemProviderDto(
           id = "venugopala stores",
           providerLocations = listOf("13.001581,77.5703686")
         ),
-        itemId = "cothas-coffee-1",
-        quantity = 2,
-        measure = ProtocolScalar(
-          value = BigDecimal.valueOf(500),
-          unit = "gm"
-        )
-      ),
-      CartItemDtoV0(
-        bppId = "paisool",
-        provider = CartItemProviderDtoV0(
-          id = "maruthi-stores",
-          providerLocations = listOf("12.9995218,77.5704439")
-        ),
-        itemId = "malgudi-coffee-500-gms",
         quantity = 1,
         measure = ProtocolScalar(
           value = BigDecimal.valueOf(1),
           unit = "kg"
-        )
-      )
+        ),
+      ),
+      CartItemDto(
+        descriptor = ProtocolDescriptor(
+          name = "Malgudi Coffee 500 gm",
+          images = listOf("https://i.ibb.co/wgXx7K6/Coffee-1-Malgudi.jpg"),
+        ),
+        price = ProtocolPrice(
+          currency = "INR",
+          value = "240"
+        ),
+        id = "malgudi-coffee-500-gm",
+        bppId = "paisool",
+        provider = CartItemProviderDto(
+          id = "venugopala stores",
+          providerLocations = listOf("13.001581,77.5703686")
+        ),
+        quantity = 1,
+        measure = ProtocolScalar(
+          value = BigDecimal.valueOf(500),
+          unit = "gm"
+        ),
+      ),
     )
   )
 }
