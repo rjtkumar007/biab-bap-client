@@ -106,8 +106,6 @@ class CartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
         genericRepository.findOne(insertedCartDao::id eq cartToBeInsertedDao.id) shouldBe null
-        //todo: figure out if response body needs to be validated(don't see any use of doing it but check once)
-        //todo: add edge case tests at service level to check for DB failure errors and any other exceptions.
       }
     }
   }
