@@ -12,13 +12,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-class CartController @Autowired constructor(
+class CartControllerV0 @Autowired constructor(
   private val contextFactory: ContextFactory,
   private val cartService: CartService
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @PutMapping("/client/v1/cart")
+  @PutMapping("/client/v0.1/cart")
   @ResponseBody
   fun saveCart(@RequestBody cart: CartDtoV0): ResponseEntity<CartResponseDtoV0> {
     val context = getContext()
@@ -32,7 +32,7 @@ class CartController @Autowired constructor(
       })
   }
 
-  @DeleteMapping("/client/v1/cart/{id}")
+  @DeleteMapping("/client/v0.1/cart/{id}")
   @ResponseBody
   fun deleteCart(@PathVariable id: String): ResponseEntity<DeleteCartResponseDtoV0> {
     val context = getContext()

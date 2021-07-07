@@ -34,7 +34,7 @@ import java.math.BigDecimal
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-class CartControllerSpec @Autowired constructor(
+class CartControllerSpecV0 @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
   val uuidFactory: UuidFactory,
@@ -100,7 +100,7 @@ class CartControllerSpec @Autowired constructor(
         cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe CartFactory.create(cartId)
         val createCartResponseString = mockMvc
           .perform(
-            MockMvcRequestBuilders.delete("/client/v1/cart/$cartId")
+            MockMvcRequestBuilders.delete("/client/v0.1/cart/$cartId")
           )
           .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
           .andReturn()
@@ -127,7 +127,7 @@ class CartControllerSpec @Autowired constructor(
 
   private fun invokeCartCreateOrUpdateApi(cart: CartDtoV0) = mockMvc
     .perform(
-      put("/client/v1/cart")
+      put("/client/v0.1/cart")
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .content(objectMapper.writeValueAsString(cart))
     )
