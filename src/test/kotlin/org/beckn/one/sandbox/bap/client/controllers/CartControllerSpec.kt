@@ -5,10 +5,10 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.daos.CartDao
-import org.beckn.one.sandbox.bap.client.dtos.CartDto
-import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
-import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDto
-import org.beckn.one.sandbox.bap.client.dtos.CartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.CartDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartItemDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseDtoV0
 import org.beckn.one.sandbox.bap.client.factories.CartFactory
 import org.beckn.one.sandbox.bap.client.mappers.CartMapper
 import org.beckn.one.sandbox.bap.client.repositories.CartRepository
@@ -53,7 +53,7 @@ class CartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
 
-        val createCartResponse = objectMapper.readValue(createCartResponseString, CartResponseDto::class.java)
+        val createCartResponse = objectMapper.readValue(createCartResponseString, CartResponseDtoV0::class.java)
         assertCreateCartResponse(createCartResponse, cart)
         assertCartIsPersistedInDb(createCartResponse, cart)
       }
@@ -65,9 +65,9 @@ class CartControllerSpec @Autowired constructor(
 
         val updatedCartDto = existingCartDto.copy(
           items = listOf(
-            CartItemDto(
+            CartItemDtoV0(
               bppId = "paisool",
-              provider = CartItemProviderDto(
+              provider = CartItemProviderDtoV0(
                 id = "venugopala stores",
                 providerLocations = listOf("13.001581,77.5703686")
               ),
@@ -85,7 +85,7 @@ class CartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
 
-        val updateCartResponse = objectMapper.readValue(updateCartResponseString, CartResponseDto::class.java)
+        val updateCartResponse = objectMapper.readValue(updateCartResponseString, CartResponseDtoV0::class.java)
         assertCreateCartResponse(updateCartResponse, updatedCartDto)
         assertCartIsPersistedInDb(updateCartResponse, updatedCartDto)
       }
@@ -110,7 +110,7 @@ class CartControllerSpec @Autowired constructor(
     }
   }
 
-  private fun assertCreateCartResponse(createCartResponse: CartResponseDto, cartToBeCreated: CartDto) {
+  private fun assertCreateCartResponse(createCartResponse: CartResponseDtoV0, cartToBeCreated: CartDtoV0) {
     createCartResponse.context shouldNotBe null
     createCartResponse.message shouldNotBe null
     createCartResponse.message?.cart?.id shouldNotBe null
@@ -118,14 +118,14 @@ class CartControllerSpec @Autowired constructor(
     createCartResponse.message?.cart shouldBe expectedCartDto
   }
 
-  private fun assertCartIsPersistedInDb(createCartResponse: CartResponseDto, cartDto: CartDto) {
+  private fun assertCartIsPersistedInDb(createCartResponse: CartResponseDtoV0, cartDto: CartDtoV0) {
     val cartFromDb = genericRepository.findOne(CartDao::id eq createCartResponse.message?.cart?.id)
     cartFromDb shouldNotBe null
     val expectedCartDto = cartDto.copy(id = createCartResponse.message?.cart?.id)
     cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe expectedCartDto
   }
 
-  private fun invokeCartCreateOrUpdateApi(cart: CartDto) = mockMvc
+  private fun invokeCartCreateOrUpdateApi(cart: CartDtoV0) = mockMvc
     .perform(
       put("/client/v1/cart")
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

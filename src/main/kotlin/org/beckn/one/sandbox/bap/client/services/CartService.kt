@@ -4,15 +4,14 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.flatMap
-import org.beckn.one.sandbox.bap.client.dtos.CartDto
-import org.beckn.one.sandbox.bap.client.dtos.CartResponseMessageDto
-import org.beckn.one.sandbox.bap.client.dtos.CartResponseDto
-import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.CartDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseMessageDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDtoV0
 import org.beckn.one.sandbox.bap.client.mappers.CartMapper
 import org.beckn.one.sandbox.bap.client.repositories.CartRepository
 import org.beckn.one.sandbox.bap.client.validators.CartValidator
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.slf4j.Logger
@@ -28,7 +27,7 @@ class CartService @Autowired constructor(
   private val cartValidator: CartValidator,
   private val log: Logger = LoggerFactory.getLogger(CartService::class.java)
 ) {
-  fun saveCart(context: ProtocolContext, cartDto: CartDto): Either<HttpError, CartResponseDto> {
+  fun saveCart(context: ProtocolContext, cartDto: CartDtoV0): Either<HttpError, CartResponseDtoV0> {
     log.info("Got request to save cart: {}", cartDto)
     val cartDtoWithId = getCartWithNewIdIfNotPresent(cartDto)
     val cartToPersist = cartMapper.dtoToDao(cartDtoWithId)
@@ -36,18 +35,18 @@ class CartService @Autowired constructor(
       .fold({ Left(it) },
         {
           Right(
-            CartResponseDto(context = context, message = CartResponseMessageDto(cart = cartMapper.daoToDto(it)))
+            CartResponseDtoV0(context = context, message = CartResponseMessageDtoV0(cart = cartMapper.daoToDto(it)))
           )
         })
   }
 
-  private fun getCartWithNewIdIfNotPresent(cartDto: CartDto): CartDto =
+  private fun getCartWithNewIdIfNotPresent(cartDto: CartDtoV0): CartDtoV0 =
     cartDto.copy(id = cartDto.id ?: uuidFactory.create())
 
-  fun deleteCart(context: ProtocolContext, id: String): Either<HttpError, DeleteCartResponseDto> =
+  fun deleteCart(context: ProtocolContext, id: String): Either<HttpError, DeleteCartResponseDtoV0> =
     cartRepository.deleteById(id).fold(
       { Left(it) },
-      { Right(DeleteCartResponseDto(context = context)) }
+      { Right(DeleteCartResponseDtoV0(context = context)) }
     )
 
 }

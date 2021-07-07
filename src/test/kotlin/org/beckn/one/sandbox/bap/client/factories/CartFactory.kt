@@ -1,18 +1,18 @@
 package org.beckn.one.sandbox.bap.client.factories
 
-import org.beckn.one.sandbox.bap.client.dtos.CartDto
-import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
-import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDto
+import org.beckn.one.sandbox.bap.client.dtos.CartDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartItemDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDtoV0
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
 import java.math.BigDecimal
 
 class CartFactory {
   companion object {
-    fun create(id: String? = null) = CartDto(
+    fun create(id: String? = null) = CartDtoV0(
       id = id, items = listOf(
-        CartItemDto(
+        CartItemDtoV0(
           bppId = "paisool",
-          provider = CartItemProviderDto(
+          provider = CartItemProviderDtoV0(
             id = "venugopala stores",
             providerLocations = listOf("13.001581,77.5703686")
           ),
@@ -23,9 +23,9 @@ class CartFactory {
             unit = "gm"
           )
         ),
-        CartItemDto(
+        CartItemDtoV0(
           bppId = "paisool",
-          provider = CartItemProviderDto(
+          provider = CartItemProviderDtoV0(
             id = "maruthi-stores",
             providerLocations = listOf("12.9995218,77.5704439")
           ),
@@ -39,11 +39,11 @@ class CartFactory {
       )
     )
 
-    fun createWithMultipleBpp(id: String? = null) = CartDto(
+    fun createWithMultipleBpp(id: String? = null) = CartDtoV0(
       id = id, items = listOf(
-        CartItemDto(
+        CartItemDtoV0(
           bppId = "paisool",
-          provider = CartItemProviderDto(
+          provider = CartItemProviderDtoV0(
             id = "venugopala stores",
             providerLocations = listOf("13.001581,77.5703686")
           ),
@@ -54,9 +54,9 @@ class CartFactory {
             unit = "gm"
           )
         ),
-        CartItemDto(
+        CartItemDtoV0(
           bppId = "shopx",
-          provider = CartItemProviderDto(
+          provider = CartItemProviderDtoV0(
             id = "maruthi-stores",
             providerLocations = listOf("12.9995218,77.5704439")
           ),

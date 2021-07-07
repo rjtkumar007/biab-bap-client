@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.client.mappers
 
 import org.beckn.one.sandbox.bap.client.daos.CartDao
-import org.beckn.one.sandbox.bap.client.dtos.CartDto
+import org.beckn.one.sandbox.bap.client.dtos.CartDtoV0
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
@@ -12,6 +12,6 @@ import org.mapstruct.ReportingPolicy
   injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
 interface CartMapper {
-  fun dtoToDao(source: CartDto): CartDao
-  fun daoToDto(dao: CartDao): CartDto
+  fun dtoToDao(source: CartDtoV0): CartDao
+  fun daoToDto(dao: CartDao): CartDtoV0
 }

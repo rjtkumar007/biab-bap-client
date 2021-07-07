@@ -44,7 +44,7 @@ class MockCartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
 
-        val createCartResponse = objectMapper.readValue(createCartResponseString, CartResponseDto::class.java)
+        val createCartResponse = objectMapper.readValue(createCartResponseString, CartResponseDtoV0::class.java)
         createCartResponse.context shouldNotBe null
         createCartResponse.message?.cart shouldBe cart
       }
@@ -60,8 +60,8 @@ class MockCartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
 
-        val getCartResponse = objectMapper.readValue(getCartResponseString, CartResponseDto::class.java)
-        getCartResponse.message shouldBe CartResponseMessageDto(cart = getCart(cartId))
+        val getCartResponse = objectMapper.readValue(getCartResponseString, CartResponseDtoV0::class.java)
+        getCartResponse.message shouldBe CartResponseMessageDtoV0(cart = getCart(cartId))
       }
 
       it("should update cart") {
@@ -92,11 +92,11 @@ class MockCartControllerSpec @Autowired constructor(
     }
   }
 
-  private fun getCart(cartId: String) = CartDto(
+  private fun getCart(cartId: String) = CartDtoV0(
     id = cartId, items = listOf(
-      CartItemDto(
+      CartItemDtoV0(
         bppId = "paisool",
-        provider = CartItemProviderDto(
+        provider = CartItemProviderDtoV0(
           id = "venugopala stores",
           providerLocations = listOf("13.001581,77.5703686")
         ),
@@ -107,9 +107,9 @@ class MockCartControllerSpec @Autowired constructor(
           unit = "gm"
         )
       ),
-      CartItemDto(
+      CartItemDtoV0(
         bppId = "paisool",
-        provider = CartItemProviderDto(
+        provider = CartItemProviderDtoV0(
           id = "maruthi-stores",
           providerLocations = listOf("12.9995218,77.5704439")
         ),

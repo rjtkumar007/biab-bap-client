@@ -17,29 +17,29 @@ class MockCartController @Autowired constructor(
 
   @PostMapping("/client/v0/cart")
   @ResponseBody
-  fun createCart(@RequestBody cart: CartDto): ResponseEntity<CartResponseDto> {
+  fun createCart(@RequestBody cart: CartDtoV0): ResponseEntity<CartResponseDtoV0> {
     return ResponseEntity.ok(
-      CartResponseDto(
+      CartResponseDtoV0(
         context = getContext(),
-        message = CartResponseMessageDto(cart = cart)
+        message = CartResponseMessageDtoV0(cart = cart)
       )
     )
   }
 
   @GetMapping("/client/v0/cart/{id}")
   @ResponseBody
-  fun getCart(@PathVariable id: String): ResponseEntity<CartResponseDto> {
+  fun getCart(@PathVariable id: String): ResponseEntity<CartResponseDtoV0> {
     return ResponseEntity.ok(
-      CartResponseDto(
+      CartResponseDtoV0(
         context = getContext(),
-        message = CartResponseMessageDto(cart = buildCart(id))
+        message = CartResponseMessageDtoV0(cart = buildCart(id))
       )
     )
   }
 
   @PutMapping("/client/v0/cart/{id}")
   @ResponseBody
-  fun updateCart(@PathVariable id: String, @RequestBody updatedCart: CartDto): ResponseEntity<ProtocolAckResponse> {
+  fun updateCart(@PathVariable id: String, @RequestBody updatedCart: CartDtoV0): ResponseEntity<ProtocolAckResponse> {
     return ResponseEntity.ok(
       ProtocolAckResponse(
         context = getContext(),
@@ -61,11 +61,11 @@ class MockCartController @Autowired constructor(
 
   private fun getContext() = contextFactory.create(action = null)
 
-  private fun buildCart(id: String?) = CartDto(
+  private fun buildCart(id: String?) = CartDtoV0(
     id = id, items = listOf(
-      CartItemDto(
+      CartItemDtoV0(
         bppId = "paisool",
-        provider = CartItemProviderDto(
+        provider = CartItemProviderDtoV0(
           id = "venugopala stores",
           providerLocations = listOf("13.001581,77.5703686")
         ),
@@ -76,9 +76,9 @@ class MockCartController @Autowired constructor(
           unit = "gm"
         )
       ),
-      CartItemDto(
+      CartItemDtoV0(
         bppId = "paisool",
-        provider = CartItemProviderDto(
+        provider = CartItemProviderDtoV0(
           id = "maruthi-stores",
           providerLocations = listOf("12.9995218,77.5704439")
         ),

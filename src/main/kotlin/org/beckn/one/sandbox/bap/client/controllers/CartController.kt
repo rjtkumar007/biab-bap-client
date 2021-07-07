@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
-import org.beckn.one.sandbox.bap.client.dtos.CartDto
-import org.beckn.one.sandbox.bap.client.dtos.CartResponseDto
-import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.CartDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDtoV0
 import org.beckn.one.sandbox.bap.client.services.CartService
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
@@ -20,13 +20,13 @@ class CartController @Autowired constructor(
 
   @PutMapping("/client/v1/cart")
   @ResponseBody
-  fun saveCart(@RequestBody cart: CartDto): ResponseEntity<CartResponseDto> {
+  fun saveCart(@RequestBody cart: CartDtoV0): ResponseEntity<CartResponseDtoV0> {
     val context = getContext()
     return cartService.saveCart(context, cart)
       .fold({
         ResponseEntity
           .status(it.status())
-          .body(CartResponseDto(context = context, error = it.error()))
+          .body(CartResponseDtoV0(context = context, error = it.error()))
       }, {
         ResponseEntity.ok(it)
       })
@@ -34,7 +34,7 @@ class CartController @Autowired constructor(
 
   @DeleteMapping("/client/v1/cart/{id}")
   @ResponseBody
-  fun deleteCart(@PathVariable id: String): ResponseEntity<DeleteCartResponseDto> {
+  fun deleteCart(@PathVariable id: String): ResponseEntity<DeleteCartResponseDtoV0> {
     val context = getContext()
     return cartService
       .deleteCart(context, id)
@@ -43,11 +43,11 @@ class CartController @Autowired constructor(
           log.error("Error during cart delete. Error: {}", it)
           ResponseEntity
             .status(it.status().value())
-            .body(DeleteCartResponseDto(context = context, it.error()))
+            .body(DeleteCartResponseDtoV0(context = context, it.error()))
         },
         {
           log.info("Successfully deleted cart")
-          ResponseEntity.ok(DeleteCartResponseDto(context = context))
+          ResponseEntity.ok(DeleteCartResponseDtoV0(context = context))
         })
   }
 

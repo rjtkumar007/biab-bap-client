@@ -4,9 +4,9 @@ import arrow.core.Either
 import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
-import org.beckn.one.sandbox.bap.client.dtos.CartResponseDto
-import org.beckn.one.sandbox.bap.client.dtos.CartResponseMessageDto
-import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseMessageDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDtoV0
 import org.beckn.one.sandbox.bap.client.errors.validation.ValidationError
 import org.beckn.one.sandbox.bap.client.factories.CartFactory
 import org.beckn.one.sandbox.bap.client.mappers.CartMapperImpl
@@ -62,8 +62,8 @@ internal class CartServiceSpec : DescribeSpec() {
         val response = cartService.saveCart(context, cartDto)
 
         verify(cartRepository).saveCart(cartDao)
-        response shouldBeRight CartResponseDto(
-          context = context, message = CartResponseMessageDto(cart = cartDto)
+        response shouldBeRight CartResponseDtoV0(
+          context = context, message = CartResponseMessageDtoV0(cart = cartDto)
         )
       }
     }
@@ -81,7 +81,7 @@ internal class CartServiceSpec : DescribeSpec() {
         val response = cartService.deleteCart(context, cartId)
 
         verify(cartRepository).deleteById(cartId)
-        response shouldBeRight DeleteCartResponseDto(context=context)
+        response shouldBeRight DeleteCartResponseDtoV0(context=context)
       }
 
       it("should return nothing when dao delete succeeds when dao is absent") {
