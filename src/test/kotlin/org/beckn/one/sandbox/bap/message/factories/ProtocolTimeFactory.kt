@@ -52,5 +52,5 @@ object ProtocolTimeFactory {
 
 val fixedClock: Clock = Clock.fixed(
   Instant.parse("2018-11-30T18:35:24.00Z"),
-  ZoneId.of("Asia/Calcutta")
+  ZoneId.of("UTC")
 )

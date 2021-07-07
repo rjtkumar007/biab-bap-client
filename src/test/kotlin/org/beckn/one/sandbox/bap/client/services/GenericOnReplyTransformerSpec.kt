@@ -18,7 +18,7 @@ import java.time.ZoneId
 internal class GenericOnReplyTransformerSpec : DescribeSpec() {
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),
-    ZoneId.of("Asia/Calcutta")
+    ZoneId.of("UTC")
   )
   private val context = ProtocolContext(
     domain = "LocalRetail",
