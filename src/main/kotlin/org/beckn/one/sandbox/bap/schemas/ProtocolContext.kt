@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
 import java.time.Clock
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.Instant
+import java.util.*
 
 data class ProtocolContext @Default constructor(
   val domain: String,
@@ -20,7 +21,7 @@ data class ProtocolContext @Default constructor(
   val transactionId: String = "d4d65ff8-0d60-49bf-9288-a07261bb3f29",
   val messageId: String = "d883b720-2100-4a4e-a779-8685cd501e94",
   @JsonIgnore val clock: Clock = Clock.systemUTC(),
-  val timestamp: LocalDateTime = LocalDateTime.now(clock),
+  val timestamp: Date = Date.from(Instant.now(clock)),
   val key: String? = null,
   val ttl: Duration? = null,
 ) {

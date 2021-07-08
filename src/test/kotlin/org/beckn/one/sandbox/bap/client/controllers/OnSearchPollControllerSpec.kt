@@ -26,8 +26,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.Clock
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,7 +55,7 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
     bapUri = "http://host.bap.com",
     transactionId = "222",
     messageId = "222",
-    timestamp = LocalDateTime.now(fixedClock)
+    timestamp = Date.from(Instant.now(fixedClock))
   )
 
 

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
 import java.time.Clock
-import java.time.LocalDateTime
+import java.time.Instant
+import java.util.*
 
 data class ContextDao @Default constructor(
   val domain: Domain,
@@ -19,7 +20,7 @@ data class ContextDao @Default constructor(
   val transactionId: String,
   val messageId: String,
   @JsonIgnore val clock: Clock = Clock.systemUTC(),
-  val timestamp: java.time.LocalDateTime = LocalDateTime.now(clock),
+  val timestamp: Date = Date.from(Instant.now(clock)),
   val key: String? = null,
   val ttl: Duration? = null
 ) {
