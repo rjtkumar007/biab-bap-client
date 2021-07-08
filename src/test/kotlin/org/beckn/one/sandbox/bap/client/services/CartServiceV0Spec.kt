@@ -22,7 +22,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @RunWith(MockitoJUnitRunner::class)
-internal class CartServiceSpec : DescribeSpec() {
+internal class CartServiceV0Spec : DescribeSpec() {
   private val contextFactory = ContextFactoryInstance.create()
   private val cartMapper = CartMapperImpl()
   private val cartValidator = CartValidator()
@@ -44,7 +44,7 @@ internal class CartServiceSpec : DescribeSpec() {
         response shouldBeLeft DatabaseError.OnWrite
       }
 
-      it("should return error when more than one BPP are present in the cart Object"){
+      it("should return error when more than one BPP are present in the cart Object") {
         val cartRepository = mock<CartRepository>()
         val cartService = createCartService(cartRepository)
         val cartBppDto = CartFactory.createWithMultipleBpp(id = "cart 2")
@@ -67,8 +67,8 @@ internal class CartServiceSpec : DescribeSpec() {
         )
       }
     }
-    describe("Delete Cart"){
-      val cartId =  "cart 1"
+    describe("Delete Cart") {
+      val cartId = "cart 1"
       val cartDto = CartFactory.createV0(id = cartId)
       val cartDao = cartMapper.dtoToDao(cartDto)
       val context = contextFactory.create()
@@ -81,7 +81,7 @@ internal class CartServiceSpec : DescribeSpec() {
         val response = cartService.deleteCart(context, cartId)
 
         verify(cartRepository).deleteById(cartId)
-        response shouldBeRight DeleteCartResponseDtoV0(context=context)
+        response shouldBeRight DeleteCartResponseDtoV0(context = context)
       }
 
       it("should return nothing when dao delete succeeds when dao is absent") {
