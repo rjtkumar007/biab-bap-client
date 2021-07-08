@@ -11,7 +11,7 @@ import org.beckn.one.sandbox.bap.message.entities.OnSearchMessageDao
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.Clock
 import java.time.Instant
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.ZoneId
 
 @SpringBootTest(classes = [TestDatabaseConfiguration::class, DatabaseConfiguration::class])
@@ -57,6 +57,6 @@ class BecknResponseRepositorySpec constructor(
     bapUri = "http://host.bap.com",
     transactionId = "222",
     messageId = "222",
-    timestamp = LocalDateTime.now(fixedClock)
+    timestamp = OffsetDateTime.now(fixedClock)
   )
 }

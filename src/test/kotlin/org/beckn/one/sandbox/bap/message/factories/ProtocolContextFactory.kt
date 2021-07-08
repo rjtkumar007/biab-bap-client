@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.ContextDao
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 object ProtocolContextFactory {
 
@@ -16,7 +16,7 @@ object ProtocolContextFactory {
     bapUri = "http://host.bap.com",
     transactionId = "222",
     messageId = "222",
-    timestamp = LocalDateTime.now(fixedClock)
+    timestamp = OffsetDateTime.now(fixedClock)
   )
 
   fun fixedAsEntity(context: ProtocolContext) = ContextDao(
@@ -29,7 +29,7 @@ object ProtocolContextFactory {
     bapUri = context.bapUri,
     transactionId = context.transactionId,
     messageId = context.messageId,
-    timestamp = LocalDateTime.now(fixedClock)
+    timestamp = OffsetDateTime.now(fixedClock)
   )
 
 }

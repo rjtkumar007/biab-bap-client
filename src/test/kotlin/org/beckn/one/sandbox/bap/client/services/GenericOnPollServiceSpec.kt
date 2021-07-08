@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import java.time.Clock
 import java.time.Instant
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.ZoneId
 
 @SpringBootTest
@@ -41,7 +41,7 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
     bapUri = "http://host.bap.com",
     transactionId = "222",
     messageId = "222",
-    timestamp = LocalDateTime.now(fixedClock)
+    timestamp = OffsetDateTime.now(fixedClock)
   )
 
   private val context = ProtocolContext(
@@ -54,7 +54,7 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
     bapUri = "http://host.bap.com",
     transactionId = "222",
     messageId = "222",
-    timestamp = LocalDateTime.now(fixedClock)
+    timestamp = OffsetDateTime.now(fixedClock)
   )
 
   init {
