@@ -12,8 +12,8 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
 import java.time.Clock
 import java.time.Instant
+import java.time.OffsetDateTime
 import java.time.ZoneId
-import java.util.*
 
 internal class GenericOnReplyTransformerSpec : DescribeSpec() {
   private val fixedClock = Clock.fixed(
@@ -30,7 +30,7 @@ internal class GenericOnReplyTransformerSpec : DescribeSpec() {
     bapUri = "http://host.bap.com",
     transactionId = "222",
     messageId = "222",
-    timestamp = Date.from(Instant.now(fixedClock))
+    timestamp = OffsetDateTime.now(fixedClock)
   )
   private val catalog1 = ProtocolCatalogFactory.create(1)
   private val catalog2 = ProtocolCatalogFactory.create(2)
