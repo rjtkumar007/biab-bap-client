@@ -1,24 +1,24 @@
-package org.beckn.one.sandbox.bap.client.errors.provider
+package org.beckn.one.sandbox.bap.client.errors.bpp
 
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.ProtocolError
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.springframework.http.HttpStatus
 
-sealed class ProviderError: HttpError {
-  val providerError = ProtocolError("BAP_011", "Provider returned error")
-  val nullError = ProtocolError("BAP_012", "Provider returned null")
-  val nackError = ProtocolError("BAP_013", "Provider returned nack")
+sealed class BppError : HttpError {
+  val bppError = ProtocolError("BAP_011", "BPP returned error")
+  val nullError = ProtocolError("BAP_012", "BPP returned null")
+  val nackError = ProtocolError("BAP_013", "BPP returned nack")
 
-  object Internal : ProviderError() {
+  object Internal : BppError() {
     override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
 
-    override fun error(): ProtocolError = providerError
+    override fun error(): ProtocolError = bppError
   }
 
-  object Nack : ProviderError() {
+  object Nack : BppError() {
     override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
@@ -26,7 +26,7 @@ sealed class ProviderError: HttpError {
     override fun error(): ProtocolError = nackError
   }
 
-  object NullResponse : ProviderError() {
+  object NullResponse : BppError() {
     override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
 
     override fun message(): ResponseMessage = ResponseMessage.nack()

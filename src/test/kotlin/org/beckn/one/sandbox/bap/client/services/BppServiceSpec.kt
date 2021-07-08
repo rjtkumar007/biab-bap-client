@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.client.services
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.client.errors.provider.ProviderError
+import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.provider.BppServiceClient
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
@@ -58,7 +58,7 @@ internal class BppServiceSpec : DescribeSpec() {
 
         response
           .fold(
-            { it shouldBe ProviderError.Internal },
+            { it shouldBe BppError.Internal },
             { Assertions.fail("Provider should have timed out but didn't. Response: $it") }
           )
         verify(bppServiceClient).select(getRequest())

@@ -2,7 +2,9 @@ package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
 import org.beckn.one.sandbox.bap.client.services.CartService
+import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
+import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext.Action.SELECT
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
@@ -29,11 +31,24 @@ class CartController @Autowired constructor(
     return cartService.saveCart(context, cart)
       .fold(
         {
-          TODO("Handle errors")
+          log.error("Error when saving cart: {}", it)
+          mapToErrorResponse(it, context)
         },
-        return ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
+        {
+          ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
+        }
       )
   }
+
+  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext) = ResponseEntity
+    .status(it.status())
+    .body(
+      ProtocolAckResponse(
+        context = context,
+        message = it.message(),
+        error = it.error()
+      )
+    )
 
   private fun getContext(transactionId: String) = contextFactory.create(action = SELECT, transactionId = transactionId)
 }

@@ -48,10 +48,23 @@ class CartControllerSpec @Autowired constructor(
         providerApi.resetAll()
       }
 
+      it("should return error when bpp select call fails") {
+        providerApi.stubFor(post("/select/").willReturn(serverError()))
+
+        val createCartResponseString = invokeCartCreateOrUpdateApi(cart)
+          .andExpect(status().isInternalServerError)
+          .andReturn()
+          .response.contentAsString
+
+        val createCartResponse = verifyResponseMessage(createCartResponseString, cart, ResponseMessage.nack())
+        verifyThatMessageWasNotPersisted(createCartResponse)
+        verifyThatBppSelectApiWasInvoked(createCartResponse, cart, providerApi)
+      }
+
       it("should invoke provide select api and save message") {
         providerApi
           .stubFor(
-            post("/select").willReturn(
+            post("/select/").willReturn(
               okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory)))
             )
           )
@@ -61,25 +74,49 @@ class CartControllerSpec @Autowired constructor(
           .andReturn()
           .response.contentAsString
 
-        val createCartResponse = objectMapper.readValue(createCartResponseString, ProtocolAckResponse::class.java)
-        createCartResponse.context shouldNotBe null
-        createCartResponse.context.messageId shouldNotBe null
-        createCartResponse.context.transactionId shouldBe cart.transactionId
-        createCartResponse.context.action shouldBe ProtocolContext.Action.SELECT
-        createCartResponse.message shouldBe ResponseMessage.ack()
-
-        val savedMessage = messageRepository.findOne(MessageDao::id eq createCartResponse.context.messageId)
-        savedMessage shouldNotBe null
-        savedMessage?.id shouldBe createCartResponse.context.messageId
-        savedMessage?.type shouldBe MessageDao.Type.Select
-
-        val protocolSelectRequest = getProtocolSelectRequest(createCartResponse, cart)
-        providerApi.verify(
-          postRequestedFor(urlEqualTo("/select/"))
-            .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSelectRequest)))
-        )
+        val createCartResponse = verifyResponseMessage(createCartResponseString, cart, ResponseMessage.ack())
+        verifyThatMessageForSelectRequestIsPersisted(createCartResponse)
+        verifyThatBppSelectApiWasInvoked(createCartResponse, cart, providerApi)
       }
     }
+  }
+
+  private fun verifyThatMessageWasNotPersisted(createCartResponse: ProtocolAckResponse) {
+    val savedMessage = messageRepository.findOne(MessageDao::id eq createCartResponse.context.messageId)
+    savedMessage shouldBe null
+  }
+
+  private fun verifyResponseMessage(
+    createCartResponseString: String,
+    cart: CartDto,
+    expectedMessage: ResponseMessage
+  ): ProtocolAckResponse {
+    val createCartResponse = objectMapper.readValue(createCartResponseString, ProtocolAckResponse::class.java)
+    createCartResponse.context shouldNotBe null
+    createCartResponse.context.messageId shouldNotBe null
+    createCartResponse.context.transactionId shouldBe cart.transactionId
+    createCartResponse.context.action shouldBe ProtocolContext.Action.SELECT
+    createCartResponse.message shouldBe expectedMessage
+    return createCartResponse
+  }
+
+  private fun verifyThatMessageForSelectRequestIsPersisted(createCartResponse: ProtocolAckResponse) {
+    val savedMessage = messageRepository.findOne(MessageDao::id eq createCartResponse.context.messageId)
+    savedMessage shouldNotBe null
+    savedMessage?.id shouldBe createCartResponse.context.messageId
+    savedMessage?.type shouldBe MessageDao.Type.Select
+  }
+
+  private fun verifyThatBppSelectApiWasInvoked(
+    createCartResponse: ProtocolAckResponse,
+    cart: CartDto,
+    providerApi: WireMockServer
+  ) {
+    val protocolSelectRequest = getProtocolSelectRequest(createCartResponse, cart)
+    providerApi.verify(
+      postRequestedFor(urlEqualTo("/select/"))
+        .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSelectRequest)))
+    )
   }
 
   private fun getProtocolSelectRequest(createCartResponse: ProtocolAckResponse, cart: CartDto): ProtocolSelectRequest {

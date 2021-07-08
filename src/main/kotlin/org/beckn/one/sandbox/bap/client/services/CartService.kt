@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.Either
+import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
 import org.beckn.one.sandbox.bap.client.mappers.SelectedItemMapper
 import org.beckn.one.sandbox.bap.errors.HttpError
@@ -22,15 +23,17 @@ class CartService @Autowired constructor(
 ) {
   fun saveCart(context: ProtocolContext, cart: CartDto): Either<HttpError, MessageDao> {
     log.info("Got save cart request. Context: {}, Cart: {}", context, cart)
-    cart.items?.first()?.bppUri?.let { bppUri ->
-      bppService.select(
-        context,
-        bppUri = bppUri,
-        providerId = cart.items.first().provider.id,
-        providerLocation = ProtocolLocation(gps = cart.items.first().provider.locations?.first()),
-        items = cart.items.map { selectedItemMapper.dtoToProtocol(it) }
-      )
+    if (cart.items.isNullOrEmpty()) {
+      return Either.Right(MessageDao(id = "", type = MessageDao.Type.Select))
     }
-    return messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Select))
+    return bppService.select(
+      context,
+      bppUri = cart.items.first().bppUri,
+      providerId = cart.items.first().provider.id,
+      providerLocation = ProtocolLocation(gps = cart.items.first().provider.locations?.first()),
+      items = cart.items.map { selectedItemMapper.dtoToProtocol(it) }
+    ).flatMap {
+      messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Select))
+    }
   }
 }
