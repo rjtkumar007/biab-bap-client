@@ -16,7 +16,8 @@ data class MessageDao(
   val updated: LocalDateTime = LocalDateTime.now(clock)
 ) {
   enum class Type {
-    Search
+    Search,
+    Select
   }
 }
 
