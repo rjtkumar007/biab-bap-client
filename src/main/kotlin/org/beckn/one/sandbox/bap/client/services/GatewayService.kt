@@ -30,9 +30,11 @@ class GatewayService @Autowired constructor(
     return try {
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
+      val context = contextFactory.create()
+      log.info("Initiated Search for message id: {}", context.messageId)
       val httpResponse = gatewayServiceClient.search(
         ProtocolSearchRequest(
-          contextFactory.create(),
+          context,
           ProtocolSearchRequestMessage(
             ProtocolIntent(
               queryString = queryString,
