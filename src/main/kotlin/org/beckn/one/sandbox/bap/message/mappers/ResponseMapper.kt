@@ -10,7 +10,7 @@ import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
 
-interface GenericResponseMapper<Protocol: ProtocolResponse, Entity: BecknResponseDao> {
+interface GenericResponseMapper<Protocol : ProtocolResponse, Entity : BecknResponseDao> {
   fun entityToProtocol(entity: Entity): Protocol
   fun protocolToEntity(schema: Protocol): Entity
 }

@@ -31,8 +31,12 @@ data class CartItemDto @Default constructor(
   val bppId: String,
   val bppUri: String,
   val provider: CartItemProviderDto,
-  val quantity: Int,
-  val measure: ProtocolScalar? = null
+  val quantity: CartSelectedItemQuantity
+)
+
+data class CartSelectedItemQuantity @Default constructor(
+  val count: Int,
+  val measure: ProtocolScalar?
 )
 
 data class CartItemProviderDto @Default constructor(

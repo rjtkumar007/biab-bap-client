@@ -2,9 +2,7 @@ package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.Either
 import org.beckn.one.sandbox.bap.client.errors.provider.ProviderError
-import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.schemas.*
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,27 +10,26 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
-class ProviderService @Autowired constructor(
-  val providerServiceClientFactory: ProviderServiceClientFactory,
-  val contextFactory: ContextFactory
+class BppService @Autowired constructor(
+  private val bppServiceClientFactory: BppServiceClientFactory,
+  private val log: Logger = LoggerFactory.getLogger(BppService::class.java)
 ) {
-  val log: Logger = LoggerFactory.getLogger(ProviderService::class.java)
-
   fun select(
-    provider: SubscriberDto,
+    context: ProtocolContext,
+    bppUri: String,
     providerId: String,
     providerLocation: ProtocolLocation,
     items: List<ProtocolSelectedItem>
-  ): Either<ProviderError, ProtocolAckResponse> { //todo : function parameters may not be protocol specific but client domain specific
+  ): Either<ProviderError, ProtocolAckResponse> {
     return try {
-      log.info("Initiating select using provider: {}", provider)
-      val providerServiceClient = providerServiceClientFactory.getClient(provider)
+      log.info("Initiating select using provider: {}", bppUri)
+      val providerServiceClient = bppServiceClientFactory.getClient(bppUri)
       val httpResponse = providerServiceClient.select(
         ProtocolSelectRequest(
-          context = contextFactory.create(),
+          context = context,
           ProtocolSelectRequestMessage(
             selected = ProtocolOnSelectMessageSelected(
-              provider = ProtocolProvider(id = providerId),
+              provider = ProtocolProvider(id = providerId, locations = listOf(providerLocation)),
               providerLocation = providerLocation,
               items = items
             )

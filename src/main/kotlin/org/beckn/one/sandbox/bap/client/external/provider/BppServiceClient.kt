@@ -6,7 +6,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface ProviderServiceClient {
-  @POST("select")
+interface BppServiceClient {
+  @POST("select/")
   fun select(@Body request: ProtocolSelectRequest): Call<ProtocolAckResponse>
 }

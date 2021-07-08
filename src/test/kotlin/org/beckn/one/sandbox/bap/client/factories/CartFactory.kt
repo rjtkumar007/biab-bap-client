@@ -30,10 +30,12 @@ class CartFactory {
               id = "venugopala stores",
               locations = listOf("13.001581,77.5703686")
             ),
-            quantity = 1,
-            measure = ProtocolScalar(
-              value = BigDecimal.valueOf(1),
-              unit = "kg"
+            quantity = CartSelectedItemQuantity(
+              count = 1,
+              measure = ProtocolScalar(
+                value = BigDecimal.valueOf(1),
+                unit = "kg"
+              )
             ),
           ),
           CartItemDto(
@@ -52,10 +54,12 @@ class CartFactory {
               id = "venugopala stores",
               locations = listOf("13.001581,77.5703686")
             ),
-            quantity = 1,
-            measure = ProtocolScalar(
-              value = BigDecimal.valueOf(500),
-              unit = "gm"
+            quantity = CartSelectedItemQuantity(
+              count = 1,
+              measure = ProtocolScalar(
+                value = BigDecimal.valueOf(500),
+                unit = "gm"
+              )
             ),
           ),
         )
