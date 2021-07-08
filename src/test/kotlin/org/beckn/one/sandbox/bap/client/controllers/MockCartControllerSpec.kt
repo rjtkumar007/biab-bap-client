@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.beckn.one.sandbox.bap.client.dtos.*
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseDto
+import org.beckn.one.sandbox.bap.client.dtos.CartResponseMessageDto
+import org.beckn.one.sandbox.bap.client.factories.CartFactory
+import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
+import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -17,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.math.BigDecimal
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -84,51 +86,6 @@ class MockCartControllerSpec @Autowired constructor(
     }
   }
 
-  private fun getCart(cartId: String) = CartDto(
-    id = cartId,
-    items = listOf(
-      CartItemDto(
-        descriptor = ProtocolDescriptor(
-          name = "Cothas Coffee 1 kg",
-          images = listOf("https://i.ibb.co/rZqPDd2/Coffee-2-Cothas.jpg"),
-        ),
-        price = ProtocolPrice(
-          currency = "INR",
-          value = "500"
-        ),
-        id = "cothas-coffee-1",
-        bppId = "paisool",
-        provider = CartItemProviderDto(
-          id = "venugopala stores",
-          providerLocations = listOf("13.001581,77.5703686")
-        ),
-        quantity = 1,
-        measure = ProtocolScalar(
-          value = BigDecimal.valueOf(1),
-          unit = "kg"
-        ),
-      ),
-      CartItemDto(
-        descriptor = ProtocolDescriptor(
-          name = "Malgudi Coffee 500 gm",
-          images = listOf("https://i.ibb.co/wgXx7K6/Coffee-1-Malgudi.jpg"),
-        ),
-        price = ProtocolPrice(
-          currency = "INR",
-          value = "240"
-        ),
-        id = "malgudi-coffee-500-gm",
-        bppId = "paisool",
-        provider = CartItemProviderDto(
-          id = "venugopala stores",
-          providerLocations = listOf("13.001581,77.5703686")
-        ),
-        quantity = 1,
-        measure = ProtocolScalar(
-          value = BigDecimal.valueOf(500),
-          unit = "gm"
-        ),
-      ),
-    )
-  )
+  private fun getCart(cartId: String) =
+    CartFactory.create(id = cartId, transactionId = "ac99a617-5065-4ae8-9695-d9de3d80f030")
 }

@@ -15,6 +15,7 @@ data class CartResponseMessageDto(
 
 data class CartDto @Default constructor(
   val id: String? = null,
+  val transactionId: String,
   val items: List<CartItemDto>? = null
 )
 
@@ -28,6 +29,7 @@ data class CartItemDto @Default constructor(
   val time: ProtocolTime? = null,
   val tags: Map<String, String>? = null,
   val bppId: String,
+  val bppUri: String,
   val provider: CartItemProviderDto,
   val quantity: Int,
   val measure: ProtocolScalar? = null

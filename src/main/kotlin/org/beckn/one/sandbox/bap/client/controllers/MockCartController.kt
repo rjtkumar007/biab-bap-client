@@ -53,6 +53,7 @@ class MockCartController @Autowired constructor(
 
   private fun buildCart(id: String?) = CartDto(
     id = id,
+    transactionId = "ac99a617-5065-4ae8-9695-d9de3d80f030",
     items = listOf(
       CartItemDto(
         descriptor = ProtocolDescriptor(
@@ -65,6 +66,7 @@ class MockCartController @Autowired constructor(
         ),
         id = "cothas-coffee-1",
         bppId = "paisool",
+        bppUri = "www.paisool.test",
         provider = CartItemProviderDto(
           id = "venugopala stores",
           providerLocations = listOf("13.001581,77.5703686")
@@ -86,6 +88,7 @@ class MockCartController @Autowired constructor(
         ),
         id = "malgudi-coffee-500-gm",
         bppId = "paisool",
+        bppUri = "www.paisool.test",
         provider = CartItemProviderDto(
           id = "venugopala stores",
           providerLocations = listOf("13.001581,77.5703686")
