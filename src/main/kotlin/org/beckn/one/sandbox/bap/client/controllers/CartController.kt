@@ -35,6 +35,7 @@ class CartController @Autowired constructor(
           mapToErrorResponse(it, context)
         },
         {
+          log.error("Successfully saved cart. Message: {}", it)
           ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
         }
       )

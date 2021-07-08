@@ -30,7 +30,7 @@ class BppService @Autowired constructor(
         log.info("Invoking Select API on BPP: {}", bppUri)
         val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
         val httpResponse = invokeBppSelectApi(bppServiceClient, context, providerId, providerLocation, items)
-        log.info("BPP Select response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+        log.info("BPP Select API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
         return when {
           isInternalServerError(httpResponse) -> Left(BppError.Internal)
           isBodyNull(httpResponse) -> Left(BppError.NullResponse)

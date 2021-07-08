@@ -21,10 +21,11 @@ class CartService @Autowired constructor(
   private val selectedItemMapper: SelectedItemMapper,
   private val log: Logger = LoggerFactory.getLogger(CartService::class.java)
 ) {
-  fun saveCart(context: ProtocolContext, cart: CartDto): Either<HttpError, MessageDao> {
+  fun saveCart(context: ProtocolContext, cart: CartDto): Either<HttpError, MessageDao?> {
     log.info("Got save cart request. Context: {}, Cart: {}", context, cart)
     if (cart.items.isNullOrEmpty()) {
-      return Either.Right(MessageDao(id = "", type = MessageDao.Type.Select))
+      log.info("Empty cart received, not doing anything. Cart: {}", cart)
+      return Either.Right(null)
     }
     return bppService.select(
       context,
