@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.schemas
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
 
 data class ProtocolQuotation @Default constructor(
@@ -19,7 +20,7 @@ data class ProtocolQuotationBreakup @Default constructor(
   enum class Type(val value: String) {
     ITEM("item"),
     OFFER("offer"),
-    ADDON("add-on"),
+    @JsonProperty("add-on") ADDON("add-on"),
     FULFILLMENT("fulfillment");
   }
 }

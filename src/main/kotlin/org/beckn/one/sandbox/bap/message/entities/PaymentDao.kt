@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.message.entities
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
 
 data class PaymentDao  @Default constructor(
@@ -16,18 +17,18 @@ data class PaymentDao  @Default constructor(
    * Values: get,post
    */
   enum class TlMethod(val value: String) {
-    GET("http/get"),
-    POST("http/post");
+    @JsonProperty("http/get") GET("http/get"),
+    @JsonProperty("http/post") POST("http/post");
   }
   /**
    *
    * Values: oNMinusORDER,pREMinusFULFILLMENT,oNMinusFULFILLMENT,pOSTMinusFULFILLMENT
    */
   enum class Type(val value: String) {
-    ONORDER("ON-ORDER"),
-    PREFULFILLMENT("PRE-FULFILLMENT"),
-    ONFULFILLMENT("ON-FULFILLMENT"),
-    POSTFULFILLMENT("POST-FULFILLMENT");
+    @JsonProperty("ON-ORDER") ONORDER("ON-ORDER"),
+    @JsonProperty("PRE-FULFILLMENT")  PREFULFILLMENT("PRE-FULFILLMENT"),
+    @JsonProperty("ON-FULFILLMENT")  ONFULFILLMENT("ON-FULFILLMENT"),
+    @JsonProperty("POST-FULFILLMENT")  POSTFULFILLMENT("POST-FULFILLMENT");
   }
   /**
    *
@@ -35,6 +36,6 @@ data class PaymentDao  @Default constructor(
    */
   enum class Status(val value: String) {
     PAID("PAID"),
-    NOTPATD("NOT-PATD");
+    @JsonProperty("NOT-PAID") NOTPAID("NOT-PAID");
   }
 }

@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.schemas
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
 
 data class ProtocolPayment @Default constructor(
@@ -16,25 +17,22 @@ data class ProtocolPayment @Default constructor(
    * Values: get,post
    */
   enum class TlMethod(val value: String) {
-    GET("http/get"),
-    POST("http/post");
+    @JsonProperty("http/get") GET("http/get"),
+    @JsonProperty("http/post") POST("http/post");
   }
   /**
    *
    * Values: oNMinusORDER,pREMinusFULFILLMENT,oNMinusFULFILLMENT,pOSTMinusFULFILLMENT
    */
   enum class Type(val value: String) {
-    ONORDER("ON-ORDER"),
-    PREFULFILLMENT("PRE-FULFILLMENT"),
-    ONFULFILLMENT("ON-FULFILLMENT"),
-    POSTFULFILLMENT("POST-FULFILLMENT");
+    @JsonProperty("ON-ORDER") ONORDER("ON-ORDER"),
+    @JsonProperty("PRE-FULFILLMENT") PREFULFILLMENT("PRE-FULFILLMENT"),
+    @JsonProperty("ON-FULFILLMENT") ONFULFILLMENT("ON-FULFILLMENT"),
+    @JsonProperty("POST-FULFILLMENT") POSTFULFILLMENT("POST-FULFILLMENT");
   }
-  /**
-   *
-   * Values: pAID,nOTMinusPATD
-   */
+
   enum class Status(val value: String) {
     PAID("PAID"),
-    NOTPATD("NOT-PATD");
+    @JsonProperty("NOT-PAID") NOTPATD("NOT-PAID");
   }
 }

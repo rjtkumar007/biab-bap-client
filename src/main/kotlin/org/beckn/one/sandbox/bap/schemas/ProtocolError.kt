@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.schemas
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
 
 data class ProtocolError @Default constructor(
@@ -10,10 +11,10 @@ data class ProtocolError @Default constructor(
 ){
 
   enum class Type(val value: String) {
-    CONTEXTERROR("CONTEXT-ERROR"),
-    COREERROR("CORE-ERROR"),
-    DOMAINERROR("DOMAIN-ERROR"),
-    POLICYERROR("POLICY-ERROR"),
-    JSONSCHEMAERROR("JSON-SCHEMA-ERROR");
+    @JsonProperty("CONTEXT-ERROR") CONTEXTERROR("CONTEXT-ERROR"),
+    @JsonProperty("CORE-ERROR") COREERROR("CORE-ERROR"),
+    @JsonProperty("DOMAIN-ERROR") DOMAINERROR("DOMAIN-ERROR"),
+    @JsonProperty("POLICY-ERROR") POLICYERROR("POLICY-ERROR"),
+    @JsonProperty("JSON-SCHEMA-ERROR") JSONSCHEMAERROR("JSON-SCHEMA-ERROR");
   }
 }
