@@ -7,7 +7,8 @@ data class CatalogDao @Default constructor(
   val bppDescriptor: DescriptorDao? = null,
   val bppProviders: List<ProviderCatalogDao>? = null,
   val bppCategories: List<CategoryDao>? = null,
-  val exp: LocalDateTime? = null
+  val exp: LocalDateTime? = null,
+  val id: String? = null,
 )
 
 data class ProviderCatalogDao @Default constructor(
@@ -17,5 +18,6 @@ data class ProviderCatalogDao @Default constructor(
   val categories: List<CategoryDao>? = null,
   val items: List<ItemDao>? = null,
   val tags: Map<String, String>? = null,
-  val exp: LocalDateTime? = null
+  val exp: LocalDateTime? = null,
+  val matched: Boolean? = null
 )
