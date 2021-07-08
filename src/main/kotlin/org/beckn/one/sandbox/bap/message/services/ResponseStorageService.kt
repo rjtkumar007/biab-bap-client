@@ -9,20 +9,23 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-interface ResponseStorageService<Proto: ProtocolResponse> {
+interface ResponseStorageService<Proto : ProtocolResponse> {
   fun save(protoResponse: Proto): Either<DatabaseError.OnWrite, Proto>
   fun findByMessageId(id: String): Either<DatabaseError.OnRead, List<Proto>>
 }
 
-class ResponseStorageServiceImpl<Proto: ProtocolResponse, Entity: BecknResponseDao> constructor(
+class ResponseStorageServiceImpl<Proto : ProtocolResponse, Entity : BecknResponseDao> constructor(
   val responseRepo: BecknResponseRepository<Entity>,
   val mapper: GenericResponseMapper<Proto, Entity>
-): ResponseStorageService<Proto> {
+) : ResponseStorageService<Proto> {
   private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   override fun save(protoResponse: Proto): Either<DatabaseError.OnWrite, Proto> =
     Either
-      .catch { responseRepo.insertOne(mapper.protocolToEntity(protoResponse)) }
+      .catch {
+        log.info("Saving protocol response: {}", protoResponse)
+        responseRepo.insertOne(mapper.protocolToEntity(protoResponse))
+      }
       .bimap(
         rightOperation = { protoResponse },
         leftOperation = {
