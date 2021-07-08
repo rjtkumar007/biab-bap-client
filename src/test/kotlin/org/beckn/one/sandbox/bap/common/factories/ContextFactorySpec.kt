@@ -13,7 +13,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import java.time.Clock
 import java.time.Instant
-import java.time.OffsetDateTime
 import java.time.ZoneId
 
 internal class ContextFactorySpec : DescribeSpec() {
@@ -51,7 +50,6 @@ internal class ContextFactorySpec : DescribeSpec() {
         context.clock shouldBe fixedUtcClock
         context.key shouldBe null
         context.ttl shouldBe null
-        context.timestamp shouldBe OffsetDateTime.now(fixedUtcClock)
       }
     }
   }

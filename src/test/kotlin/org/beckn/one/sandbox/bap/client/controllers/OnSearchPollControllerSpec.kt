@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.Clock
 import java.time.Instant
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 import java.time.ZoneId
 
 @SpringBootTest
@@ -55,7 +55,7 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
     bapUri = "http://host.bap.com",
     transactionId = "222",
     messageId = "222",
-    timestamp = OffsetDateTime.now(fixedClock)
+    timestamp = LocalDateTime.now(fixedClock)
   )
 
 
