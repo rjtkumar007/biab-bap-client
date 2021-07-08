@@ -12,7 +12,7 @@ object ProtocolOnSelectMessageSelectedFactory {
     return ProtocolOnSelectMessageSelected(
       provider = ProtocolProviderFactory.create(index),
       providerLocation = null,
-      items = itemIds.map { ProtocolItemFactory.create(it) },
+      items = itemIds.map { ProtocolSelectedItemFactory.create(it) },
       addOns = null,
       offers = null,
       quote = ProtocolQuotationFactory.quoteForItems(itemIds)
@@ -23,7 +23,7 @@ object ProtocolOnSelectMessageSelectedFactory {
     OnSelectMessageSelectedDao(
       provider = ProtocolProviderFactory.createAsEntity(protocol.provider),
       providerLocation = null,
-      items = protocol.items?.map { ProtocolItemFactory.createAsEntity(it) },
+      items = protocol.items?.map { ProtocolSelectedItemFactory.createAsEntity(it) },
       addOns = null,
       offers = null,
       quote = ProtocolQuotationFactory.createAsEntity(protocol.quote)

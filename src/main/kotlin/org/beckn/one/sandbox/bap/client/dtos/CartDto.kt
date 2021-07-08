@@ -20,7 +20,7 @@ data class CartDto @Default constructor(
 )
 
 data class CartItemDto @Default constructor(
-  val id: String? = null,
+  val id: String,
   val parentItemId: String? = null,
   val descriptor: ProtocolDescriptor? = null,
   val price: ProtocolPrice? = null,
@@ -37,5 +37,5 @@ data class CartItemDto @Default constructor(
 
 data class CartItemProviderDto @Default constructor(
   val id: String,
-  val providerLocations: List<String>? = null
+  val locations: List<String>? = null
 )

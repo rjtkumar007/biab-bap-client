@@ -35,5 +35,5 @@ data class CartItemDtoV0 @Default constructor(
 
 data class CartItemProviderDtoV0 @Default constructor(
   val id: String,
-  val providerLocations: List<String>? = null
+  val locations: List<String>? = null
 )

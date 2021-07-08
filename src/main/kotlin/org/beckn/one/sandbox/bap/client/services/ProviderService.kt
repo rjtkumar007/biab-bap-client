@@ -22,7 +22,7 @@ class ProviderService @Autowired constructor(
     provider: SubscriberDto,
     providerId: String,
     providerLocation: ProtocolLocation,
-    items: List<ProtocolItem>
+    items: List<ProtocolSelectedItem>
   ): Either<ProviderError, ProtocolAckResponse> { //todo : function parameters may not be protocol specific but client domain specific
     return try {
       log.info("Initiating select using provider: {}", provider)

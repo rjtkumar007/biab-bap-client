@@ -69,7 +69,7 @@ class CartControllerSpecV0 @Autowired constructor(
               bppId = "paisool",
               provider = CartItemProviderDtoV0(
                 id = "venugopala stores",
-                providerLocations = listOf("13.001581,77.5703686")
+                locations = listOf("13.001581,77.5703686")
               ),
               itemId = "cothas-coffee-1",
               quantity = 2,

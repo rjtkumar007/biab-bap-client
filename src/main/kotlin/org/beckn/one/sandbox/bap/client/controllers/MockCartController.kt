@@ -69,7 +69,7 @@ class MockCartController @Autowired constructor(
         bppUri = "www.paisool.test",
         provider = CartItemProviderDto(
           id = "venugopala stores",
-          providerLocations = listOf("13.001581,77.5703686")
+          locations = listOf("13.001581,77.5703686")
         ),
         quantity = 1,
         measure = ProtocolScalar(
@@ -91,7 +91,7 @@ class MockCartController @Autowired constructor(
         bppUri = "www.paisool.test",
         provider = CartItemProviderDto(
           id = "venugopala stores",
-          providerLocations = listOf("13.001581,77.5703686")
+          locations = listOf("13.001581,77.5703686")
         ),
         quantity = 1,
         measure = ProtocolScalar(

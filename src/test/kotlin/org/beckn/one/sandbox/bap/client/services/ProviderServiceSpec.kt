@@ -7,9 +7,12 @@ import org.beckn.one.sandbox.bap.client.external.provider.ProviderServiceClient
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.message.factories.IdFactory
-import org.beckn.one.sandbox.bap.message.factories.ProtocolItemFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolLocationFactory
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.one.sandbox.bap.message.factories.ProtocolSelectedItemFactory
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelectMessageSelected
+import org.beckn.one.sandbox.bap.schemas.ProtocolProvider
+import org.beckn.one.sandbox.bap.schemas.ProtocolSelectRequest
+import org.beckn.one.sandbox.bap.schemas.ProtocolSelectRequestMessage
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.junit.jupiter.api.Assertions
 import org.mockito.Mockito
@@ -49,7 +52,7 @@ internal class ProviderServiceSpec : DescribeSpec() {
           provider,
           "paisool",
           ProtocolLocationFactory.addressLocation(1),
-          IdFactory.forItems(IdFactory.forProvider(1), 1).map { ProtocolItemFactory.create(it) })
+          IdFactory.forItems(IdFactory.forProvider(1), 1).map { ProtocolSelectedItemFactory.create(it) })
 
         response
           .fold(
@@ -67,7 +70,7 @@ internal class ProviderServiceSpec : DescribeSpec() {
       selected = ProtocolOnSelectMessageSelected(
         provider = ProtocolProvider(id = "paisool"),
         providerLocation = ProtocolLocationFactory.addressLocation(1),
-        items = IdFactory.forItems(IdFactory.forProvider(1), 1).map { ProtocolItemFactory.create(it) }
+        items = IdFactory.forItems(IdFactory.forProvider(1), 1).map { ProtocolSelectedItemFactory.create(it) }
       )
     )
   )

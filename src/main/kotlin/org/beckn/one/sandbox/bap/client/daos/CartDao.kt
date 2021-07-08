@@ -22,6 +22,6 @@ data class CartItemDao @Default constructor(
 
 data class CartItemProviderDao @Default constructor(
   val id: String,
-  val providerLocations: List<String>? = null
+  val locations: List<String>? = null
 )
 
