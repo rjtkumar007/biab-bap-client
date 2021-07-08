@@ -28,6 +28,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
   private val uuidFactory = mock(UuidFactory::class.java)
   private val gatewayServiceClient: GatewayServiceClient = mock(GatewayServiceClient::class.java)
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
+
   private val gatewayService: GatewayService =
     GatewayService(
       domain = Domain.LocalRetail.value,
@@ -35,8 +36,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
       country = Country.India.value,
       bapId = "beckn_in_a_box_bap",
       bapUri = "beckn_in_a_box_bap.com",
-      gatewayServiceClientFactory = gatewayServiceClientFactory,
-      contextFactory = contextFactory
+      gatewayServiceClientFactory = gatewayServiceClientFactory
     )
 
   init {
@@ -45,6 +45,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
       val gateway = MockNetwork.getRetailBengaluruBg()
       `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
       `when`(gatewayServiceClientFactory.getClient(gateway)).thenReturn(gatewayServiceClient)
+      val context = contextFactory.create()
 
       beforeEach {
         MockNetwork.resetAllSubscribers()
@@ -57,7 +58,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
           Calls.failure(IOException("Timeout"))
         )
 
-        val response = gatewayService.search(gateway, queryString, locationString)
+        val response = gatewayService.search(context, gateway, queryString, locationString)
 
         response
           .fold(
@@ -71,7 +72,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
         val searchRequest = getRequest()
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(Calls.response(null))
 
-        val response = gatewayService.search(gateway, queryString, locationString)
+        val response = gatewayService.search(context, gateway, queryString, locationString)
 
         response
           .fold(
@@ -83,10 +84,10 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
       it("should return gateway error when gateway search returns negative acknowledgement") {
         val searchRequest = getRequest()
-        val nackResponse = Calls.response(ProtocolAckResponse(contextFactory.create(), nack()))
+        val nackResponse = Calls.response(ProtocolAckResponse(context, nack()))
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(nackResponse)
 
-        val response = gatewayService.search(gateway, queryString, locationString)
+        val response = gatewayService.search(context, gateway, queryString, locationString)
 
         response
           .fold(

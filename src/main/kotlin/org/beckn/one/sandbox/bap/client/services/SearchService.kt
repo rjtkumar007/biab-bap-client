@@ -23,7 +23,7 @@ class SearchService(
     log.info("Got search request: {}", queryString)
     return registryService
       .lookupGateways()
-      .flatMap { gatewayService.search(it.first(), queryString, location) }
+      .flatMap { gatewayService.search(context, it.first(), queryString, location) }
       .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
   }
 }
