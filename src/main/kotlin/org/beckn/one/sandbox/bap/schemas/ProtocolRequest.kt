@@ -14,3 +14,12 @@ data class ProtocolSearchRequest @Default constructor(
 data class ProtocolSearchRequestMessage @Default constructor(
   val intent: ProtocolIntent
 )
+
+data class ProtocolSelectRequest @Default constructor(
+  override val context: ProtocolContext,
+  val message: ProtocolSelectRequestMessage
+): ProtocolRequest
+
+data class ProtocolSelectRequestMessage @Default constructor(
+  val selected: ProtocolOnSelectMessageSelected
+)

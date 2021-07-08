@@ -1,6 +1,5 @@
 package org.beckn.one.sandbox.bap.client.external.registry
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.Clock
 import java.time.LocalDateTime

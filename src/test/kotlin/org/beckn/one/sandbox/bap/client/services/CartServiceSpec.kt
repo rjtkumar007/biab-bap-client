@@ -25,7 +25,7 @@ import org.mockito.kotlin.verify
 internal class CartServiceSpec : DescribeSpec() {
   private val contextFactory = ContextFactoryInstance.create()
   private val cartMapper = CartMapperImpl()
-  private val cartValidator = CartValidator() //todo: need to figure out how to auto-wire
+  private val cartValidator = CartValidator()
 
   init {
     describe("Save Cart") {

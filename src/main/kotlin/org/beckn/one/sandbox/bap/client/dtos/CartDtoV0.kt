@@ -26,7 +26,7 @@ data class CartDtoV0 @Default constructor(
 )
 
 data class CartItemDtoV0 @Default constructor(
-  val bppId: String,
+  val bppId: String,//todo: make this into a more BPP info rich
   val provider: CartItemProviderDtoV0,
   val itemId: String,
   val quantity: Int,
