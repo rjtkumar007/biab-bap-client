@@ -33,6 +33,6 @@ data class ProtocolPayment @Default constructor(
 
   enum class Status(val value: String) {
     PAID("PAID"),
-    @JsonProperty("NOT-PAID") NOTPATD("NOT-PAID");
+    @JsonProperty("NOT-PAID") NOTPAID("NOT-PAID");
   }
 }
