@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping
 class ProtocolOnSelectController(
   store: ResponseStorageService<ProtocolOnSelect>
-): BaseProtocolController<ProtocolOnSelect>(store) {
+) : BaseProtocolController<ProtocolOnSelect>(store) {
 
   @PostMapping(
     "v1/on_select",
