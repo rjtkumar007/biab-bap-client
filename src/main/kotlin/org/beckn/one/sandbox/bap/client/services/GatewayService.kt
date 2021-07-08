@@ -6,7 +6,6 @@ import arrow.core.Either.Right
 import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.schemas.*
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,16 +21,19 @@ class GatewayService @Autowired constructor(
   @Value("\${context.bap_id}") val bapId: String,
   @Value("\${context.bap_uri}") val bapUri: String,
   val gatewayServiceClientFactory: GatewayServiceClientFactory,
-  val contextFactory: ContextFactory
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
 
-  fun search(gateway: SubscriberDto, queryString: String?, locationString: String?): Either<GatewaySearchError, ProtocolAckResponse> {
+  fun search(
+    context: ProtocolContext,
+    gateway: SubscriberDto,
+    queryString: String?,
+    locationString: String?
+  ): Either<GatewaySearchError, ProtocolAckResponse> {
     return try {
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
-      val context = contextFactory.create()
-      log.info("Initiated Search for message id: {}", context.messageId)
+      log.info("Initiated Search for context: {}", context)
       val httpResponse = gatewayServiceClient.search(
         ProtocolSearchRequest(
           context,
