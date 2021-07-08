@@ -19,7 +19,7 @@ internal class CartRepositorySpec : DescribeSpec() {
   init {
     describe("Save Cart") {
       val cartMapper = CartMapperImpl()
-      val cartDto = CartFactory.create(id = "cart 1")
+      val cartDto = CartFactory.createV0(id = "cart 1")
       val cartDao = cartMapper.dtoToDao(cartDto)
 
       it("should return error when cart save fails with db write error") {

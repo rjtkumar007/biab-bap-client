@@ -46,7 +46,7 @@ class CartControllerSpecV0 @Autowired constructor(
     describe("Cart") {
 
       it("should create cart if it does not exist") {
-        val cart = CartFactory.create(null)
+        val cart = CartFactory.createV0(null)
 
         val createCartResponseString = invokeCartCreateOrUpdateApi(cart)
           .andExpect(status().is2xxSuccessful)
@@ -59,7 +59,7 @@ class CartControllerSpecV0 @Autowired constructor(
       }
 
       it("should update cart if it exists") {
-        val existingCartDto = CartFactory.create(uuidFactory.create())
+        val existingCartDto = CartFactory.createV0(uuidFactory.create())
         val existingCartDao = cartMapper.dtoToDao(existingCartDto)
         cartRepository.saveCart(existingCartDao)
 
@@ -92,12 +92,12 @@ class CartControllerSpecV0 @Autowired constructor(
 
       it("should delete cart") {
         val cartId = "abc-123-ne"
-        val cartToBeInsertedDao = cartMapper.dtoToDao(CartFactory.create(cartId).copy(id = cartId))
+        val cartToBeInsertedDao = cartMapper.dtoToDao(CartFactory.createV0(cartId).copy(id = cartId))
         genericRepository.findOne(cartToBeInsertedDao::id eq cartToBeInsertedDao.id) shouldBe null
         val insertedCartDao = genericRepository.insertOne(cartToBeInsertedDao)
         val cartFromDb = genericRepository.findOne(insertedCartDao::id eq cartToBeInsertedDao.id)
         cartFromDb shouldNotBe null
-        cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe CartFactory.create(cartId)
+        cartFromDb?.let { cartMapper.daoToDto(it) } shouldBe CartFactory.createV0(cartId)
         val createCartResponseString = mockMvc
           .perform(
             MockMvcRequestBuilders.delete("/client/v0.1/cart/$cartId")

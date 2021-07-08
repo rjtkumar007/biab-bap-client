@@ -45,7 +45,7 @@ data class ProtocolOnSelect @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolOnSelectMessage? = null,
   override val error: ProtocolError? = null
-): ProtocolResponse
+) : ProtocolResponse
 
 data class ProtocolOnSelectMessage @Default constructor(
   val selected: ProtocolOnSelectMessageSelected? = null
@@ -56,7 +56,7 @@ data class ProtocolOnInit @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolOnInitMessage? = null,
   override val error: ProtocolError? = null
-): ProtocolResponse
+) : ProtocolResponse
 
 data class ProtocolOnInitMessage @Default constructor(
   val initialized: ProtocolOnInitMessageInitialized? = null
@@ -67,7 +67,7 @@ data class ProtocolOnConfirm @Default constructor(
   override val context: ProtocolContext,
   val message: ProtocolOnConfirmMessage? = null,
   override val error: ProtocolError? = null
-): ProtocolResponse
+) : ProtocolResponse
 
 data class ProtocolOnConfirmMessage @Default constructor(
   val order: ProtocolOrder? = null

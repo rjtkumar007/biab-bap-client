@@ -29,7 +29,7 @@ internal class CartServiceSpec : DescribeSpec() {
 
   init {
     describe("Save Cart") {
-      val cartDto = CartFactory.create(id = "cart 1")
+      val cartDto = CartFactory.createV0(id = "cart 1")
       val cartDao = cartMapper.dtoToDao(cartDto)
       val context = contextFactory.create()
 
@@ -69,7 +69,7 @@ internal class CartServiceSpec : DescribeSpec() {
     }
     describe("Delete Cart"){
       val cartId =  "cart 1"
-      val cartDto = CartFactory.create(id = cartId)
+      val cartDto = CartFactory.createV0(id = cartId)
       val cartDao = cartMapper.dtoToDao(cartDto)
       val context = contextFactory.create()
 
@@ -97,8 +97,8 @@ internal class CartServiceSpec : DescribeSpec() {
     }
   }
 
-  private fun createCartService(cartRepository: CartRepository): CartService {
-    return CartService(
+  private fun createCartService(cartRepository: CartRepository): CartServiceV0 {
+    return CartServiceV0(
       uuidFactory = UuidFactory(),
       cartMapper = cartMapper,
       cartValidator = cartValidator,

@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.controllers
 import org.beckn.one.sandbox.bap.client.dtos.CartDtoV0
 import org.beckn.one.sandbox.bap.client.dtos.CartResponseDtoV0
 import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDtoV0
-import org.beckn.one.sandbox.bap.client.services.CartService
+import org.beckn.one.sandbox.bap.client.services.CartServiceV0
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class CartControllerV0 @Autowired constructor(
   private val contextFactory: ContextFactory,
-  private val cartService: CartService
+  private val cartService: CartServiceV0
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
