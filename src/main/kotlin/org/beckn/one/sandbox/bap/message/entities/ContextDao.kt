@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.message.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
 import java.time.Clock
 import java.time.LocalDateTime
@@ -23,27 +24,27 @@ data class ContextDao @Default constructor(
   val ttl: Duration? = null
 ) {
   enum class Action(val value: String) {
-    SEARCH("search"),
-    SELECT("select"),
-    INIT("init"),
-    CONFIRM("confirm"),
-    UPDATE("update"),
-    STATUS("status"),
-    TRACK("track"),
-    CANCEL("cancel"),
-    FEEDBACK("feedback"),
-    SUPPORT("support"),
-    ON_SEARCH("on_search"),
-    ON_SELECT("on_select"),
-    ON_INIT("on_init"),
-    ON_CONFIRM("on_confirm"),
-    ON_UPDATE("on_update"),
-    ON_STATUS("on_status"),
-    ON_TRACK("on_track"),
-    ON_CANCEL("on_cancel"),
-    ON_FEEDBACK("on_feedback"),
-    ON_SUPPORT("on_support"),
-    ACK("ack"),
+    @JsonProperty("search") SEARCH("search"),
+    @JsonProperty("select") SELECT("select"),
+    @JsonProperty("init") INIT("`init`"),
+    @JsonProperty("confirm") CONFIRM("confirm"),
+    @JsonProperty("update") UPDATE("update"),
+    @JsonProperty("status") STATUS("status"),
+    @JsonProperty("track") TRACK("track"),
+    @JsonProperty("cancel") CANCEL("cancel"),
+    @JsonProperty("feedback") FEEDBACK("feedback"),
+    @JsonProperty("support") SUPPORT("support"),
+    @JsonProperty("on_search") ON_SEARCH("on_search"),
+    @JsonProperty("on_select") ON_SELECT("on_select"),
+    @JsonProperty("on_init") ON_INIT("on_init"),
+    @JsonProperty("on_confirm") ON_CONFIRM("on_confirm"),
+    @JsonProperty("on_update") ON_UPDATE("on_update"),
+    @JsonProperty("on_status") ON_STATUS("on_status"),
+    @JsonProperty("on_track") ON_TRACK("on_track"),
+    @JsonProperty("on_cancel") ON_CANCEL("on_cancel"),
+    @JsonProperty("on_feedback") ON_FEEDBACK("on_feedback"),
+    @JsonProperty("on_support") ON_SUPPORT("on_support"),
+    @JsonProperty("ack") ACK("ack")
   }
 }
 
