@@ -30,10 +30,10 @@ class CartRepository @Autowired constructor(
       }
   }
 
-  fun deleteById(id: String): Either<HttpError, CartDao> {
+  fun deleteById(id: String): Either<HttpError, CartDao?> {
     return Either.Companion.catch{
       return when(val deletedVal = genericRepository.deleteOne(CartDao::id eq id)){
-        null -> Either.Left(DatabaseError.NotFound)
+        null -> Either.Right(null)
         else -> Either.Right(deletedVal)
       }
     }
