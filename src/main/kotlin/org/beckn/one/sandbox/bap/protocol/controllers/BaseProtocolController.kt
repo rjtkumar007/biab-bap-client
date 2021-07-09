@@ -24,7 +24,7 @@ open class BaseProtocolController<Protocol: ProtocolResponse> @Autowired constru
           .body(ProtocolAckResponse(searchResponse.context, it.message(), it.error()))
       },
       ifRight = {
-        log.info("Successfully persisted response with message id: ${searchResponse.context.messageId}")
+        log.info("Successfully persisted response with message id: ${searchResponse.context?.messageId}")
         ResponseEntity.ok(ProtocolAckResponse(searchResponse.context, ResponseMessage.ack()))
       }
     )

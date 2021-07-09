@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import org.beckn.one.sandbox.bap.Default
 
 interface ProtocolResponse {
-  val context: ProtocolContext
+  val context: ProtocolContext?
   val error: ProtocolError?
 }
 
@@ -25,7 +25,7 @@ enum class ResponseStatus(
 }
 
 data class ProtocolAckResponse(
-  override val context: ProtocolContext,
+  override val context: ProtocolContext?,
   val message: ResponseMessage,
   override val error: ProtocolError? = null,
 ) : ProtocolResponse

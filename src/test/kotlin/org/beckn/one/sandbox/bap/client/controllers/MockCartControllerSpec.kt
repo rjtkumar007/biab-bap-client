@@ -47,7 +47,7 @@ class MockCartControllerSpec @Autowired constructor(
 
         val createCartResponse = objectMapper.readValue(createCartResponseString, ProtocolAckResponse::class.java)
         createCartResponse.context shouldNotBe null
-        createCartResponse.context.messageId shouldNotBe null
+        createCartResponse.context?.messageId shouldNotBe null
         createCartResponse.message shouldBe ResponseMessage.ack()
       }
 

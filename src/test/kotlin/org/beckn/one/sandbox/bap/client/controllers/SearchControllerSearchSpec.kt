@@ -100,9 +100,9 @@ class SearchControllerSearchSpec @Autowired constructor(
 
         MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
         val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolAckResponse::class.java)
-        val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context.messageId)
+        val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context?.messageId)
         savedMessage shouldNotBe null
-        savedMessage?.id shouldBe searchResponse.context.messageId
+        savedMessage?.id shouldBe searchResponse.context?.messageId
         savedMessage?.type shouldBe MessageDao.Type.Search
       }
 
@@ -132,9 +132,9 @@ class SearchControllerSearchSpec @Autowired constructor(
 
         MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
         val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolAckResponse::class.java)
-        val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context.messageId)
+        val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context?.messageId)
         savedMessage shouldNotBe null
-        savedMessage?.id shouldBe searchResponse.context.messageId
+        savedMessage?.id shouldBe searchResponse.context?.messageId
         savedMessage?.type shouldBe MessageDao.Type.Search
       }
 
@@ -164,9 +164,9 @@ class SearchControllerSearchSpec @Autowired constructor(
 
         MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
         val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolAckResponse::class.java)
-        val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context.messageId)
+        val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context?.messageId)
         savedMessage shouldNotBe null
-        savedMessage?.id shouldBe searchResponse.context.messageId
+        savedMessage?.id shouldBe searchResponse.context?.messageId
         savedMessage?.type shouldBe MessageDao.Type.Search
 //        val protocolSearchRequest = getProtocolSearchRequest(
 //          searchResponse,
@@ -184,7 +184,7 @@ class SearchControllerSearchSpec @Autowired constructor(
 
   private fun getProtocolSearchRequest(searchResponse: ProtocolAckResponse , providerId: String, location: String): ProtocolSearchRequest {
     return ProtocolSearchRequest(
-      context = searchResponse.context,
+      context = searchResponse.context!!,
       message = ProtocolSearchRequestMessage(
         intent = ProtocolIntent(
           queryString = null,

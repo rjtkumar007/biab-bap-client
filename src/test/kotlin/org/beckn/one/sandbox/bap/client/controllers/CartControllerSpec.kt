@@ -101,7 +101,7 @@ class CartControllerSpec @Autowired constructor(
   }
 
   private fun verifyThatMessageWasNotPersisted(saveCartResponse: ProtocolAckResponse) {
-    val savedMessage = messageRepository.findOne(MessageDao::id eq saveCartResponse.context.messageId)
+    val savedMessage = messageRepository.findOne(MessageDao::id eq saveCartResponse.context?.messageId)
     savedMessage shouldBe null
   }
 
@@ -112,17 +112,17 @@ class CartControllerSpec @Autowired constructor(
   ): ProtocolAckResponse {
     val saveCartResponse = objectMapper.readValue(saveCartResponseString, ProtocolAckResponse::class.java)
     saveCartResponse.context shouldNotBe null
-    saveCartResponse.context.messageId shouldNotBe null
-    saveCartResponse.context.transactionId shouldBe cart.transactionId
-    saveCartResponse.context.action shouldBe ProtocolContext.Action.SELECT
+    saveCartResponse.context?.messageId shouldNotBe null
+    saveCartResponse.context?.transactionId shouldBe cart.transactionId
+    saveCartResponse.context?.action shouldBe ProtocolContext.Action.SELECT
     saveCartResponse.message shouldBe expectedMessage
     return saveCartResponse
   }
 
   private fun verifyThatMessageForSelectRequestIsPersisted(saveCartResponse: ProtocolAckResponse) {
-    val savedMessage = messageRepository.findOne(MessageDao::id eq saveCartResponse.context.messageId)
+    val savedMessage = messageRepository.findOne(MessageDao::id eq saveCartResponse.context?.messageId)
     savedMessage shouldNotBe null
-    savedMessage?.id shouldBe saveCartResponse.context.messageId
+    savedMessage?.id shouldBe saveCartResponse.context?.messageId
     savedMessage?.type shouldBe MessageDao.Type.Select
   }
 
@@ -141,7 +141,7 @@ class CartControllerSpec @Autowired constructor(
   private fun getProtocolSelectRequest(saveCartResponse: ProtocolAckResponse, cart: CartDto): ProtocolSelectRequest {
     val locations = cart.items?.first()?.provider?.locations?.map { ProtocolLocation(gps = it) }
     return ProtocolSelectRequest(
-      context = saveCartResponse.context,
+      context = saveCartResponse.context!!,
       message = ProtocolSelectRequestMessage(
         selected = ProtocolOnSelectMessageSelected(
           provider = ProtocolProvider(
