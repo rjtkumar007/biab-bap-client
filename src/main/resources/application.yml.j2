@@ -1,6 +1,12 @@
 ---
 server:
   port: 9001
+logging:
+  level:
+    org:
+      apache:
+        coyote:
+          http11: DEBUG
 spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
