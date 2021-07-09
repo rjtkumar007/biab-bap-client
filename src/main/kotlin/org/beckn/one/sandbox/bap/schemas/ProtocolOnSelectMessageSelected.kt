@@ -20,10 +20,13 @@ data class ProtocolSelectedItem @Default constructor(
   val locationId: String? = null,
   val time: ProtocolTime? = null,
   val tags: Map<String, String>? = null,
-  val quantity: ProtocolSelectedItemQuantity,
+  val quantity: ProtocolItemQuantity,
 )
 
-data class ProtocolSelectedItemQuantity @Default constructor(
-  val count: Int,
-  val measure: ProtocolScalar? = null
+data class ProtocolItemQuantity @Default constructor(
+  val allocated: ProtocolItemQuantityAllocated? = null,
+  val available: ProtocolItemQuantityAllocated? = null,
+  val maximum: ProtocolItemQuantityAllocated? = null,
+  val minimum: ProtocolItemQuantityAllocated? = null,
+  val selected: ProtocolItemQuantityAllocated? = null
 )

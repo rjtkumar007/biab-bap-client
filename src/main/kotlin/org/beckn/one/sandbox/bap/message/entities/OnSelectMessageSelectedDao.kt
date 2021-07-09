@@ -1,7 +1,6 @@
 package org.beckn.one.sandbox.bap.message.entities
 
 import org.beckn.one.sandbox.bap.Default
-import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
 
 data class OnSelectMessageSelectedDao @Default constructor(
   val provider: ProviderDao? = null,
@@ -21,10 +20,13 @@ data class SelectedItemDao @Default constructor(
   val locationId: String? = null,
   val time: TimeDao? = null,
   val tags: Map<String, String>? = null,
-  val quantity: SelectedItemQuantityDao,
+  val quantity: ItemQuantityDao,
 )
 
-data class SelectedItemQuantityDao @Default constructor(
-  val count: Int,
-  val measure: ProtocolScalar?
+data class ItemQuantityDao @Default constructor(
+  val allocated: ItemQuantityAllocatedDao? = null,
+  val available: ItemQuantityAllocatedDao? = null,
+  val maximum: ItemQuantityAllocatedDao? = null,
+  val minimum: ItemQuantityAllocatedDao? = null,
+  val selected: ItemQuantityAllocatedDao? = null
 )

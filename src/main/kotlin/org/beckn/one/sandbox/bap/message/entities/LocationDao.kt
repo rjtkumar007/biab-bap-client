@@ -35,7 +35,7 @@ data class ScalarDao @Default constructor(
   val type: Type? = null,
   val estimatedValue: java.math.BigDecimal? = null,
   val computedValue: java.math.BigDecimal? = null,
-  val range: ProtocolScalarRangeDao? = null
+  val range: ScalarRangeDao? = null
 ) {
 
   enum class Type(val value: String) {
@@ -44,7 +44,7 @@ data class ScalarDao @Default constructor(
   }
 }
 
-data class ProtocolScalarRangeDao @Default constructor(
+data class ScalarRangeDao @Default constructor(
   val min: java.math.BigDecimal? = null,
   val max: java.math.BigDecimal? = null
 )

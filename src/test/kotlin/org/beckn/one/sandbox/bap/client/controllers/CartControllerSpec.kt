@@ -152,7 +152,11 @@ class CartControllerSpec @Autowired constructor(
             ProtocolSelectedItem(
               id = it.id,
               descriptor = it.descriptor,
-              quantity = ProtocolSelectedItemQuantity(count = it.quantity.count, measure = it.quantity.measure),
+              quantity = ProtocolItemQuantity(
+                selected = ProtocolItemQuantityAllocated(
+                  count = it.quantity.count, measure = it.quantity.measure
+                )
+              ),
               price = it.price
             )
           },

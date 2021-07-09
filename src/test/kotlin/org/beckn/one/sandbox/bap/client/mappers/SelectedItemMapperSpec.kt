@@ -7,10 +7,16 @@ import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDto
 import org.beckn.one.sandbox.bap.client.dtos.CartSelectedItemQuantity
 import org.beckn.one.sandbox.bap.schemas.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import java.math.BigDecimal
 
+@SpringBootTest
+@ActiveProfiles(value = ["test"])
+@TestPropertySource(locations = ["/application-test.yml"])
 class SelectedItemMapperSpec @Autowired constructor(
-  private val selectedItemMapper: SelectedItemMapper = SelectedItemMapperImpl()
+  private val selectedItemMapper: SelectedItemMapper
 ) : DescribeSpec() {
   init {
     describe("Selected Item Mapper") {
@@ -49,7 +55,11 @@ class SelectedItemMapperSpec @Autowired constructor(
             images = dto.descriptor?.images,
           ),
           price = dto.price,
-          quantity = ProtocolSelectedItemQuantity(count = dto.quantity.count, measure = dto.quantity.measure)
+          quantity = ProtocolItemQuantity(
+            selected = ProtocolItemQuantityAllocated(
+              count = dto.quantity.count, measure = dto.quantity.measure
+            )
+          )
         )
       }
     }
