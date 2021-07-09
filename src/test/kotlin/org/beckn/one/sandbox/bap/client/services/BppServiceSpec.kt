@@ -70,7 +70,6 @@ internal class BppServiceSpec : DescribeSpec() {
         response shouldBeLeft BppError.Nack
         verify(bppServiceClient).select(getRequest())
       }
-      //todo: add provider search tests
     }
   }
 

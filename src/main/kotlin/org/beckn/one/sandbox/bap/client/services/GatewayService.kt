@@ -68,4 +68,42 @@ class GatewayService @Autowired constructor(
 
   private fun isAckNegative(httpAckAckResponse: retrofit2.Response<ProtocolAckResponse>) =
     httpAckAckResponse.body()!!.message.ack.status == ResponseStatus.NACK
+
+  fun searchProvider(
+    context: ProtocolContext,
+    gateway: SubscriberDto,
+    providerId: String,
+    locationString: String?
+  ): Either<GatewaySearchError, ProtocolAckResponse> {
+    return try {
+      log.info("Initiating Search using gateway: {}", gateway)
+      val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
+      log.info("Initiated Search for context: {}", context)
+      val httpResponse = gatewayServiceClient.search(
+        ProtocolSearchRequest(
+          context,
+          ProtocolSearchRequestMessage(
+            ProtocolIntent(
+              queryString = null,
+              provider = ProtocolProvider(id = providerId),
+              fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString)))
+            )
+          )
+        )
+      ).execute()
+      log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+      when {
+        isInternalServerError(httpResponse) -> Either.Left(GatewaySearchError.Internal)
+        httpResponse.body() == null -> Either.Left(GatewaySearchError.NullResponse)
+        isAckNegative(httpResponse) -> Either.Left(GatewaySearchError.Nack)
+        else -> {
+          log.info("Successfully invoked search on gateway. Response: {}", httpResponse.body())
+          Either.Right(httpResponse.body()!!)
+        }
+      }
+    } catch (e: Exception) {
+      log.error("Error when initiating search", e)
+      Left(GatewaySearchError.Internal)
+    }
+  }
 }

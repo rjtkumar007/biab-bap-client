@@ -5,9 +5,9 @@ import org.beckn.one.sandbox.bap.Default
 import java.time.LocalDateTime
 
 data class ProtocolCatalog @Default constructor(
-  @JsonProperty("descriptor") val bppDescriptor: ProtocolDescriptor? = null,
-  @JsonProperty("providers") val bppProviders: List<ProtocolProviderCatalog>? = null,
-  @JsonProperty("categories") val bppCategories: List<ProtocolCategory>? = null,
+  @JsonProperty("bpp/descriptor") val bppDescriptor: ProtocolDescriptor? = null,//todo: remove this, its only a temporary test remove bpp/ from all 3
+  @JsonProperty("bpp/providers") val bppProviders: List<ProtocolProviderCatalog>? = null,
+  @JsonProperty("bpp/categories") val bppCategories: List<ProtocolCategory>? = null,
   val id: String? = null,
   val exp: LocalDateTime? = null
 )

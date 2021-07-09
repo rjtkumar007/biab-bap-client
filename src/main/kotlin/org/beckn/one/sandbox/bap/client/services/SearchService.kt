@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service
 class SearchService(
   @Autowired val registryService: RegistryService,
   @Autowired val gatewayService: GatewayService,
-  @Autowired val bppService: BppService,
   @Autowired val messageService: MessageService
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
@@ -25,23 +24,23 @@ class SearchService(
     queryString: String?,
     location: String?,
     providerId: String?,
-    bppUri: String?,
     categoryId: String?
   ): Either<HttpError, MessageDao> {
     log.info(
-      "Got search request queryString: {} location: {}  providerId: {} categoryId: {} bppUri: {}",
+      "Got search request queryString: {} location: {}  providerId: {} categoryId: {}",
       queryString,
       location,
       providerId,
-      categoryId,
-      bppUri
+      categoryId
     )
     return when (providerId) {
       null -> registryService
         .lookupGateways()
         .flatMap { gatewayService.search(context, it.first(), queryString, location) }
         .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
-      else -> bppService.search(context, bppUri, providerId, location)
+      else -> registryService
+        .lookupGateways()
+        .flatMap { gatewayService.searchProvider(context, it.first(), providerId, location) }
         .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
     }
   }

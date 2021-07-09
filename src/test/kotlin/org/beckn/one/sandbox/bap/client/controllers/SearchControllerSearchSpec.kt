@@ -1,7 +1,6 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -40,12 +39,9 @@ class SearchControllerSearchSpec @Autowired constructor(
   init {
 
     describe("Search") {
-      val providerApi = WireMockServer(4011)
-      providerApi.start()
       MockNetwork.startAllSubscribers()
       beforeEach {
         MockNetwork.resetAllSubscribers()
-        providerApi.resetAll()
       }
 
       it("should return error response when registry lookup fails") {
@@ -142,11 +138,16 @@ class SearchControllerSearchSpec @Autowired constructor(
         savedMessage?.type shouldBe MessageDao.Type.Search
       }
 
-      it("should invoke Beckn /search API on specified BPP and persist message with location") {
-        providerApi
+      it("should invoke Beckn /search API on specified BPP using gateway and persist message with location") {
+        val gatewaysJson = objectMapper.writeValueAsString(MockNetwork.getAllGateways())
+        MockNetwork.registry
+          .stubFor(post("/lookup").willReturn(okJson(gatewaysJson)))
+        MockNetwork.retailBengaluruBg
           .stubFor(
             post("/search").willReturn(
-              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory)))
+              okJson(
+                objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory))
+              )
             )
           )
 
@@ -154,28 +155,28 @@ class SearchControllerSearchSpec @Autowired constructor(
           .perform(
             get("/client/v1/search")
               .param("providerId", "tulsidev")
-              .param("location", "40.741895,-73.989308")
-              .param("bppUri", providerApi.baseUrl())
+              .param("location", "12.9259,77.583")
           )
           .andExpect(status().is2xxSuccessful)
           .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
           .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
           .andReturn()
 
+        MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
         val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolAckResponse::class.java)
         val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context.messageId)
         savedMessage shouldNotBe null
         savedMessage?.id shouldBe searchResponse.context.messageId
         savedMessage?.type shouldBe MessageDao.Type.Search
-        val protocolSearchRequest = getProtocolSearchRequest(
-          searchResponse,
-          "tulsidev",
-          "40.741895,-73.989308"
-        )
-        providerApi.verify(
-          postRequestedFor(urlEqualTo("/search"))
-            .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))
-        )
+//        val protocolSearchRequest = getProtocolSearchRequest(
+//          searchResponse,
+//          "tulsidev",
+//          "12.9259,77.583"
+//        )
+//        retailBengaluruBpp.verify(
+//          postRequestedFor(urlEqualTo("/search"))
+//            .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))
+//        ) todo: verify that the BPP gets a request?
       }
 
     }
