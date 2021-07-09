@@ -11,6 +11,10 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolLocation
 
 object ProtocolLocationFactory {
 
+  fun idLocation(id: Int) = ProtocolLocation(
+    id = IdFactory.forLocation(id)
+  )
+
   fun cityLocation(id: Int) = ProtocolLocation(
     id = IdFactory.forLocation(id),
     descriptor = ProtocolDescriptorFactory.create("location", IdFactory.forLocation(id)),

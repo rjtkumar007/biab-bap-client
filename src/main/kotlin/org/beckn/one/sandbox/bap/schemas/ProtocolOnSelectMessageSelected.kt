@@ -25,5 +25,5 @@ data class ProtocolSelectedItem @Default constructor(
 
 data class ProtocolSelectedItemQuantity @Default constructor(
   val count: Int,
-  val measure: ProtocolScalar?
+  val measure: ProtocolScalar? = null
 )

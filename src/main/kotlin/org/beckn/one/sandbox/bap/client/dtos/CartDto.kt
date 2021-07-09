@@ -36,7 +36,7 @@ data class CartItemDto @Default constructor(
 
 data class CartSelectedItemQuantity @Default constructor(
   val count: Int,
-  val measure: ProtocolScalar?
+  val measure: ProtocolScalar? = null
 )
 
 data class CartItemProviderDto @Default constructor(

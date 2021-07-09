@@ -55,7 +55,6 @@ class BppService @Autowired constructor(
       ProtocolSelectRequestMessage(
         selected = ProtocolOnSelectMessageSelected(
           provider = ProtocolProvider(id = providerId, locations = listOf(providerLocation)),
-          providerLocation = providerLocation,
           items = items
         )
       )
