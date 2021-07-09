@@ -86,11 +86,15 @@ class GatewayService @Autowired constructor(
             ProtocolIntent(
               queryString = null,
               provider = ProtocolProvider(id = providerId),
-              fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString)))
+              fulfillment = when(locationString?.isNotEmpty()) {
+                true -> ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString)))
+                else -> null
+              }
             )
           )
         )
       ).execute()
+
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       when {
         isInternalServerError(httpResponse) -> Either.Left(GatewaySearchError.Internal)
