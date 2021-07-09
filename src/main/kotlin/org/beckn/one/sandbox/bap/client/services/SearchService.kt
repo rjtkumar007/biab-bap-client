@@ -15,15 +15,34 @@ import org.springframework.stereotype.Service
 class SearchService(
   @Autowired val registryService: RegistryService,
   @Autowired val gatewayService: GatewayService,
+  @Autowired val bppService: BppService,
   @Autowired val messageService: MessageService
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun search(context: ProtocolContext, queryString: String?, location: String?): Either<HttpError, MessageDao> {
-    log.info("Got search request: {}", queryString)
-    return registryService
-      .lookupGateways()
-      .flatMap { gatewayService.search(context, it.first(), queryString, location) }
-      .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
+  fun search(
+    context: ProtocolContext,
+    queryString: String?,
+    location: String?,
+    providerId: String?,
+    bppUri: String?,
+    categoryId: String?
+  ): Either<HttpError, MessageDao> {
+    log.info(
+      "Got search request queryString: {} location: {}  providerId: {} categoryId: {} bppUri: {}",
+      queryString,
+      location,
+      providerId,
+      categoryId,
+      bppUri
+    )
+    return when (providerId) {
+      null -> registryService
+        .lookupGateways()
+        .flatMap { gatewayService.search(context, it.first(), queryString, location) }
+        .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
+      else -> bppService.search(context, bppUri, providerId, location)
+        .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
+    }
   }
 }

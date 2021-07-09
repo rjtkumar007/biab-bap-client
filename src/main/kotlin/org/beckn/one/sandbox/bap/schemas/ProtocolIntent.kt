@@ -6,6 +6,7 @@ data class ProtocolIntent(
   val queryString: String?,
   val fulfillment: ProtocolFulfillment?,
   val item: ProtocolIntentItem? = null,
+  val provider: ProtocolProvider?
 ){
   override fun equals(other: Any?): Boolean {
     if (other != null) {

@@ -105,7 +105,8 @@ internal class GatewayServiceSpec : DescribeSpec() {
       ProtocolIntent(
         queryString = queryString,
         fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString))),
-        item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = queryString))
+        item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = queryString)),
+        provider = null
       )
     )
   )

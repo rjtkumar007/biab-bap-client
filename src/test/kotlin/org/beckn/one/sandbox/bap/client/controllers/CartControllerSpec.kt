@@ -49,7 +49,7 @@ class CartControllerSpec @Autowired constructor(
       }
 
       it("should return error when bpp select call fails") {
-        providerApi.stubFor(post("/select/").willReturn(serverError()))
+        providerApi.stubFor(post("/select").willReturn(serverError()))
 
         val saveCartResponseString = invokeCartCreateOrUpdateApi(cart)
           .andExpect(status().isInternalServerError)
@@ -64,7 +64,7 @@ class CartControllerSpec @Autowired constructor(
       it("should invoke provide select api and save message") {
         providerApi
           .stubFor(
-            post("/select/").willReturn(
+            post("/select").willReturn(
               okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory)))
             )
           )
@@ -82,7 +82,7 @@ class CartControllerSpec @Autowired constructor(
       it("should update cart if it already exists") {
         providerApi
           .stubFor(
-            post("/select/").willReturn(
+            post("/select").willReturn(
               okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory)))
             )
           )
@@ -133,7 +133,7 @@ class CartControllerSpec @Autowired constructor(
   ) {
     val protocolSelectRequest = getProtocolSelectRequest(saveCartResponse, cart)
     providerApi.verify(
-      postRequestedFor(urlEqualTo("/select/"))
+      postRequestedFor(urlEqualTo("/select"))
         .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSelectRequest)))
     )
   }

@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -9,7 +10,7 @@ import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
+import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.ResponseStatus.ACK
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.hamcrest.CoreMatchers.`is`
@@ -39,9 +40,12 @@ class SearchControllerSearchSpec @Autowired constructor(
   init {
 
     describe("Search") {
+      val providerApi = WireMockServer(4011)
+      providerApi.start()
       MockNetwork.startAllSubscribers()
       beforeEach {
         MockNetwork.resetAllSubscribers()
+        providerApi.resetAll()
       }
 
       it("should return error response when registry lookup fails") {
@@ -138,6 +142,61 @@ class SearchControllerSearchSpec @Autowired constructor(
         savedMessage?.type shouldBe MessageDao.Type.Search
       }
 
+      it("should invoke Beckn /search API on specified BPP and persist message with location") {
+        providerApi
+          .stubFor(
+            post("/search").willReturn(
+              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory)))
+            )
+          )
+
+        val result: MvcResult = mockMvc
+          .perform(
+            get("/client/v1/search")
+              .param("providerId", "tulsidev")
+              .param("location", "40.741895,-73.989308")
+              .param("bppUri", providerApi.baseUrl())
+          )
+          .andExpect(status().is2xxSuccessful)
+          .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
+          .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
+          .andReturn()
+
+        val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolAckResponse::class.java)
+        val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context.messageId)
+        savedMessage shouldNotBe null
+        savedMessage?.id shouldBe searchResponse.context.messageId
+        savedMessage?.type shouldBe MessageDao.Type.Search
+        val protocolSearchRequest = getProtocolSearchRequest(
+          searchResponse,
+          "tulsidev",
+          "40.741895,-73.989308"
+        )
+        providerApi.verify(
+          postRequestedFor(urlEqualTo("/search"))
+            .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))
+        )
+      }
+
     }
+  }
+
+  private fun getProtocolSearchRequest(searchResponse: ProtocolAckResponse , providerId: String, location: String): ProtocolSearchRequest {
+    return ProtocolSearchRequest(
+      context = searchResponse.context,
+      message = ProtocolSearchRequestMessage(
+        intent = ProtocolIntent(
+          queryString = null,
+          provider = ProtocolProvider(id = providerId),
+          fulfillment = ProtocolFulfillment(
+            end = ProtocolFulfillmentEnd(
+              location = ProtocolLocation(
+                gps = location
+              )
+            )
+          )
+        )
+      )
+    )
   }
 }

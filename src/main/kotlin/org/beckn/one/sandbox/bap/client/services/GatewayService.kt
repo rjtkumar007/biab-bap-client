@@ -40,6 +40,7 @@ class GatewayService @Autowired constructor(
           ProtocolSearchRequestMessage(
             ProtocolIntent(
               queryString = queryString,
+              provider = null,
               fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString))),
               item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = queryString))
             )

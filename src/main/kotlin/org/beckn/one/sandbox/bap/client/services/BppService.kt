@@ -64,6 +64,55 @@ class BppService @Autowired constructor(
     return providerServiceClient.select(selectRequest).execute()
   }
 
+  fun search(
+    context: ProtocolContext,
+    bppUri: String?,
+    providerId: String,
+    locationString: String?,
+  ): Either<BppError, ProtocolAckResponse> {
+    log.info("Initiating search using provider: {}", bppUri)
+    return try {
+      when (bppUri) {
+        null -> Either.Left(BppError.ProviderNotFound)
+        else -> {
+          val providerServiceClient = bppServiceClientFactory.getClient(bppUri)
+          val httpResponse = providerServiceClient.search(
+            ProtocolSearchRequest(
+              context = context,
+              message = ProtocolSearchRequestMessage(
+                intent = ProtocolIntent(
+                  queryString = null,
+                  provider = ProtocolProvider(id = providerId),
+                  fulfillment = ProtocolFulfillment(
+                    end = ProtocolFulfillmentEnd(
+                      location = ProtocolLocation(
+                        gps = locationString
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          ).execute()
+          log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+          when {
+            isInternalServerError(httpResponse) -> Either.Left(BppError.Internal)
+            httpResponse.body() == null -> Either.Left(BppError.NullResponse)
+            isAckNegative(httpResponse) -> Either.Left(BppError.Nack)
+            else -> {
+              log.info("Successfully invoked search on gateway. Response: {}", httpResponse.body())
+              Either.Right(httpResponse.body()!!)
+            }
+          }
+        }
+      }
+    }
+    catch (e: Exception) {
+      log.error("Error when initiating search", e)
+      Either.Left(BppError.Internal)
+    }
+  }
+
   private fun isInternalServerError(httpResponse: Response<ProtocolAckResponse>) =
     httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
 
