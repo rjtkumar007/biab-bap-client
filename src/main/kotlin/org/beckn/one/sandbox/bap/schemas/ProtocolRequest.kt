@@ -21,5 +21,5 @@ data class ProtocolSelectRequest @Default constructor(
 ): ProtocolRequest
 
 data class ProtocolSelectRequestMessage @Default constructor(
-  val selected: ProtocolOnSelectMessageSelected
+  val selected: ProtocolSelectMessageSelected
 )

@@ -143,7 +143,7 @@ class CartControllerSpec @Autowired constructor(
     return ProtocolSelectRequest(
       context = saveCartResponse.context!!,
       message = ProtocolSelectRequestMessage(
-        selected = ProtocolOnSelectMessageSelected(
+        selected = ProtocolSelectMessageSelected(
           provider = ProtocolProvider(
             id = cart.items?.first()?.provider?.id,
             locations = locations
@@ -152,10 +152,9 @@ class CartControllerSpec @Autowired constructor(
             ProtocolSelectedItem(
               id = it.id,
               descriptor = it.descriptor,
-              quantity = ProtocolItemQuantity(
-                selected = ProtocolItemQuantityAllocated(
-                  count = it.quantity.count, measure = it.quantity.measure
-                )
+              quantity =
+              ProtocolItemQuantityAllocated(
+                count = it.quantity.count, measure = it.quantity.measure
               ),
               price = it.price
             )

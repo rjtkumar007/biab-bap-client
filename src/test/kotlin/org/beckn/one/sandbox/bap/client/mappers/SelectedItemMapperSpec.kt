@@ -55,10 +55,9 @@ class SelectedItemMapperSpec @Autowired constructor(
             images = dto.descriptor?.images,
           ),
           price = dto.price,
-          quantity = ProtocolItemQuantity(
-            selected = ProtocolItemQuantityAllocated(
-              count = dto.quantity.count, measure = dto.quantity.measure
-            )
+          quantity =
+          ProtocolItemQuantityAllocated(
+            count = dto.quantity.count, measure = dto.quantity.measure
           )
         )
       }
