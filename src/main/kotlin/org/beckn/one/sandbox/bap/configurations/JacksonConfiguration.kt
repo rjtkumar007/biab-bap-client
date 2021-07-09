@@ -15,6 +15,7 @@ class JacksonConfiguration {
     val objectMapper = ObjectMapper()
     objectMapper.findAndRegisterModules()
     objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+    objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
     objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     objectMapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
     objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
