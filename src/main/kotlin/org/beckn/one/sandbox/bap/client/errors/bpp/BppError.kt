@@ -9,7 +9,6 @@ sealed class BppError : HttpError {
   val bppError = ProtocolError("BAP_011", "BPP returned error")
   val nullError = ProtocolError("BAP_012", "BPP returned null")
   val nackError = ProtocolError("BAP_013", "BPP returned nack")
-  val providerNotFound = ProtocolError("BAP_014", "BPP URL not found")
 
   object Internal : BppError() {
     override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
@@ -33,13 +32,5 @@ sealed class BppError : HttpError {
     override fun message(): ResponseMessage = ResponseMessage.nack()
 
     override fun error(): ProtocolError = nullError
-  }
-
-  object ProviderNotFound : BppError() {
-    override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
-
-    override fun message(): ResponseMessage = ResponseMessage.nack()
-
-    override fun error(): ProtocolError = providerNotFound
   }
 }
