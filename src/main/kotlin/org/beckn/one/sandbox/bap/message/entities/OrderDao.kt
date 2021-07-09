@@ -20,7 +20,7 @@ data class OrderDao @Default constructor(
 
 data class SelectMessageSelectedProviderDao @Default constructor(
   val id: String,
-  val locations: List<SelectMessageSelectedProviderLocationsDao>
+  val locations: List<SelectMessageSelectedProviderLocationsDao>?
 )
 
 data class SelectMessageSelectedProviderLocationsDao @Default constructor(

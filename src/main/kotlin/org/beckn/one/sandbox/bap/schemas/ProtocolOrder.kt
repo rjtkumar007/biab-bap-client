@@ -20,7 +20,7 @@ data class ProtocolOrder @Default constructor(
 
 data class ProtocolSelectMessageSelectedProvider @Default constructor(
   val id: String,
-  val locations: List<ProtocolSelectMessageSelectedProviderLocations>
+  val locations: List<ProtocolSelectMessageSelectedProviderLocations>?
 )
 
 data class ProtocolSelectMessageSelectedProviderLocations @Default constructor(

@@ -36,7 +36,7 @@ object ProtocolOrderFactory {
       provider = protocol?.provider?.let { p ->
         SelectMessageSelectedProviderDao(
           id = p.id,
-          locations = p.locations.map { l -> SelectMessageSelectedProviderLocationsDao(l.id) }
+          locations = p.locations?.map { l -> SelectMessageSelectedProviderLocationsDao(l.id) }
         )
       }!!,
       items = protocol.items.map { i ->
