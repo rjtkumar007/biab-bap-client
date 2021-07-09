@@ -139,7 +139,7 @@ class CartControllerSpec @Autowired constructor(
   }
 
   private fun getProtocolSelectRequest(saveCartResponse: ProtocolAckResponse, cart: CartDto): ProtocolSelectRequest {
-    val locations = cart.items?.first()?.provider?.locations?.map { ProtocolLocation(gps = it) }
+    val locations = cart.items?.first()?.provider?.locations?.map { ProtocolLocation(id = it) }
     return ProtocolSelectRequest(
       context = saveCartResponse.context!!,
       message = ProtocolSelectRequestMessage(
@@ -148,13 +148,12 @@ class CartControllerSpec @Autowired constructor(
             id = cart.items?.first()?.provider?.id,
             locations = locations
           ),
-          providerLocation = locations?.first(),
           items = cart.items?.map {
             ProtocolSelectedItem(
               id = it.id,
               descriptor = it.descriptor,
-              price = it.price,
-              quantity = ProtocolSelectedItemQuantity(count = it.quantity.count, measure = it.quantity.measure)
+              quantity = ProtocolSelectedItemQuantity(count = it.quantity.count, measure = it.quantity.measure),
+              price = it.price
             )
           },
         )

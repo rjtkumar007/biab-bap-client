@@ -78,7 +78,7 @@ internal class BppServiceSpec : DescribeSpec() {
       contextFactory.create(),
       bppUri,
       "venugopala stores",
-      ProtocolLocationFactory.addressLocation(1),
+      ProtocolLocationFactory.idLocation(1),
       IdFactory.forItems(IdFactory.forProvider(1), 1).map { ProtocolSelectedItemFactory.create(it) }
     )
   }
@@ -89,9 +89,8 @@ internal class BppServiceSpec : DescribeSpec() {
       selected = ProtocolOnSelectMessageSelected(
         provider = ProtocolProvider(
           id = "venugopala stores",
-          locations = listOf(ProtocolLocationFactory.addressLocation(1))
+          locations = listOf(ProtocolLocationFactory.idLocation(1))
         ),
-        providerLocation = ProtocolLocationFactory.addressLocation(1),
         items = IdFactory.forItems(IdFactory.forProvider(1), 1).map { ProtocolSelectedItemFactory.create(it) }
       )
     )

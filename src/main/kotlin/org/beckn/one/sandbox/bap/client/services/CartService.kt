@@ -31,7 +31,7 @@ class CartService @Autowired constructor(
       context,
       bppUri = cart.items.first().bppUri,
       providerId = cart.items.first().provider.id,
-      providerLocation = ProtocolLocation(gps = cart.items.first().provider.locations?.first()),
+      providerLocation = ProtocolLocation(id = cart.items.first().provider.locations?.first()),
       items = cart.items.map { selectedItemMapper.dtoToProtocol(it) }
     ).flatMap {
       messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Select))
