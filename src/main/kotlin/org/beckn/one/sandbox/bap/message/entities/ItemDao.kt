@@ -13,5 +13,5 @@ data class ItemDao @Default constructor(
   val matched: Boolean? = null,
   val related: Boolean? = null,
   val recommended: Boolean? = null,
-  val tags: List<Map<String, String>>? = null
+  val tags: Map<String, String>? = null
 )

@@ -10,7 +10,7 @@ object ProtocolItemFactory {
     descriptor = ProtocolDescriptorFactory.create("provider-$itemId-item", itemId),
     price = ProtocolPriceFactory.create(),
     categoryId = "provider-$itemId-category-$itemId",
-    tags = listOf(mapOf("item-tag1" to "item-value1")),
+    tags = mapOf("item-tag1" to "item-value1"),
     matched = true,
     related = true,
     recommended = true,
