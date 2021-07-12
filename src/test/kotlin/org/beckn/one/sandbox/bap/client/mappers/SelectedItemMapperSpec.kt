@@ -31,8 +31,8 @@ class SelectedItemMapperSpec @Autowired constructor(
             currency = "INR",
             value = "500"
           ),
-          bppId = "paisool",
-          bppUri = "www.paisool.test",
+          bppId = "local-coffee-house",
+          bppUri = "local-coffee-house",
           provider = CartItemProviderDto(
             id = "venugopala stores",
             locations = listOf("13.001581,77.5703686")

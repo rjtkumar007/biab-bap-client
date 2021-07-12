@@ -66,7 +66,7 @@ class CartControllerSpecV0 @Autowired constructor(
         val updatedCartDto = existingCartDto.copy(
           items = listOf(
             CartItemDtoV0(
-              bppId = "paisool",
+              bppId = "local-coffee-house",
               provider = CartItemProviderDtoV0(
                 id = "venugopala stores",
                 locations = listOf("13.001581,77.5703686")

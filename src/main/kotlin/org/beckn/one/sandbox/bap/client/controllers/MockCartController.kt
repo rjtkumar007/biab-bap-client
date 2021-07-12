@@ -65,8 +65,8 @@ class MockCartController @Autowired constructor(
           value = "500"
         ),
         id = "cothas-coffee-1",
-        bppId = "paisool",
-        bppUri = "www.paisool.test",
+        bppId = "local-coffee-house",
+        bppUri = "www.local-coffee-house.in",
         provider = CartItemProviderDto(
           id = "venugopala stores",
           locations = listOf("13.001581,77.5703686")
@@ -89,8 +89,8 @@ class MockCartController @Autowired constructor(
           value = "240"
         ),
         id = "malgudi-coffee-500-gm",
-        bppId = "paisool",
-        bppUri = "www.paisool.test",
+        bppId = "local-coffee-house",
+        bppUri = "www.local-coffee-house.in",
         provider = CartItemProviderDto(
           id = "venugopala stores",
           locations = listOf("13.001581,77.5703686")

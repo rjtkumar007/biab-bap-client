@@ -1,76 +1,31 @@
 package org.beckn.one.sandbox.bap.client.factories
 
-import org.beckn.one.sandbox.bap.client.dtos.*
-import org.beckn.one.sandbox.bap.schemas.ProtocolDescriptor
-import org.beckn.one.sandbox.bap.schemas.ProtocolPrice
+import org.beckn.one.sandbox.bap.client.dtos.CartDto
+import org.beckn.one.sandbox.bap.client.dtos.CartDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartItemDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDtoV0
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
+import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import java.math.BigDecimal
 import java.util.*
 
 class CartFactory {
   companion object {
-    fun create(id: String? = getUuid(), transactionId: String = getUuid(), bppUri: String = "www.paisool.test") =
+    fun create(
+      id: String? = UuidFactory.create(),
+      transactionId: String = UuidFactory.create(),
+      bppUri: String = "www.local-coffee-house.in"
+    ) =
       CartDto(
         id = id,
         transactionId = transactionId,
-        items = listOf(
-          CartItemDto(
-            descriptor = ProtocolDescriptor(
-              name = "Cothas Coffee 1 kg",
-              images = listOf("https://i.ibb.co/rZqPDd2/Coffee-2-Cothas.jpg"),
-            ),
-            price = ProtocolPrice(
-              currency = "INR",
-              value = "500"
-            ),
-            id = "cothas-coffee-1",
-            bppId = "paisool",
-            bppUri = bppUri,
-            provider = CartItemProviderDto(
-              id = "venugopala stores",
-              locations = listOf("13.001581,77.5703686")
-            ),
-            quantity = CartSelectedItemQuantity(
-              count = 1,
-              measure = ProtocolScalar(
-                value = BigDecimal.valueOf(1),
-                unit = "kg"
-              )
-            ),
-          ),
-          CartItemDto(
-            descriptor = ProtocolDescriptor(
-              name = "Malgudi Coffee 500 gm",
-              images = listOf("https://i.ibb.co/wgXx7K6/Coffee-1-Malgudi.jpg"),
-            ),
-            price = ProtocolPrice(
-              currency = "INR",
-              value = "240"
-            ),
-            id = "malgudi-coffee-500-gm",
-            bppId = "paisool",
-            bppUri = bppUri,
-            provider = CartItemProviderDto(
-              id = "venugopala stores",
-              locations = listOf("13.001581,77.5703686")
-            ),
-            quantity = CartSelectedItemQuantity(
-              count = 1,
-              measure = ProtocolScalar(
-                value = BigDecimal.valueOf(500),
-                unit = "gm"
-              )
-            ),
-          ),
-        )
+        items = listOf(CartItemFactory.cothasCoffee(bppUri), CartItemFactory.malgudiCoffee(bppUri))
       )
-
-    private fun getUuid() = UUID.randomUUID().toString()
 
     fun createV0(id: String? = null) = CartDtoV0(
       id = id, items = listOf(
         CartItemDtoV0(
-          bppId = "paisool",
+          bppId = "local-coffee-house",
           provider = CartItemProviderDtoV0(
             id = "venugopala stores",
             locations = listOf("13.001581,77.5703686")
@@ -83,7 +38,7 @@ class CartFactory {
           )
         ),
         CartItemDtoV0(
-          bppId = "paisool",
+          bppId = "local-coffee-house",
           provider = CartItemProviderDtoV0(
             id = "maruthi-stores",
             locations = listOf("12.9995218,77.5704439")
@@ -101,7 +56,7 @@ class CartFactory {
     fun createWithMultipleBpp(id: String? = null) = CartDtoV0(
       id = id, items = listOf(
         CartItemDtoV0(
-          bppId = "paisool",
+          bppId = "local-coffee-house",
           provider = CartItemProviderDtoV0(
             id = "venugopala stores",
             locations = listOf("13.001581,77.5703686")
