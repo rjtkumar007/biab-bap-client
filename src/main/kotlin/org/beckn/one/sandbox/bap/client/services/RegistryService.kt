@@ -3,16 +3,18 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.errors.registry.RegistryLookupError
 import org.beckn.one.sandbox.bap.client.errors.registry.RegistryLookupError.Internal
-import org.beckn.one.sandbox.bap.client.errors.registry.RegistryLookupError.NoGatewayFound
+import org.beckn.one.sandbox.bap.client.errors.registry.RegistryLookupError.NoSubscriberFound
+import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.RegistryServiceClient
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
+import org.beckn.one.sandbox.bap.configurations.RegistryServiceConfiguration.Companion.BPP_REGISTRY_SERVICE_CLIENT
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -20,38 +22,58 @@ import retrofit2.Response
 
 @Service
 class RegistryService(
-  @Autowired val registryServiceClient: RegistryServiceClient,
-  @Value("\${context.domain}") val domain: String,
-  @Value("\${context.city}") val city: String,
-  @Value("\${context.country}") val country: String
+  @Autowired private val registryServiceClient: RegistryServiceClient,
+  @Qualifier(BPP_REGISTRY_SERVICE_CLIENT) @Autowired private val bppRegistryServiceClient: RegistryServiceClient,
+  @Value("\${context.domain}") private val domain: String,
+  @Value("\${context.city}") private val city: String,
+  @Value("\${context.country}") private val country: String
 ) {
-  val log: Logger = LoggerFactory.getLogger(RegistryService::class.java)
+  private val log: Logger = LoggerFactory.getLogger(RegistryService::class.java)
 
   fun lookupGateways(): Either<RegistryLookupError, List<SubscriberDto>> {
-    return try {
-      val request = lookupGatewayRequest()
-      log.info("Looking up gateways: {}", request)
-      val httpResponse = registryServiceClient.lookup(request).execute()
-      log.info("Lookup gateway response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-      when {
+    return lookup(registryServiceClient, lookupGatewayRequest())
+  }
+
+  fun lookupBppById(id: String): Either<RegistryLookupError, List<SubscriberDto>> {
+    return lookup(bppRegistryServiceClient, lookupBppByIdRequest(id))
+  }
+
+  private fun lookup(
+    client: RegistryServiceClient,
+    request: SubscriberLookupRequest
+  ): Either<RegistryLookupError, List<SubscriberDto>> {
+    return Either.catch {
+      val request = request
+      log.info("Looking up subscribers: {}", request)
+      val httpResponse = client.lookup(request).execute()
+      log.info("Lookup subscriber response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+      return when {
         internalServerError(httpResponse) -> Left(Internal)
-        noGatewaysFound(httpResponse) -> Left(NoGatewayFound)
+        noSubscribersFound(httpResponse) -> Left(NoSubscriberFound)
         else -> Right(httpResponse.body()!!)
       }
-    } catch (e: Exception) {
-      log.error("Error when looking up gateways", e)
-      Left(Internal)
+    }.mapLeft {
+      log.error("Error when looking up subscribers", it)
+      Internal
     }
   }
 
-  fun lookupGatewayRequest() = SubscriberLookupRequest(
+  private fun lookupGatewayRequest() = SubscriberLookupRequest(
     type = Subscriber.Type.BG,
     domain = domain,
     city = city,
     country = country
   )
 
-  private fun noGatewaysFound(httpResponse: Response<List<SubscriberDto>>) =
+  private fun lookupBppByIdRequest(id: String) = SubscriberLookupRequest(
+    subscriber_id = id,
+    type = Subscriber.Type.BPP,
+    domain = domain,
+    city = city,
+    country = country
+  )
+
+  private fun noSubscribersFound(httpResponse: Response<List<SubscriberDto>>) =
     httpResponse.body() == null || httpResponse.body()?.isEmpty() == true
 
   private fun internalServerError(httpResponse: Response<List<SubscriberDto>>) =

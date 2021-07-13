@@ -13,9 +13,11 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 @Configuration
 class RegistryServiceConfiguration(
   @Autowired @Value("\${registry_service.url}")
-  val registryServiceUrl: String,
+  private val registryServiceUrl: String,
+  @Autowired @Value("\${bpp_registry_service.url}")
+  private val bppRegistryServiceUrl: String,
   @Autowired
-  val objectMapper: ObjectMapper
+  private val objectMapper: ObjectMapper
 ) {
   @Bean
   fun registryServiceClient(): RegistryServiceClient {
@@ -25,5 +27,20 @@ class RegistryServiceConfiguration(
       .build()
 
     return retrofit.create(RegistryServiceClient::class.java)
+  }
+
+  @Bean(BPP_REGISTRY_SERVICE_CLIENT)
+  fun bppRegistryServiceClient(): RegistryServiceClient {
+    val retrofit = Retrofit.Builder()
+      .baseUrl(bppRegistryServiceUrl)
+      .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+      .build()
+
+    return retrofit.create(RegistryServiceClient::class.java)
+  }
+
+  companion object {
+    const val BPP_REGISTRY_SERVICE_CLIENT = "bppRegistryServiceClient"
+
   }
 }

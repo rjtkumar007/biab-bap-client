@@ -8,8 +8,15 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
+import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
+import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
+import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
 import org.beckn.one.sandbox.bap.client.factories.CartFactory
+import org.beckn.one.sandbox.bap.common.City
+import org.beckn.one.sandbox.bap.common.Country
+import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
+import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.*
@@ -41,12 +48,19 @@ class CartControllerSpec @Autowired constructor(
 
   init {
     describe("Save Cart") {
-      val bppApi = WireMockServer(4010)
+      val registryBppLookupApi = WireMockServer(4010)
+      registryBppLookupApi.start()
+      val bppApi = WireMockServer(4011)
       bppApi.start()
+      val anotherBppApi = WireMockServer(4012)
+      anotherBppApi.start()
       val cart = CartFactory.create(null, bpp1Uri = bppApi.baseUrl())
 
       beforeEach {
         bppApi.resetAll()
+        registryBppLookupApi.resetAll()
+        stubBppLookupApi(registryBppLookupApi, bppApi)
+        stubBppLookupApi(registryBppLookupApi, anotherBppApi)
       }
 
       it("should return error when bpp select call fails") {
@@ -61,6 +75,8 @@ class CartControllerSpec @Autowired constructor(
           verifyResponseMessage(saveCartResponseString, cart, ResponseMessage.nack(), BppError.Internal.error())
         verifyThatMessageWasNotPersisted(saveCartResponse)
         verifyThatBppSelectApiWasInvoked(saveCartResponse, cart, bppApi)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, bppApi)
+
       }
 
       it("should invoke provide select api and save message") {
@@ -79,30 +95,10 @@ class CartControllerSpec @Autowired constructor(
         val saveCartResponse = verifyResponseMessage(saveCartResponseString, cart, ResponseMessage.ack())
         verifyThatMessageForSelectRequestIsPersisted(saveCartResponse)
         verifyThatBppSelectApiWasInvoked(saveCartResponse, cart, bppApi)
-      }
-
-      it("should update cart if it already exists") {
-        bppApi
-          .stubFor(
-            post("/select").willReturn(
-              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory)))
-            )
-          )
-
-        val existingCart = cart.copy(id = "cart id 1")
-        val saveCartResponseString = invokeCartCreateOrUpdateApi(existingCart)
-          .andExpect(status().is2xxSuccessful)
-          .andReturn()
-          .response.contentAsString
-
-        val saveCartResponse = verifyResponseMessage(saveCartResponseString, existingCart, ResponseMessage.ack())
-        verifyThatMessageForSelectRequestIsPersisted(saveCartResponse)
-        verifyThatBppSelectApiWasInvoked(saveCartResponse, existingCart, bppApi)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, bppApi)
       }
 
       it("should validate that cart contains items from only one bpp") {
-        val anotherBppApi = WireMockServer(4011)
-        anotherBppApi.start()
 
         val cartWithMultipleBppItems =
           CartFactory.create(null, bpp1Uri = bppApi.baseUrl(), bpp2Uri = anotherBppApi.baseUrl())
@@ -120,7 +116,9 @@ class CartControllerSpec @Autowired constructor(
             ProtocolError("BAP_014", "More than one BPP's item(s) selected")
           )
         verifyThatMessageWasNotPersisted(saveCartResponse)
-        verifyThatBppSelectApiWasNotInvoked(saveCartResponse, cartWithMultipleBppItems, bppApi)
+        verifyThatBppSelectApiWasNotInvoked(bppApi)
+        verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
+        verifyThatSubscriberLookupApiWasNotInvoked(anotherBppApi)
       }
 
       it("should validate that cart contains items from only one provider") {
@@ -145,10 +143,58 @@ class CartControllerSpec @Autowired constructor(
             ProtocolError("BAP_010", "More than one Provider's item(s) selected")
           )
         verifyThatMessageWasNotPersisted(saveCartResponse)
-        verifyThatBppSelectApiWasNotInvoked(saveCartResponse, cartWithMultipleProviderItems, bppApi)
+        verifyThatBppSelectApiWasNotInvoked(bppApi)
       }
     }
   }
+
+  private fun stubBppLookupApi(
+    registryBppLookupApi: WireMockServer,
+    bppApi: WireMockServer
+  ) {
+    registryBppLookupApi
+      .stubFor(
+        post("/lookup")
+          .withRequestBody(matchingJsonPath("$.subscriber_id", equalTo(bppApi.baseUrl())))
+          .willReturn(okJson(getSubscriberForBpp(bppApi)))
+      )
+  }
+
+  private fun verifyThatSubscriberLookupApiWasInvoked(
+    registryBppLookupApi: WireMockServer,
+    bppApi: WireMockServer
+  ) {
+    registryBppLookupApi.verify(
+      postRequestedFor(urlEqualTo("/lookup"))
+        .withRequestBody(
+          equalToJson(
+            objectMapper.writeValueAsString(
+              SubscriberLookupRequest(
+                subscriber_id = bppApi.baseUrl(),
+                type = Subscriber.Type.BPP,
+                domain = Domain.LocalRetail.value,
+                country = Country.India.value,
+                city = City.Bengaluru.value
+              )
+            )
+          )
+        )
+    )
+  }
+
+  private fun verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi: WireMockServer) =
+    registryBppLookupApi.verify(0, postRequestedFor(urlEqualTo("/lookup")))
+
+  private fun getSubscriberForBpp(bppApi: WireMockServer) =
+    objectMapper.writeValueAsString(
+      listOf(
+        SubscriberDtoFactory.getDefault(
+          subscriber_id = bppApi.baseUrl(),
+          baseUrl = bppApi.baseUrl(),
+          type = SubscriberDto.Type.BPP,
+        )
+      )
+    )
 
   private fun verifyThatMessageWasNotPersisted(saveCartResponse: ProtocolAckResponse) {
     val savedMessage = messageRepository.findOne(MessageDao::id eq saveCartResponse.context?.messageId)
@@ -190,18 +236,8 @@ class CartControllerSpec @Autowired constructor(
     )
   }
 
-  private fun verifyThatBppSelectApiWasNotInvoked(
-    saveCartResponse: ProtocolAckResponse,
-    cart: CartDto,
-    bppApi: WireMockServer
-  ) {
-    val protocolSelectRequest = getProtocolSelectRequest(saveCartResponse, cart)
-    bppApi.verify(
-      0,
-      postRequestedFor(urlEqualTo("/select"))
-        .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSelectRequest)))
-    )
-  }
+  private fun verifyThatBppSelectApiWasNotInvoked(bppApi: WireMockServer) =
+    bppApi.verify(0, postRequestedFor(urlEqualTo("/select")))
 
   private fun getProtocolSelectRequest(saveCartResponse: ProtocolAckResponse, cart: CartDto): ProtocolSelectRequest {
     val locations = cart.items?.first()?.provider?.locations?.map { ProtocolLocation(id = it) }

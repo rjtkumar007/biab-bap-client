@@ -3,14 +3,14 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.common.City
-import org.beckn.one.sandbox.bap.common.Country
-import org.beckn.one.sandbox.bap.common.Domain
-import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.errors.registry.RegistryLookupError
+import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.RegistryServiceClient
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
+import org.beckn.one.sandbox.bap.common.City
+import org.beckn.one.sandbox.bap.common.Country
+import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.junit.jupiter.api.Assertions.fail
 import org.mockito.Mockito.*
@@ -23,8 +23,15 @@ import java.time.ZoneId
 internal class RegistryServiceSpec : DescribeSpec() {
   init {
     val registryServiceClient = mock(RegistryServiceClient::class.java)
+    val bppRegistryServiceClient = mock(RegistryServiceClient::class.java)
     val registryService =
-      RegistryService(registryServiceClient, Domain.LocalRetail.value, City.Bengaluru.value, Country.India.value)
+      RegistryService(
+        registryServiceClient,
+        bppRegistryServiceClient,
+        Domain.LocalRetail.value,
+        City.Bengaluru.value,
+        Country.India.value
+      )
     val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
     val request = SubscriberLookupRequest(
       type = Subscriber.Type.BG,
@@ -86,7 +93,7 @@ internal class RegistryServiceSpec : DescribeSpec() {
 
         response
           .fold(
-            { it shouldBe RegistryLookupError.NoGatewayFound },
+            { it shouldBe RegistryLookupError.NoSubscriberFound },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )
       }
@@ -100,7 +107,7 @@ internal class RegistryServiceSpec : DescribeSpec() {
 
         response
           .fold(
-            { it shouldBe RegistryLookupError.NoGatewayFound },
+            { it shouldBe RegistryLookupError.NoSubscriberFound },
             { fail("Lookup should have timed out but didn't. Response: $it") }
           )
       }

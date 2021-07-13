@@ -1,16 +1,17 @@
 package org.beckn.one.sandbox.bap.client.factories
 
-import org.beckn.one.sandbox.bap.client.dtos.*
-import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
+import org.beckn.one.sandbox.bap.client.dtos.CartDto
+import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
-import java.math.BigDecimal
 
 class CartFactory {
   companion object {
+    val BPP_ID = "www.local-coffee-house.in"
+
     fun create(
       id: String? = UuidFactory().create(),
       transactionId: String = UuidFactory().create(),
-      bpp1Uri: String = "www.local-coffee-house.in",
+      bpp1Uri: String = BPP_ID,
       bpp2Uri: String = bpp1Uri,
       provider1Id: String = "venugopala stores",
       provider1Location: List<String> = listOf("venugopala stores location 1"),

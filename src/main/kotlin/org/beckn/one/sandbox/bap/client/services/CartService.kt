@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service
 @Service
 class CartService @Autowired constructor(
   private val messageService: MessageService,
+  private val registryService: RegistryService,
   private val bppService: BppService,
   private val selectedItemMapper: SelectedItemMapper,
   private val log: Logger = LoggerFactory.getLogger(CartService::class.java)
@@ -29,23 +30,29 @@ class CartService @Autowired constructor(
       log.info("Empty cart received, not doing anything. Cart: {}", cart)
       return Either.Right(null)
     }
+
     if (areMultipleBppItemsSelected(cart.items)) {
       log.info("Cart contains items from more than one BPP, returning error. Cart: {}", cart)
       return Either.Left(CartError.MultipleBpps)
     }
+
     if (areMultipleProviderItemsSelected(cart.items)) {
       log.info("Cart contains items from more than one provider, returning error. Cart: {}", cart)
       return Either.Left(CartError.MultipleProviders)
     }
-    return bppService.select(
-      context,
-      bppUri = cart.items.first().bppUri,
-      providerId = cart.items.first().provider.id,
-      providerLocation = ProtocolLocation(id = cart.items.first().provider.locations?.first()),
-      items = cart.items.map { selectedItemMapper.dtoToProtocol(it) }
-    ).flatMap {
-      messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Select))
-    }
+    return registryService.lookupBppById(cart.items.first().bppId)
+      .flatMap {
+        bppService.select(
+          context,
+          bppUri = it.first().subscriber_url,
+          providerId = cart.items.first().provider.id,
+          providerLocation = ProtocolLocation(id = cart.items.first().provider.locations?.first()),
+          items = cart.items.map { cartItem -> selectedItemMapper.dtoToProtocol(cartItem) }
+        )
+      }
+      .flatMap {
+        messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Select))
+      }
   }
 
   private fun areMultipleProviderItemsSelected(items: List<CartItemDto>) =
