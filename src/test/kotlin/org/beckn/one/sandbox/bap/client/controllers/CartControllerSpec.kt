@@ -43,7 +43,7 @@ class CartControllerSpec @Autowired constructor(
     describe("Save Cart") {
       val bppApi = WireMockServer(4010)
       bppApi.start()
-      val cart = CartFactory.create(null, bppUri = bppApi.baseUrl())
+      val cart = CartFactory.create(null, bpp1Uri = bppApi.baseUrl())
 
       beforeEach {
         bppApi.resetAll()
@@ -105,7 +105,7 @@ class CartControllerSpec @Autowired constructor(
         anotherBppApi.start()
 
         val cartWithMultipleBppItems =
-          CartFactory.createWithMultipleProviders(null, bpp1Uri = bppApi.baseUrl(), bpp2Uri = anotherBppApi.baseUrl())
+          CartFactory.create(null, bpp1Uri = bppApi.baseUrl(), bpp2Uri = anotherBppApi.baseUrl())
 
         val saveCartResponseString = invokeCartCreateOrUpdateApi(cartWithMultipleBppItems)
           .andExpect(status().is4xxClientError)
@@ -125,7 +125,7 @@ class CartControllerSpec @Autowired constructor(
 
       it("should validate that cart contains items from only one provider") {
         val cartWithMultipleProviderItems =
-          CartFactory.createWithMultipleProviders(
+          CartFactory.create(
             null,
             bpp1Uri = bppApi.baseUrl(),
             provider2Id = "padma coffee works",

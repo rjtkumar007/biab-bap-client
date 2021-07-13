@@ -10,12 +10,6 @@ class CartFactory {
     fun create(
       id: String? = UuidFactory().create(),
       transactionId: String = UuidFactory().create(),
-      bppUri: String = "www.local-coffee-house.in"
-    ) = createWithMultipleProviders(id = id, transactionId = transactionId, bpp1Uri = bppUri)
-
-    fun createWithMultipleProviders(
-      id: String? = UuidFactory().create(),
-      transactionId: String = UuidFactory().create(),
       bpp1Uri: String = "www.local-coffee-house.in",
       bpp2Uri: String = bpp1Uri,
       provider1Id: String = "venugopala stores",
@@ -25,13 +19,11 @@ class CartFactory {
       items: List<CartItemDto> = listOf(
         CartItemFactory.cothasCoffee(
           bppId = bpp1Uri,
-          bppUri = bpp1Uri,
           providerId = provider1Id,
           providerLocation = provider1Location
         ),
         CartItemFactory.malgudiCoffee(
           bppId = bpp2Uri,
-          bppUri = bpp2Uri,
           providerId = provider2Id,
           providerLocation = provider2Location
         ),
@@ -45,7 +37,7 @@ class CartFactory {
     fun createV0(id: String? = null) = CartDtoV0(
       id = id, items = listOf(
         CartItemDtoV0(
-          bppId = "local-coffee-house",
+          bppId = "www.local-coffee-house.in",
           provider = CartItemProviderDtoV0(
             id = "venugopala stores",
             locations = listOf("13.001581,77.5703686")
@@ -58,7 +50,7 @@ class CartFactory {
           )
         ),
         CartItemDtoV0(
-          bppId = "local-coffee-house",
+          bppId = "www.local-coffee-house.in",
           provider = CartItemProviderDtoV0(
             id = "maruthi-stores",
             locations = listOf("12.9995218,77.5704439")
@@ -76,7 +68,7 @@ class CartFactory {
     fun createWithMultipleBpp(id: String? = null) = CartDtoV0(
       id = id, items = listOf(
         CartItemDtoV0(
-          bppId = "local-coffee-house",
+          bppId = "www.local-coffee-house.in",
           provider = CartItemProviderDtoV0(
             id = "venugopala stores",
             locations = listOf("13.001581,77.5703686")
