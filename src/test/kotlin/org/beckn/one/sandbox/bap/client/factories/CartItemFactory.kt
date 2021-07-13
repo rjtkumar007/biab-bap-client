@@ -11,9 +11,10 @@ import java.math.BigDecimal
 class CartItemFactory {
   companion object {
     fun cothasCoffee(
+      bppId: String = "local-coffee-house",
       bppUri: String,
       providerId: String = "venugopala stores",
-      providerLocation: List<String> = listOf("13.001581,77.5703686")
+      providerLocation: List<String> = listOf("13.001581,77.5703686"),
     ) = CartItemDto(
       descriptor = ProtocolDescriptor(
         name = "Cothas Coffee 1 kg",
@@ -24,7 +25,7 @@ class CartItemFactory {
         value = "500"
       ),
       id = "cothas-coffee-1",
-      bppId = "local-coffee-house",
+      bppId = bppId,
       bppUri = bppUri,
       provider = CartItemProviderDto(
         id = providerId,
@@ -40,9 +41,10 @@ class CartItemFactory {
     )
 
     fun malgudiCoffee(
+      bppId: String = "local-coffee-house",
       bppUri: String,
       providerId: String = "venugopala stores",
-      providerLocation: List<String> = listOf("venugopala stores location 1")
+      providerLocation: List<String> = listOf("venugopala stores location 1"),
     ) = CartItemDto(
       descriptor = ProtocolDescriptor(
         name = "Malgudi Coffee 500 gm",
@@ -53,7 +55,7 @@ class CartItemFactory {
         value = "240"
       ),
       id = "malgudi-coffee-500-gm",
-      bppId = "local-coffee-house",
+      bppId = bppId,
       bppUri = bppUri,
       provider = CartItemProviderDto(
         id = providerId,

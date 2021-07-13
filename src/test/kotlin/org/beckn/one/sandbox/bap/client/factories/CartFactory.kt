@@ -1,13 +1,9 @@
 package org.beckn.one.sandbox.bap.client.factories
 
-import org.beckn.one.sandbox.bap.client.dtos.CartDto
-import org.beckn.one.sandbox.bap.client.dtos.CartDtoV0
-import org.beckn.one.sandbox.bap.client.dtos.CartItemDtoV0
-import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDtoV0
+import org.beckn.one.sandbox.bap.client.dtos.*
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import java.math.BigDecimal
-import java.util.*
 
 class CartFactory {
   companion object {
@@ -15,27 +11,35 @@ class CartFactory {
       id: String? = UuidFactory().create(),
       transactionId: String = UuidFactory().create(),
       bppUri: String = "www.local-coffee-house.in"
-    ) = CartDto(
-      id = id,
-      transactionId = transactionId,
-      items = listOf(CartItemFactory.cothasCoffee(bppUri), CartItemFactory.malgudiCoffee(bppUri))
-    )
+    ) = createWithMultipleProviders(id = id, transactionId = transactionId, bpp1Uri = bppUri)
 
     fun createWithMultipleProviders(
       id: String? = UuidFactory().create(),
       transactionId: String = UuidFactory().create(),
-      bppUri: String = "www.local-coffee-house.in",
+      bpp1Uri: String = "www.local-coffee-house.in",
+      bpp2Uri: String = bpp1Uri,
+      provider1Id: String = "venugopala stores",
+      provider1Location: List<String> = listOf("venugopala stores location 1"),
+      provider2Id: String = provider1Id,
+      provider2Location: List<String> = provider1Location,
+      items: List<CartItemDto> = listOf(
+        CartItemFactory.cothasCoffee(
+          bppId = bpp1Uri,
+          bppUri = bpp1Uri,
+          providerId = provider1Id,
+          providerLocation = provider1Location
+        ),
+        CartItemFactory.malgudiCoffee(
+          bppId = bpp2Uri,
+          bppUri = bpp2Uri,
+          providerId = provider2Id,
+          providerLocation = provider2Location
+        ),
+      )
     ) = CartDto(
       id = id,
       transactionId = transactionId,
-      items = listOf(
-        CartItemFactory.cothasCoffee(bppUri),
-        CartItemFactory.malgudiCoffee(
-          bppUri,
-          providerId = "gayathri-coffee-works",
-          providerLocation = listOf("malleshwara"),
-        )
-      )
+      items = items
     )
 
     fun createV0(id: String? = null) = CartDtoV0(

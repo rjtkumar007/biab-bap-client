@@ -28,6 +28,10 @@ class CartService @Autowired constructor(
       log.info("Empty cart received, not doing anything. Cart: {}", cart)
       return Either.Right(null)
     }
+    if (cart.items.distinctBy { it.bppId }.size > 1) {
+      log.info("Cart contains items from more than one BPP, returning error. Cart: {}", cart)
+      return Either.Left(CartError.MultipleBpps)
+    }
     if (cart.items.distinctBy { it.provider.id }.size > 1) {
       log.info("Cart contains items from more than one provider, returning error. Cart: {}", cart)
       return Either.Left(CartError.MultipleProviders)
