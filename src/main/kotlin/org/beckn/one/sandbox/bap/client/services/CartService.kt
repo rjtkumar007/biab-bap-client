@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
+import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
 import org.beckn.one.sandbox.bap.client.errors.validation.CartError
 import org.beckn.one.sandbox.bap.client.mappers.SelectedItemMapper
 import org.beckn.one.sandbox.bap.errors.HttpError
@@ -28,11 +29,11 @@ class CartService @Autowired constructor(
       log.info("Empty cart received, not doing anything. Cart: {}", cart)
       return Either.Right(null)
     }
-    if (cart.items.distinctBy { it.bppId }.size > 1) {
+    if (areMultipleBppItemsSelected(cart.items)) {
       log.info("Cart contains items from more than one BPP, returning error. Cart: {}", cart)
       return Either.Left(CartError.MultipleBpps)
     }
-    if (cart.items.distinctBy { it.provider.id }.size > 1) {
+    if (areMultipleProviderItemsSelected(cart.items)) {
       log.info("Cart contains items from more than one provider, returning error. Cart: {}", cart)
       return Either.Left(CartError.MultipleProviders)
     }
@@ -46,4 +47,10 @@ class CartService @Autowired constructor(
       messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Select))
     }
   }
+
+  private fun areMultipleProviderItemsSelected(items: List<CartItemDto>) =
+    items.distinctBy { it.provider.id }.size > 1
+
+  private fun areMultipleBppItemsSelected(items: List<CartItemDto>) =
+    items.distinctBy { it.bppId }.size > 1
 }
