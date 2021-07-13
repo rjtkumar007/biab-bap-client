@@ -32,7 +32,6 @@ class SelectedItemMapperSpec @Autowired constructor(
             value = "500"
           ),
           bppId = "www.local-coffee-house.in",
-          bppUri = "www.local-coffee-house.in",
           provider = CartItemProviderDto(
             id = "venugopala stores",
             locations = listOf("13.001581,77.5703686")

@@ -26,7 +26,6 @@ class CartItemFactory {
       ),
       id = "cothas-coffee-1",
       bppId = bppId,
-      bppUri = bppUri,
       provider = CartItemProviderDto(
         id = providerId,
         locations = providerLocation
@@ -56,7 +55,6 @@ class CartItemFactory {
       ),
       id = "malgudi-coffee-500-gm",
       bppId = bppId,
-      bppUri = bppUri,
       provider = CartItemProviderDto(
         id = providerId,
         locations = providerLocation

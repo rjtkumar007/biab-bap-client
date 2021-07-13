@@ -29,7 +29,6 @@ data class CartItemDto @Default constructor(
   val time: ProtocolTime? = null,
   val tags: Map<String, String>? = null,
   val bppId: String,
-  val bppUri: String,
   val provider: CartItemProviderDto,
   val quantity: CartSelectedItemQuantity
 )
