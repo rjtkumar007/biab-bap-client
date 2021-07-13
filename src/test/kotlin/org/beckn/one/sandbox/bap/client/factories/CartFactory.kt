@@ -12,15 +12,31 @@ import java.util.*
 class CartFactory {
   companion object {
     fun create(
-      id: String? = UuidFactory.create(),
-      transactionId: String = UuidFactory.create(),
+      id: String? = UuidFactory().create(),
+      transactionId: String = UuidFactory().create(),
       bppUri: String = "www.local-coffee-house.in"
-    ) =
-      CartDto(
-        id = id,
-        transactionId = transactionId,
-        items = listOf(CartItemFactory.cothasCoffee(bppUri), CartItemFactory.malgudiCoffee(bppUri))
+    ) = CartDto(
+      id = id,
+      transactionId = transactionId,
+      items = listOf(CartItemFactory.cothasCoffee(bppUri), CartItemFactory.malgudiCoffee(bppUri))
+    )
+
+    fun createWithMultipleProviders(
+      id: String? = UuidFactory().create(),
+      transactionId: String = UuidFactory().create(),
+      bppUri: String = "www.local-coffee-house.in",
+    ) = CartDto(
+      id = id,
+      transactionId = transactionId,
+      items = listOf(
+        CartItemFactory.cothasCoffee(bppUri),
+        CartItemFactory.malgudiCoffee(
+          bppUri,
+          providerId = "gayathri-coffee-works",
+          providerLocation = listOf("malleshwara"),
+        )
       )
+    )
 
     fun createV0(id: String? = null) = CartDtoV0(
       id = id, items = listOf(

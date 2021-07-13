@@ -7,7 +7,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.dtos.CartResponseDtoV0
 import org.beckn.one.sandbox.bap.client.dtos.CartResponseMessageDtoV0
 import org.beckn.one.sandbox.bap.client.dtos.DeleteCartResponseDtoV0
-import org.beckn.one.sandbox.bap.client.errors.validation.ValidationError
+import org.beckn.one.sandbox.bap.client.errors.validation.CartError
 import org.beckn.one.sandbox.bap.client.factories.CartFactory
 import org.beckn.one.sandbox.bap.client.mappers.CartMapperImpl
 import org.beckn.one.sandbox.bap.client.repositories.CartRepository
@@ -51,7 +51,7 @@ internal class CartServiceV0Spec : DescribeSpec() {
 
         val response = cartService.saveCart(context, cartBppDto)
 
-        response shouldBeLeft ValidationError.MultipleBpp
+        response shouldBeLeft CartError.MultipleProviders
       }
 
       it("should return persisted dao when cart save succeeds") {

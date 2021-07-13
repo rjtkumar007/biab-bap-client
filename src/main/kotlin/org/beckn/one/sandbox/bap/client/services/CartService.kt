@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
+import org.beckn.one.sandbox.bap.client.errors.validation.CartError
 import org.beckn.one.sandbox.bap.client.mappers.SelectedItemMapper
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
@@ -26,6 +27,10 @@ class CartService @Autowired constructor(
     if (cart.items.isNullOrEmpty()) {
       log.info("Empty cart received, not doing anything. Cart: {}", cart)
       return Either.Right(null)
+    }
+    if (cart.items.distinctBy { it.provider.id }.size > 1) {
+      log.info("Cart contains items from more than one provider, returning error. Cart: {}", cart)
+      return Either.Left(CartError.MultipleProviders)
     }
     return bppService.select(
       context,

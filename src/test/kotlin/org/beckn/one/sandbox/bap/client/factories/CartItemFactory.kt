@@ -42,7 +42,7 @@ class CartItemFactory {
     fun malgudiCoffee(
       bppUri: String,
       providerId: String = "venugopala stores",
-      providerLocation: List<String> = listOf("13.001581,77.5703686")
+      providerLocation: List<String> = listOf("venugopala stores location 1")
     ) = CartItemDto(
       descriptor = ProtocolDescriptor(
         name = "Malgudi Coffee 500 gm",

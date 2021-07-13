@@ -5,14 +5,14 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolError
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
 import org.springframework.http.HttpStatus
 
-sealed class ValidationError : HttpError {
-  val bppValidationError = ProtocolError("BAP_010", "More than 1 BPP selected for action")
+sealed class CartError : HttpError {
+  val moreThanOneProviderValidationError = ProtocolError("BAP_010", "More than one Provider's item(s) selected")
 
-  object MultipleBpp : ValidationError() {
+  object MultipleProviders : CartError() {
     override fun status(): HttpStatus = HttpStatus.BAD_REQUEST
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
 
-    override fun error(): ProtocolError = bppValidationError
+    override fun error(): ProtocolError = moreThanOneProviderValidationError
   }
 }
