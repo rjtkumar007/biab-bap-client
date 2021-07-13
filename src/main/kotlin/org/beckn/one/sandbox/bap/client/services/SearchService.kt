@@ -28,10 +28,7 @@ class SearchService(
   ): Either<HttpError, MessageDao> {
     log.info(
       "Got search request queryString: {} location: {}  providerId: {} categoryId: {}",
-      queryString,
-      location,
-      providerId,
-      categoryId
+      queryString, location, providerId, categoryId
     )
     return when (providerId) {
       null -> registryService
