@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.client.factories
 
 import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDto
-import org.beckn.one.sandbox.bap.client.dtos.DeliveryInfoDto
+import org.beckn.one.sandbox.bap.client.dtos.DeliveryDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderItemDto
 import org.beckn.one.sandbox.bap.schemas.*
@@ -12,7 +12,6 @@ class OrderDtoFactory {
   companion object {
     fun create(
       id: String? = getUuid(),
-      transactionId: String = getUuid(),
       bpp1_id: String,
       bpp2_id: String = bpp1_id,
       provider1_id: String,
@@ -20,7 +19,6 @@ class OrderDtoFactory {
     ) =
       OrderDto(
         id = id,
-        transactionId = transactionId,
         items = listOf(
           OrderItemDto(
             id = getUuid(),
@@ -67,10 +65,10 @@ class OrderDtoFactory {
             building = "Pine Apartments"
           )
         ),
-        deliveryInfo = DeliveryInfoDto(
+        deliveryInfo = DeliveryDto(
           phone = "9999999999",
           email = "test@gmail.com",
-          deliveryLocation = ProtocolLocation(
+          location = ProtocolLocation(
             address = ProtocolAddress(
               door = "A",
               country = "IND",

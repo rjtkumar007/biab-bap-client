@@ -33,7 +33,6 @@ internal class BppServiceSpec : DescribeSpec() {
     describe("Search") {
       `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
       `when`(bppServiceClientFactory.getClient(bppUri)).thenReturn(bppServiceClient)
-      val selectRequest = getSelectRequest()
       val context = contextFactory.create()
 
       beforeEach {
@@ -120,6 +119,8 @@ internal class BppServiceSpec : DescribeSpec() {
         verify(bppServiceClient).select(getSelectRequest())
       }
     }
+
+    //todo: need to add init tests here
   }
 
   private fun getSearchRequest(

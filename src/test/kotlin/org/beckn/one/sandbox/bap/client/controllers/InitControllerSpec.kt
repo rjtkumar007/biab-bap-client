@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.beckn.one.sandbox.bap.client.dtos.OrderDto
+import org.beckn.one.sandbox.bap.client.dtos.OrderRequestDto
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
@@ -51,7 +51,12 @@ class InitControllerSpec @Autowired constructor(
       providerApi.start()
       val provider2Api = WireMockServer(4014)
       provider2Api.start()
-      val order = OrderDtoFactory.create(bpp1_id = providerApi.baseUrl(), provider1_id = "padma coffee works")
+      val orderRequest = OrderRequestDto(
+        message = OrderDtoFactory.create(
+          bpp1_id = providerApi.baseUrl(),
+          provider1_id = "padma coffee works"
+        ), context = contextFactory.create()
+      )
 
       beforeEach {
         providerApi.resetAll()
@@ -64,32 +69,35 @@ class InitControllerSpec @Autowired constructor(
         providerApi.stubFor(WireMock.post("/init").willReturn(WireMock.serverError()))
 
         val initializeOrderResponseString =
-          invokeInitializeOrder(order).andExpect(MockMvcResultMatchers.status().isInternalServerError)
+          invokeInitializeOrder(orderRequest).andExpect(MockMvcResultMatchers.status().isInternalServerError)
             .andReturn().response.contentAsString
 
         val initializeOrderResponse =
           verifyInitResponseMessage(
             initializeOrderResponseString,
-            order,
+            orderRequest,
             ResponseMessage.nack(),
             ProtocolError("BAP_011", "BPP returned error")
           )
         verifyThatMessageWasNotPersisted(initializeOrderResponse)
-        verifyThatBppInitApiWasInvoked(initializeOrderResponse, order, providerApi)
+        verifyThatBppInitApiWasInvoked(initializeOrderResponse, orderRequest, providerApi)
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, providerApi)
       }
 
       it("should validate that order contains items from only one bpp") {
 
-        val orderWithMultipleBppItems =
-          OrderDtoFactory.create(
-            null,
-            bpp1_id = providerApi.baseUrl(),
-            bpp2_id = provider2Api.baseUrl(),
-            provider1_id = "padma coffee works"
+        val orderRequestWithMultipleBppItems =
+          OrderRequestDto(
+            context = contextFactory.create(),
+            message = OrderDtoFactory.create(
+              null,
+              bpp1_id = providerApi.baseUrl(),
+              bpp2_id = provider2Api.baseUrl(),
+              provider1_id = "padma coffee works"
+            )
           )
 
-        val initializeOrderResponseString = invokeInitializeOrder(orderWithMultipleBppItems)
+        val initializeOrderResponseString = invokeInitializeOrder(orderRequestWithMultipleBppItems)
           .andExpect(MockMvcResultMatchers.status().is4xxClientError)
           .andReturn()
           .response.contentAsString
@@ -97,7 +105,7 @@ class InitControllerSpec @Autowired constructor(
         val initializeOrderResponse =
           verifyInitResponseMessage(
             initializeOrderResponseString,
-            orderWithMultipleBppItems,
+            orderRequestWithMultipleBppItems,
             ResponseMessage.nack(),
             ProtocolError("BAP_014", "More than one BPP's item(s) selected/initialized")
           )
@@ -108,15 +116,17 @@ class InitControllerSpec @Autowired constructor(
       }
 
       it("should validate that order contains items from only one provider") {
-        val orderWithMultipleProviderItems =
-          OrderDtoFactory.create(
+        val orderRequestWithMultipleProviderItems = OrderRequestDto(
+          context = contextFactory.create(),
+          message = OrderDtoFactory.create(
             null,
             bpp1_id = providerApi.baseUrl(),
             provider1_id = "padma coffee works",
             provider2_id = "Venugopal store"
           )
+        )
 
-        val initializeOrderResponseString = invokeInitializeOrder(orderWithMultipleProviderItems)
+        val initializeOrderResponseString = invokeInitializeOrder(orderRequestWithMultipleProviderItems)
           .andExpect(MockMvcResultMatchers.status().is4xxClientError)
           .andReturn()
           .response.contentAsString
@@ -124,7 +134,7 @@ class InitControllerSpec @Autowired constructor(
         val initializeOrderResponse =
           verifyInitResponseMessage(
             initializeOrderResponseString,
-            orderWithMultipleProviderItems,
+            orderRequestWithMultipleProviderItems,
             ResponseMessage.nack(),
             ProtocolError("BAP_010", "More than one Provider's item(s) selected/initialized")
           )
@@ -142,15 +152,15 @@ class InitControllerSpec @Autowired constructor(
             )
           )
 
-        val initializeOrderResponseString = invokeInitializeOrder(order)
+        val initializeOrderResponseString = invokeInitializeOrder(orderRequest)
           .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
 
         val initializeOrderResponse =
-          verifyInitResponseMessage(initializeOrderResponseString, order, ResponseMessage.ack())
+          verifyInitResponseMessage(initializeOrderResponseString, orderRequest, ResponseMessage.ack())
         verifyThatMessageWasPersisted(initializeOrderResponse)
-        verifyThatBppInitApiWasInvoked(initializeOrderResponse, order, providerApi)
+        verifyThatBppInitApiWasInvoked(initializeOrderResponse, orderRequest, providerApi)
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, providerApi)
       }
 
@@ -212,14 +222,14 @@ class InitControllerSpec @Autowired constructor(
 
   private fun verifyInitResponseMessage(
     initializeOrderResponseString: String,
-    order: OrderDto,
+    orderRequest: OrderRequestDto,
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null
   ): ProtocolAckResponse {
     val initOrderResponse = objectMapper.readValue(initializeOrderResponseString, ProtocolAckResponse::class.java)
     initOrderResponse.context shouldNotBe null
     initOrderResponse.context?.messageId shouldNotBe null
-    initOrderResponse.context?.transactionId shouldBe order.transactionId
+    initOrderResponse.context?.transactionId shouldBe orderRequest.context.transactionId
     initOrderResponse.context?.action shouldBe ProtocolContext.Action.INIT
     initOrderResponse.message shouldBe expectedMessage
     initOrderResponse.error shouldBe expectedError
@@ -228,10 +238,10 @@ class InitControllerSpec @Autowired constructor(
 
   private fun verifyThatBppInitApiWasInvoked(
     initializeOrderResponse: ProtocolAckResponse,
-    order: OrderDto,
+    orderRequest: OrderRequestDto,
     providerApi: WireMockServer
   ) {
-    val protocolInitRequest = getProtocolInitRequest(initializeOrderResponse, order)
+    val protocolInitRequest = getProtocolInitRequest(initializeOrderResponse, orderRequest)
     providerApi.verify(
       WireMock.postRequestedFor(WireMock.urlEqualTo("/init"))
         .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(protocolInitRequest)))
@@ -240,12 +250,12 @@ class InitControllerSpec @Autowired constructor(
 
   private fun getProtocolInitRequest(
     initializeOrderResponse: ProtocolAckResponse,
-    order: OrderDto
+    orderRequest: OrderRequestDto
   ): ProtocolInitRequest {
     val locations =
-      order.items?.first()?.provider?.locations?.map { ProtocolSelectMessageSelectedProviderLocations(id = it) }
+      orderRequest.message.items?.first()?.provider?.locations?.map { ProtocolSelectMessageSelectedProviderLocations(id = it) }
     val provider =
-      order.items?.first()?.provider// todo: does this hold good even for order object or is this gotten from somewhere else?
+      orderRequest.message.items?.first()?.provider// todo: does this hold good even for order object or is this gotten from somewhere else?
     return ProtocolInitRequest(
       context = initializeOrderResponse.context!!,
       message = ProtocolInitRequestMessage(
@@ -254,14 +264,19 @@ class InitControllerSpec @Autowired constructor(
             id = provider!!.id,
             locations = locations
           ),
-          items = order.items!!.map { ProtocolSelectMessageSelectedItems(id = it.id, quantity = it.quantity) },
-          billing = order.billingInfo,
+          items = orderRequest.message.items!!.map {
+            ProtocolSelectMessageSelectedItems(
+              id = it.id,
+              quantity = it.quantity
+            )
+          },
+          billing = orderRequest.message.billingInfo,
           fulfillment = ProtocolFulfillment(
             end = ProtocolFulfillmentEnd(
               contact = ProtocolContact(
-                phone = order.deliveryInfo.phone,
-                email = order.deliveryInfo.email
-              ), location = order.deliveryInfo.deliveryLocation
+                phone = orderRequest.message.deliveryInfo.phone,
+                email = orderRequest.message.deliveryInfo.email
+              ), location = orderRequest.message.deliveryInfo.location
             ),
             type = "home_delivery",
           ),
@@ -282,9 +297,9 @@ class InitControllerSpec @Autowired constructor(
     savedMessage shouldBe null
   }
 
-  private fun invokeInitializeOrder(order: OrderDto) = mockMvc.perform(
+  private fun invokeInitializeOrder(orderRequest: OrderRequestDto) = mockMvc.perform(
     MockMvcRequestBuilders.post("/client/v1/initialize_order").header(
       org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
-    ).content(objectMapper.writeValueAsString(order))
+    ).content(objectMapper.writeValueAsString(orderRequest))
   )
 }

@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.Either
 import arrow.core.flatMap
-import org.beckn.one.sandbox.bap.client.dtos.DeliveryInfoDto
+import org.beckn.one.sandbox.bap.client.dtos.DeliveryDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderItemDto
 import org.beckn.one.sandbox.bap.client.errors.validation.MultipleProviderError
@@ -27,7 +27,7 @@ class InitializeOrderService @Autowired constructor(
   fun initOrder(
     context: ProtocolContext,
     order: OrderDto,
-    deliveryInfo: DeliveryInfoDto,
+    deliveryInfo: DeliveryDto,
     billingInfo: ProtocolBilling
   ): Either<HttpError, MessageDao?> {
     log.info("Got initialize order request. Context: {}, Order: {}, Delivery Info: {}", context, order, deliveryInfo)

@@ -1,7 +1,6 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
-import org.beckn.one.sandbox.bap.client.dtos.DeliveryInfoDto
-import org.beckn.one.sandbox.bap.client.dtos.OrderDto
+import org.beckn.one.sandbox.bap.client.dtos.OrderRequestDto
 import org.beckn.one.sandbox.bap.client.services.InitializeOrderService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.*
@@ -25,14 +24,14 @@ class InitializeOrderController @Autowired constructor(
   @PostMapping("/client/v1/initialize_order")
   @ResponseBody
   fun initializeOrder(
-    @RequestBody order: OrderDto
+    @RequestBody orderRequest: OrderRequestDto
   ): ResponseEntity<ProtocolAckResponse> {
-    val context = getContext(order.transactionId)
+    val context = getContext(orderRequest.context.transactionId)
     return initializeOrderService.initOrder(
       context = context,
-      order = order,
-      deliveryInfo = order.deliveryInfo,
-      billingInfo = order.billingInfo
+      order = orderRequest.message,
+      deliveryInfo = orderRequest.message.deliveryInfo,
+      billingInfo = orderRequest.message.billingInfo
     )
       .fold(
         {

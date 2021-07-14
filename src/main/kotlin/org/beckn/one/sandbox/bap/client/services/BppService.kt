@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import org.beckn.one.sandbox.bap.client.dtos.DeliveryInfoDto
+import org.beckn.one.sandbox.bap.client.dtos.DeliveryDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderItemDto
 import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
@@ -82,7 +82,7 @@ class BppService @Autowired constructor(
     providerId: String,
     billingInfo: ProtocolBilling,
     providerLocation: ProtocolSelectMessageSelectedProviderLocations,
-    deliveryInfo: DeliveryInfoDto,
+    deliveryInfo: DeliveryDto,
     items: List<OrderItemDto>
   ): Either<BppError, ProtocolAckResponse> {
     return Either.catch {
@@ -117,7 +117,7 @@ class BppService @Autowired constructor(
     providerId: String,
     billingInfo: ProtocolBilling,
     providerLocation: ProtocolSelectMessageSelectedProviderLocations,
-    deliveryInfo: DeliveryInfoDto,
+    deliveryInfo: DeliveryDto,
     items: List<OrderItemDto>
   ): Response<ProtocolAckResponse> {
     val initRequest = ProtocolInitRequest(
@@ -135,7 +135,7 @@ class BppService @Autowired constructor(
               contact = ProtocolContact(
                 phone = deliveryInfo.phone,
                 email = deliveryInfo.email
-              ), location = deliveryInfo.deliveryLocation
+              ), location = deliveryInfo.location
             ),
             type = "home_delivery",//todo: check if type is enum or string
             //todo: HBO has a person and name here which isn't proper json as per spec, check spec
