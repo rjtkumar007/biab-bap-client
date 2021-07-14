@@ -162,7 +162,7 @@ class BppService @Autowired constructor(
             ProtocolIntent(
               queryString = criteria.searchString,
               provider = ProtocolProvider(id = criteria.providerId),
-              fulfillment =  getFulfillmentFilter(criteria),
+              fulfillment = getFulfillmentFilter(criteria),
             )
           )
         )

@@ -23,14 +23,6 @@ class SelectedItemMapperSpec @Autowired constructor(
       it("should map dto to protocol") {
         val dto = CartItemDto(
           id = "cothas-coffee-1",
-          descriptor = ProtocolDescriptor(
-            name = "Cothas Coffee 1 kg",
-            images = listOf("https://i.ibb.co/rZqPDd2/Coffee-2-Cothas.jpg"),
-          ),
-          price = ProtocolPrice(
-            currency = "INR",
-            value = "500"
-          ),
           bppId = "www.local-coffee-house.in",
           provider = CartItemProviderDto(
             id = "venugopala stores",
@@ -49,11 +41,6 @@ class SelectedItemMapperSpec @Autowired constructor(
 
         protocol shouldBe ProtocolSelectedItem(
           id = dto.id,
-          descriptor = ProtocolDescriptor(
-            name = dto.descriptor?.name,
-            images = dto.descriptor?.images,
-          ),
-          price = dto.price,
           quantity =
           ProtocolItemQuantityAllocated(
             count = dto.quantity.count, measure = dto.quantity.measure

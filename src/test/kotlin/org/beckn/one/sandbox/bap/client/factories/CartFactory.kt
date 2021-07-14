@@ -9,7 +9,6 @@ class CartFactory {
     val BPP_ID = "www.local-coffee-house.in"
 
     fun create(
-      id: String? = UuidFactory().create(),
       transactionId: String = UuidFactory().create(),
       bpp1Uri: String = BPP_ID,
       bpp2Uri: String = bpp1Uri,
@@ -30,9 +29,8 @@ class CartFactory {
         ),
       )
     ) = CartDto(
-      id = id,
       transactionId = transactionId,
-      items = items
+      items = items,
     )
 
   }
