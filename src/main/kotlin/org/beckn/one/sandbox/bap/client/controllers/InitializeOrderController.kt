@@ -23,7 +23,7 @@ class InitializeOrderController @Autowired constructor(
 
   @PostMapping("/client/v1/initialize_order")
   @ResponseBody
-  fun initializeOrder(
+  fun initializeOrderV1(
     @RequestBody orderRequest: OrderRequestDto
   ): ResponseEntity<ProtocolAckResponse> {
     val context = getContext(orderRequest.context.transactionId)

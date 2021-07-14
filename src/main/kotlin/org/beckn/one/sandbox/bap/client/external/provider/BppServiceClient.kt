@@ -15,7 +15,6 @@ interface BppServiceClient {
   @POST("select")
   fun select(@Body request: ProtocolSelectRequest): Call<ProtocolAckResponse>
 
-
   @POST("init")
   fun init(@Body request: ProtocolInitRequest): Call<ProtocolAckResponse>
 }

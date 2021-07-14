@@ -50,7 +50,7 @@ class InitializeOrderService @Autowired constructor(
       .flatMap {
         bppService.init(
           context,
-          bppUri = it.first().subscriber_id,
+          bppUri = it.first().subscriber_url,
           providerId = order.items.first().provider.id,
           billingInfo = billingInfo,
           items = order.items,
