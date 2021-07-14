@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
-import org.beckn.one.sandbox.bap.client.services.CartService
+import org.beckn.one.sandbox.bap.client.services.QuoteService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
@@ -18,24 +18,24 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class CartController @Autowired constructor(
+class GetQuoteController @Autowired constructor(
   private val contextFactory: ContextFactory,
-  private val cartService: CartService
+  private val quoteService: QuoteService
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @PutMapping("/client/v1/cart")
+  @PutMapping("/client/v1/get_quote")
   @ResponseBody
-  fun saveCart(@RequestBody cart: CartDto): ResponseEntity<ProtocolAckResponse> {
+  fun getQuote(@RequestBody cart: CartDto): ResponseEntity<ProtocolAckResponse> {
     val context = getContext(cart.transactionId)
-    return cartService.saveCart(context, cart)
+    return quoteService.getQuote(context, cart)
       .fold(
         {
-          log.error("Error when saving cart: {}", it)
+          log.error("Error when getting quote: {}", it)
           mapToErrorResponse(it, context)
         },
         {
-          log.info("Successfully saved cart. Message: {}", it)
+          log.info("Successfully initiated get quote. Message: {}", it)
           ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
         }
       )

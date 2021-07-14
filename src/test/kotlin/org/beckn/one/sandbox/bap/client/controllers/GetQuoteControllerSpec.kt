@@ -38,7 +38,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-class CartControllerSpec @Autowired constructor(
+class GetQuoteControllerSpec @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
   val contextFactory: ContextFactory,
@@ -47,7 +47,7 @@ class CartControllerSpec @Autowired constructor(
 ) : DescribeSpec() {
 
   init {
-    describe("Save Cart") {
+    describe("Get Quote") {
       val registryBppLookupApi = WireMockServer(4010)
       registryBppLookupApi.start()
       val bppApi = WireMockServer(4011)
@@ -66,15 +66,15 @@ class CartControllerSpec @Autowired constructor(
       it("should return error when bpp select call fails") {
         bppApi.stubFor(post("/select").willReturn(serverError()))
 
-        val saveCartResponseString = invokeCartCreateOrUpdateApi(cart)
+        val getQuoteResponseString = invokeGetQuoteApi(cart)
           .andExpect(status().isInternalServerError)
           .andReturn()
           .response.contentAsString
 
-        val saveCartResponse =
-          verifyResponseMessage(saveCartResponseString, cart, ResponseMessage.nack(), BppError.Internal.error())
-        verifyThatMessageWasNotPersisted(saveCartResponse)
-        verifyThatBppSelectApiWasInvoked(saveCartResponse, cart, bppApi)
+        val getQuoteResponse =
+          verifyResponseMessage(getQuoteResponseString, cart, ResponseMessage.nack(), BppError.Internal.error())
+        verifyThatMessageWasNotPersisted(getQuoteResponse)
+        verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, bppApi)
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, bppApi)
 
       }
@@ -87,14 +87,14 @@ class CartControllerSpec @Autowired constructor(
             )
           )
 
-        val saveCartResponseString = invokeCartCreateOrUpdateApi(cart)
+        val getQuoteResponseString = invokeGetQuoteApi(cart)
           .andExpect(status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
 
-        val saveCartResponse = verifyResponseMessage(saveCartResponseString, cart, ResponseMessage.ack())
-        verifyThatMessageForSelectRequestIsPersisted(saveCartResponse)
-        verifyThatBppSelectApiWasInvoked(saveCartResponse, cart, bppApi)
+        val getQuoteResponse = verifyResponseMessage(getQuoteResponseString, cart, ResponseMessage.ack())
+        verifyThatMessageForSelectRequestIsPersisted(getQuoteResponse)
+        verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, bppApi)
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, bppApi)
       }
 
@@ -103,19 +103,19 @@ class CartControllerSpec @Autowired constructor(
         val cartWithMultipleBppItems =
           CartFactory.create(bpp1Uri = bppApi.baseUrl(), bpp2Uri = anotherBppApi.baseUrl())
 
-        val saveCartResponseString = invokeCartCreateOrUpdateApi(cartWithMultipleBppItems)
+        val getQuoteResponseString = invokeGetQuoteApi(cartWithMultipleBppItems)
           .andExpect(status().is4xxClientError)
           .andReturn()
           .response.contentAsString
 
-        val saveCartResponse =
+        val getQuoteResponse =
           verifyResponseMessage(
-            saveCartResponseString,
+            getQuoteResponseString,
             cartWithMultipleBppItems,
             ResponseMessage.nack(),
             ProtocolError("BAP_014", "More than one BPP's item(s) selected/initialized")
           )
-        verifyThatMessageWasNotPersisted(saveCartResponse)
+        verifyThatMessageWasNotPersisted(getQuoteResponse)
         verifyThatBppSelectApiWasNotInvoked(bppApi)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
         verifyThatSubscriberLookupApiWasNotInvoked(anotherBppApi)
@@ -129,19 +129,19 @@ class CartControllerSpec @Autowired constructor(
             provider2Location = listOf("padma coffee works location 1")
           )
 
-        val saveCartResponseString = invokeCartCreateOrUpdateApi(cartWithMultipleProviderItems)
+        val getQuoteResponseString = invokeGetQuoteApi(cartWithMultipleProviderItems)
           .andExpect(status().is4xxClientError)
           .andReturn()
           .response.contentAsString
 
-        val saveCartResponse =
+        val getQuoteResponse =
           verifyResponseMessage(
-            saveCartResponseString,
+            getQuoteResponseString,
             cartWithMultipleProviderItems,
             ResponseMessage.nack(),
             ProtocolError("BAP_010", "More than one Provider's item(s) selected/initialized")
           )
-        verifyThatMessageWasNotPersisted(saveCartResponse)
+        verifyThatMessageWasNotPersisted(getQuoteResponse)
         verifyThatBppSelectApiWasNotInvoked(bppApi)
       }
 
@@ -197,40 +197,40 @@ class CartControllerSpec @Autowired constructor(
       )
     )
 
-  private fun verifyThatMessageWasNotPersisted(saveCartResponse: ProtocolAckResponse) {
-    val savedMessage = messageRepository.findOne(MessageDao::id eq saveCartResponse.context?.messageId)
+  private fun verifyThatMessageWasNotPersisted(getQuoteResponse: ProtocolAckResponse) {
+    val savedMessage = messageRepository.findOne(MessageDao::id eq getQuoteResponse.context?.messageId)
     savedMessage shouldBe null
   }
 
   private fun verifyResponseMessage(
-    saveCartResponseString: String,
+    getQuoteResponseString: String,
     cart: CartDto,
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null,
   ): ProtocolAckResponse {
-    val saveCartResponse = objectMapper.readValue(saveCartResponseString, ProtocolAckResponse::class.java)
-    saveCartResponse.context shouldNotBe null
-    saveCartResponse.context?.messageId shouldNotBe null
-    saveCartResponse.context?.transactionId shouldBe cart.transactionId
-    saveCartResponse.context?.action shouldBe ProtocolContext.Action.SELECT
-    saveCartResponse.message shouldBe expectedMessage
-    saveCartResponse.error shouldBe expectedError
-    return saveCartResponse
+    val getQuoteResponse = objectMapper.readValue(getQuoteResponseString, ProtocolAckResponse::class.java)
+    getQuoteResponse.context shouldNotBe null
+    getQuoteResponse.context?.messageId shouldNotBe null
+    getQuoteResponse.context?.transactionId shouldBe cart.transactionId
+    getQuoteResponse.context?.action shouldBe ProtocolContext.Action.SELECT
+    getQuoteResponse.message shouldBe expectedMessage
+    getQuoteResponse.error shouldBe expectedError
+    return getQuoteResponse
   }
 
-  private fun verifyThatMessageForSelectRequestIsPersisted(saveCartResponse: ProtocolAckResponse) {
-    val savedMessage = messageRepository.findOne(MessageDao::id eq saveCartResponse.context?.messageId)
+  private fun verifyThatMessageForSelectRequestIsPersisted(getQuoteResponse: ProtocolAckResponse) {
+    val savedMessage = messageRepository.findOne(MessageDao::id eq getQuoteResponse.context?.messageId)
     savedMessage shouldNotBe null
-    savedMessage?.id shouldBe saveCartResponse.context?.messageId
+    savedMessage?.id shouldBe getQuoteResponse.context?.messageId
     savedMessage?.type shouldBe MessageDao.Type.Select
   }
 
   private fun verifyThatBppSelectApiWasInvoked(
-    saveCartResponse: ProtocolAckResponse,
+    getQuoteResponse: ProtocolAckResponse,
     cart: CartDto,
     bppApi: WireMockServer
   ) {
-    val protocolSelectRequest = getProtocolSelectRequest(saveCartResponse, cart)
+    val protocolSelectRequest = getProtocolSelectRequest(getQuoteResponse, cart)
     bppApi.verify(
       postRequestedFor(urlEqualTo("/select"))
         .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSelectRequest)))
@@ -240,10 +240,10 @@ class CartControllerSpec @Autowired constructor(
   private fun verifyThatBppSelectApiWasNotInvoked(bppApi: WireMockServer) =
     bppApi.verify(0, postRequestedFor(urlEqualTo("/select")))
 
-  private fun getProtocolSelectRequest(saveCartResponse: ProtocolAckResponse, cart: CartDto): ProtocolSelectRequest {
+  private fun getProtocolSelectRequest(getQuoteResponse: ProtocolAckResponse, cart: CartDto): ProtocolSelectRequest {
     val locations = cart.items?.first()?.provider?.locations?.map { ProtocolLocation(id = it) }
     return ProtocolSelectRequest(
-      context = saveCartResponse.context!!,
+      context = getQuoteResponse.context!!,
       message = ProtocolSelectRequestMessage(
         selected = ProtocolSelectMessageSelected(
           provider = ProtocolProvider(
@@ -264,9 +264,9 @@ class CartControllerSpec @Autowired constructor(
     )
   }
 
-  private fun invokeCartCreateOrUpdateApi(cart: CartDto) = mockMvc
+  private fun invokeGetQuoteApi(cart: CartDto) = mockMvc
     .perform(
-      put("/client/v1/cart")
+      put("/client/v1/get_quote")
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .content(objectMapper.writeValueAsString(cart))
     )

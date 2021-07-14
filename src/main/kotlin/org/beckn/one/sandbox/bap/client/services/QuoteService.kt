@@ -17,15 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class CartService @Autowired constructor(
+class QuoteService @Autowired constructor(
   private val messageService: MessageService,
   private val registryService: RegistryService,
   private val bppService: BppService,
   private val selectedItemMapper: SelectedItemMapper,
-  private val log: Logger = LoggerFactory.getLogger(CartService::class.java)
+  private val log: Logger = LoggerFactory.getLogger(QuoteService::class.java)
 ) {
-  fun saveCart(context: ProtocolContext, cart: CartDto): Either<HttpError, MessageDao?> {
-    log.info("Got save cart request. Context: {}, Cart: {}", context, cart)
+  fun getQuote(context: ProtocolContext, cart: CartDto): Either<HttpError, MessageDao?> {
+    log.info("Got get quote request. Context: {}, Cart: {}", context, cart)
     if (cart.items.isNullOrEmpty()) {
       log.info("Empty cart received, not doing anything. Cart: {}", cart)
       return Either.Right(null)
