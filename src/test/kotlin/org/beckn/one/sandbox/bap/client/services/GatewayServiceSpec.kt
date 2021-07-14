@@ -5,9 +5,6 @@ import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.external.gateway.GatewayServiceClient
-import org.beckn.one.sandbox.bap.common.City
-import org.beckn.one.sandbox.bap.common.Country
-import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.schemas.*
@@ -32,11 +29,6 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
   private val gatewayService: GatewayService =
     GatewayService(
-      domain = Domain.LocalRetail.value,
-      city = City.Bengaluru.value,
-      country = Country.India.value,
-      bapId = "beckn_in_a_box_bap",
-      bapUri = "beckn_in_a_box_bap.com",
       gatewayServiceClientFactory = gatewayServiceClientFactory
     )
 

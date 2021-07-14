@@ -1,17 +1,10 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
 import org.beckn.one.sandbox.bap.Default
-import org.beckn.one.sandbox.bap.schemas.*
-
-data class CartResponseDto(
-  override val context: ProtocolContext,
-  val message: CartResponseMessageDto? = null,
-  override val error: ProtocolError? = null,
-) : ClientResponse
-
-data class CartResponseMessageDto(
-  val cart: CartDto,
-)
+import org.beckn.one.sandbox.bap.schemas.ProtocolDescriptor
+import org.beckn.one.sandbox.bap.schemas.ProtocolPrice
+import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
+import org.beckn.one.sandbox.bap.schemas.ProtocolTime
 
 data class CartDto @Default constructor(
   val id: String? = null,

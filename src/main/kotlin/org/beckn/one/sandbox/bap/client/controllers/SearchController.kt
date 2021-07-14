@@ -47,14 +47,4 @@ class SearchController @Autowired constructor(
         }
       )
   }
-
-  @RequestMapping("/v0/search")
-  @ResponseBody
-  fun searchV0(
-    @RequestParam(required = false) searchString: String,
-    @RequestParam location: String?
-  ): ResponseEntity<ProtocolAckResponse> {
-    log.info(location)
-    return ResponseEntity.ok(ProtocolAckResponse(context = contextFactory.create(), message = ResponseMessage.ack()))
-  }
 }
