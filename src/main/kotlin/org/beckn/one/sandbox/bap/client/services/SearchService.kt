@@ -2,6 +2,7 @@ package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.Either
 import arrow.core.flatMap
+import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.services.MessageService
@@ -19,25 +20,16 @@ class SearchService(
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
-  fun search(
-    context: ProtocolContext,
-    queryString: String?,
-    location: String?,
-    providerId: String?,
-    categoryId: String?
-  ): Either<HttpError, MessageDao> {
-    log.info(
-      "Got search request queryString: {} location: {}  providerId: {} categoryId: {}",
-      queryString, location, providerId, categoryId
-    )
-    return when (providerId) {
+  fun search(context: ProtocolContext, criteria: SearchCriteria): Either<HttpError, MessageDao> {
+    log.info("Got search request with criteria: {} ", criteria)
+    return when (criteria.providerId) {
       null -> registryService
         .lookupGateways()
-        .flatMap { gatewayService.search(context, it.first(), queryString, location) }
+        .flatMap { gatewayService.search(it.first(), context, criteria) }
         .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
       else -> registryService
         .lookupGateways()
-        .flatMap { gatewayService.searchProvider(context, it.first(), providerId, location) }
+        .flatMap { gatewayService.searchProvider(it.first(), context, criteria) }
         .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
     }
   }

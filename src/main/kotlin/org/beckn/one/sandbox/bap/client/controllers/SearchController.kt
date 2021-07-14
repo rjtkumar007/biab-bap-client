@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
+import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.services.SearchService
 import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
 import org.beckn.one.sandbox.bap.schemas.ResponseMessage
@@ -24,12 +25,15 @@ class SearchController @Autowired constructor(
   @ResponseBody
   fun searchV1(
     @RequestParam(required = false) searchString: String?,
-    @RequestParam location: String?,
-    @RequestParam providerId: String?,
-    @RequestParam categoryId: String?
+    @RequestParam(required = false) location: String?,
+    @RequestParam(required = false) bppId: String?,
+    @RequestParam(required = false) providerId: String?,
+    @RequestParam(required = false) categoryId: String?
   ): ResponseEntity<ProtocolAckResponse> {
     val context = contextFactory.create()
-    return searchService.search(context, searchString, location, providerId, categoryId)
+    val searchCriteria = SearchCriteria(searchString, location, providerId, categoryId, bppId)
+
+    return searchService.search(context, searchCriteria)
       .fold(
         {
           log.error("Error during search. Error: {}", it)

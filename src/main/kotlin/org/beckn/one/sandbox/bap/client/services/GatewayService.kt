@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.schemas.*
@@ -24,12 +25,8 @@ class GatewayService @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
 
-  fun search(
-    context: ProtocolContext,
-    gateway: SubscriberDto,
-    queryString: String?,
-    locationString: String?
-  ): Either<GatewaySearchError, ProtocolAckResponse> {
+  fun search(gateway: SubscriberDto, context: ProtocolContext, criteria: SearchCriteria)
+      : Either<GatewaySearchError, ProtocolAckResponse> {
     return try {
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
@@ -39,10 +36,10 @@ class GatewayService @Autowired constructor(
           context,
           ProtocolSearchRequestMessage(
             ProtocolIntent(
-              queryString = queryString,
+              queryString = criteria.searchString,
               provider = null,
-              fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString))),
-              item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = queryString))
+              fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.location))),
+              item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = criteria.searchString))
             )
           )
         )
@@ -69,12 +66,8 @@ class GatewayService @Autowired constructor(
   private fun isAckNegative(httpAckAckResponse: retrofit2.Response<ProtocolAckResponse>) =
     httpAckAckResponse.body()!!.message.ack.status == ResponseStatus.NACK
 
-  fun searchProvider(
-    context: ProtocolContext,
-    gateway: SubscriberDto,
-    providerId: String,
-    locationString: String?
-  ): Either<GatewaySearchError, ProtocolAckResponse> {
+  fun searchProvider(gateway: SubscriberDto, context: ProtocolContext, criteria: SearchCriteria)
+      : Either<GatewaySearchError, ProtocolAckResponse> {
     return try {
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
@@ -85,9 +78,9 @@ class GatewayService @Autowired constructor(
           ProtocolSearchRequestMessage(
             ProtocolIntent(
               queryString = null,
-              provider = ProtocolProvider(id = providerId),
-              fulfillment = when(locationString?.isNotEmpty()) {
-                true -> ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString)))
+              provider = ProtocolProvider(id = criteria.providerId),
+              fulfillment = when (criteria.location?.isNotEmpty()) {
+                true -> ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.location)))
                 else -> null
               }
             )
@@ -97,12 +90,12 @@ class GatewayService @Autowired constructor(
 
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       when {
-        isInternalServerError(httpResponse) -> Either.Left(GatewaySearchError.Internal)
-        httpResponse.body() == null -> Either.Left(GatewaySearchError.NullResponse)
-        isAckNegative(httpResponse) -> Either.Left(GatewaySearchError.Nack)
+        isInternalServerError(httpResponse) -> Left(GatewaySearchError.Internal)
+        httpResponse.body() == null -> Left(GatewaySearchError.NullResponse)
+        isAckNegative(httpResponse) -> Left(GatewaySearchError.Nack)
         else -> {
           log.info("Successfully invoked search on gateway. Response: {}", httpResponse.body())
-          Either.Right(httpResponse.body()!!)
+          Right(httpResponse.body()!!)
         }
       }
     } catch (e: Exception) {

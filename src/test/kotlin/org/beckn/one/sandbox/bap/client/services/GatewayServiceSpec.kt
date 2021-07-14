@@ -2,6 +2,7 @@ package org.beckn.one.sandbox.bap.client.services
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.external.gateway.GatewayServiceClient
 import org.beckn.one.sandbox.bap.common.City
@@ -58,7 +59,10 @@ internal class GatewayServiceSpec : DescribeSpec() {
           Calls.failure(IOException("Timeout"))
         )
 
-        val response = gatewayService.search(context, gateway, queryString, locationString)
+        val response = gatewayService.search(
+          gateway, context,
+          SearchCriteria(searchString = queryString, location = locationString)
+        )
 
         response
           .fold(
@@ -72,7 +76,10 @@ internal class GatewayServiceSpec : DescribeSpec() {
         val searchRequest = getRequest()
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(Calls.response(null))
 
-        val response = gatewayService.search(context, gateway, queryString, locationString)
+        val response = gatewayService.search(
+          gateway, context,
+          SearchCriteria(searchString = queryString, location = locationString)
+        )
 
         response
           .fold(
@@ -87,7 +94,10 @@ internal class GatewayServiceSpec : DescribeSpec() {
         val nackResponse = Calls.response(ProtocolAckResponse(context, nack()))
         `when`(gatewayServiceClient.search(searchRequest)).thenReturn(nackResponse)
 
-        val response = gatewayService.search(context, gateway, queryString, locationString)
+        val response = gatewayService.search(
+          gateway, context,
+          SearchCriteria(searchString = queryString, location = locationString)
+        )
 
         response
           .fold(
