@@ -48,6 +48,7 @@ internal class ProtocolOnSelectControllerSpec : DescribeSpec() {
       selected = ProtocolOnSelectMessageSelectedFactory.create(1, 2)
     )
   )
+
   init {
 
     describe("Protocol OnSelect API") {
@@ -71,12 +72,12 @@ internal class ProtocolOnSelectControllerSpec : DescribeSpec() {
       }
 
       context("when error occurs when processing request") {
-        val mockService = mock<ResponseStorageService<ProtocolOnSelect>>{
+        val mockService = mock<ResponseStorageService<ProtocolOnSelect>> {
           onGeneric { save(onSelectResponse) }.thenReturn(Either.Left(DatabaseError.OnWrite))
         }
         val controller = ProtocolOnSelectController(mockService)
 
-        it("should respond with internal server error"){
+        it("should respond with internal server error") {
           val response = controller.onSelect(onSelectResponse)
           response.statusCode shouldBe DatabaseError.OnWrite.status()
         }

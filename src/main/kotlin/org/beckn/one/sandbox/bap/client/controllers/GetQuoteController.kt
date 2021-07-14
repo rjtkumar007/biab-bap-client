@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
-import org.beckn.one.sandbox.bap.client.dtos.CartDto
+import org.beckn.one.sandbox.bap.client.dtos.GetQuoteRequestDto
 import org.beckn.one.sandbox.bap.client.services.QuoteService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
@@ -26,9 +26,9 @@ class GetQuoteController @Autowired constructor(
 
   @PutMapping("/client/v1/get_quote")
   @ResponseBody
-  fun getQuote(@RequestBody cart: CartDto): ResponseEntity<ProtocolAckResponse> {
-    val context = getContext(cart.transactionId)
-    return quoteService.getQuote(context, cart)
+  fun getQuote(@RequestBody request: GetQuoteRequestDto): ResponseEntity<ProtocolAckResponse> {
+    val context = getContext(request.context.transactionId)
+    return quoteService.getQuote(context, request.message.cart)
       .fold(
         {
           log.error("Error when getting quote: {}", it)
@@ -43,13 +43,7 @@ class GetQuoteController @Autowired constructor(
 
   private fun mapToErrorResponse(it: HttpError, context: ProtocolContext) = ResponseEntity
     .status(it.status())
-    .body(
-      ProtocolAckResponse(
-        context = context,
-        message = it.message(),
-        error = it.error()
-      )
-    )
+    .body(ProtocolAckResponse(context = context, message = it.message(), error = it.error()))
 
   private fun getContext(transactionId: String) = contextFactory.create(action = SELECT, transactionId = transactionId)
 }

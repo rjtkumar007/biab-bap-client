@@ -7,6 +7,8 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
+import org.beckn.one.sandbox.bap.client.dtos.GetQuoteRequestDto
+import org.beckn.one.sandbox.bap.client.dtos.GetQuoteRequestMessageDto
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
@@ -48,6 +50,7 @@ class GetQuoteControllerSpec @Autowired constructor(
 
   init {
     describe("Get Quote") {
+      val context = contextFactory.create()
       val registryBppLookupApi = WireMockServer(4010)
       registryBppLookupApi.start()
       val bppApi = WireMockServer(4011)
@@ -66,13 +69,13 @@ class GetQuoteControllerSpec @Autowired constructor(
       it("should return error when bpp select call fails") {
         bppApi.stubFor(post("/select").willReturn(serverError()))
 
-        val getQuoteResponseString = invokeGetQuoteApi(cart)
+        val getQuoteResponseString = invokeGetQuoteApi(context = context, cart = cart)
           .andExpect(status().isInternalServerError)
           .andReturn()
           .response.contentAsString
 
         val getQuoteResponse =
-          verifyResponseMessage(getQuoteResponseString, cart, ResponseMessage.nack(), BppError.Internal.error())
+          verifyResponseMessage(getQuoteResponseString, ResponseMessage.nack(), BppError.Internal.error(), context)
         verifyThatMessageWasNotPersisted(getQuoteResponse)
         verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, bppApi)
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, bppApi)
@@ -83,16 +86,20 @@ class GetQuoteControllerSpec @Autowired constructor(
         bppApi
           .stubFor(
             post("/select").willReturn(
-              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory)))
+              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(context)))
             )
           )
 
-        val getQuoteResponseString = invokeGetQuoteApi(cart)
+        val getQuoteResponseString = invokeGetQuoteApi(context = context, cart = cart)
           .andExpect(status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
 
-        val getQuoteResponse = verifyResponseMessage(getQuoteResponseString, cart, ResponseMessage.ack())
+        val getQuoteResponse = verifyResponseMessage(
+          getQuoteResponseString,
+          ResponseMessage.ack(),
+          expectedContext = context
+        )
         verifyThatMessageForSelectRequestIsPersisted(getQuoteResponse)
         verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, bppApi)
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, bppApi)
@@ -103,7 +110,7 @@ class GetQuoteControllerSpec @Autowired constructor(
         val cartWithMultipleBppItems =
           CartFactory.create(bpp1Uri = bppApi.baseUrl(), bpp2Uri = anotherBppApi.baseUrl())
 
-        val getQuoteResponseString = invokeGetQuoteApi(cartWithMultipleBppItems)
+        val getQuoteResponseString = invokeGetQuoteApi(context = context, cart = cartWithMultipleBppItems)
           .andExpect(status().is4xxClientError)
           .andReturn()
           .response.contentAsString
@@ -111,9 +118,9 @@ class GetQuoteControllerSpec @Autowired constructor(
         val getQuoteResponse =
           verifyResponseMessage(
             getQuoteResponseString,
-            cartWithMultipleBppItems,
             ResponseMessage.nack(),
-            ProtocolError("BAP_014", "More than one BPP's item(s) selected/initialized")
+            ProtocolError("BAP_014", "More than one BPP's item(s) selected/initialized"),
+            context
           )
         verifyThatMessageWasNotPersisted(getQuoteResponse)
         verifyThatBppSelectApiWasNotInvoked(bppApi)
@@ -129,7 +136,7 @@ class GetQuoteControllerSpec @Autowired constructor(
             provider2Location = listOf("padma coffee works location 1")
           )
 
-        val getQuoteResponseString = invokeGetQuoteApi(cartWithMultipleProviderItems)
+        val getQuoteResponseString = invokeGetQuoteApi(context = context, cart = cartWithMultipleProviderItems)
           .andExpect(status().is4xxClientError)
           .andReturn()
           .response.contentAsString
@@ -137,9 +144,9 @@ class GetQuoteControllerSpec @Autowired constructor(
         val getQuoteResponse =
           verifyResponseMessage(
             getQuoteResponseString,
-            cartWithMultipleProviderItems,
             ResponseMessage.nack(),
-            ProtocolError("BAP_010", "More than one Provider's item(s) selected/initialized")
+            ProtocolError("BAP_010", "More than one Provider's item(s) selected/initialized"),
+            context
           )
         verifyThatMessageWasNotPersisted(getQuoteResponse)
         verifyThatBppSelectApiWasNotInvoked(bppApi)
@@ -204,14 +211,14 @@ class GetQuoteControllerSpec @Autowired constructor(
 
   private fun verifyResponseMessage(
     getQuoteResponseString: String,
-    cart: CartDto,
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null,
+    expectedContext: ProtocolContext,
   ): ProtocolAckResponse {
     val getQuoteResponse = objectMapper.readValue(getQuoteResponseString, ProtocolAckResponse::class.java)
     getQuoteResponse.context shouldNotBe null
     getQuoteResponse.context?.messageId shouldNotBe null
-    getQuoteResponse.context?.transactionId shouldBe cart.transactionId
+    getQuoteResponse.context?.transactionId shouldBe expectedContext.transactionId
     getQuoteResponse.context?.action shouldBe ProtocolContext.Action.SELECT
     getQuoteResponse.message shouldBe expectedMessage
     getQuoteResponse.error shouldBe expectedError
@@ -264,11 +271,15 @@ class GetQuoteControllerSpec @Autowired constructor(
     )
   }
 
-  private fun invokeGetQuoteApi(cart: CartDto) = mockMvc
+  private fun invokeGetQuoteApi(context: ProtocolContext, cart: CartDto) = mockMvc
     .perform(
       put("/client/v1/get_quote")
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        .content(objectMapper.writeValueAsString(cart))
+        .content(
+          objectMapper.writeValueAsString(
+            GetQuoteRequestDto(context = context, message = GetQuoteRequestMessageDto(cart = cart))
+          )
+        )
     )
 
 }

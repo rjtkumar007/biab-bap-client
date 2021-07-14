@@ -138,7 +138,7 @@ class InitControllerSpec @Autowired constructor(
         providerApi
           .stubFor(
             WireMock.post("/init").willReturn(
-              WireMock.okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory)))
+              WireMock.okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
             )
           )
 

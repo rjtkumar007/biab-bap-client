@@ -134,7 +134,7 @@ class SearchControllerSearchSpec @Autowired constructor(
     MockNetwork.retailBengaluruBpp
       .stubFor(
         post("/search")
-          .willReturn(okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory))))
+          .willReturn(okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create()))))
       )
   }
 
@@ -186,7 +186,7 @@ class SearchControllerSearchSpec @Autowired constructor(
       .stubFor(
         post("/search").willReturn(
           okJson(
-            objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory))
+            objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create()))
           )
         )
       )

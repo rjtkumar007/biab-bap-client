@@ -1,10 +1,19 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
 import org.beckn.one.sandbox.bap.Default
+import org.beckn.one.sandbox.bap.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
 
+data class GetQuoteRequestDto @Default constructor(
+  val context: ProtocolContext,
+  val message: GetQuoteRequestMessageDto,
+)
+
+data class GetQuoteRequestMessageDto @Default constructor(
+  val cart: CartDto
+)
+
 data class CartDto @Default constructor(
-  val transactionId: String,
   val items: List<CartItemDto>? = null
 )
 

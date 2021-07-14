@@ -22,8 +22,9 @@ class QuoteService @Autowired constructor(
   private val registryService: RegistryService,
   private val bppService: BppService,
   private val selectedItemMapper: SelectedItemMapper,
-  private val log: Logger = LoggerFactory.getLogger(QuoteService::class.java)
 ) {
+  private val log: Logger = LoggerFactory.getLogger(QuoteService::class.java)
+
   fun getQuote(context: ProtocolContext, cart: CartDto): Either<HttpError, MessageDao?> {
     log.info("Got get quote request. Context: {}, Cart: {}", context, cart)
     if (cart.items.isNullOrEmpty()) {
