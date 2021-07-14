@@ -113,7 +113,7 @@ class CartControllerSpec @Autowired constructor(
             saveCartResponseString,
             cartWithMultipleBppItems,
             ResponseMessage.nack(),
-            ProtocolError("BAP_014", "More than one BPP's item(s) selected")
+            ProtocolError("BAP_014", "More than one BPP's item(s) selected/initialized")
           )
         verifyThatMessageWasNotPersisted(saveCartResponse)
         verifyThatBppSelectApiWasNotInvoked(bppApi)
@@ -140,11 +140,13 @@ class CartControllerSpec @Autowired constructor(
             saveCartResponseString,
             cartWithMultipleProviderItems,
             ResponseMessage.nack(),
-            ProtocolError("BAP_010", "More than one Provider's item(s) selected")
+            ProtocolError("BAP_010", "More than one Provider's item(s) selected/initialized")
           )
         verifyThatMessageWasNotPersisted(saveCartResponse)
         verifyThatBppSelectApiWasNotInvoked(bppApi)
       }
+
+      registryBppLookupApi.stop() //todo: this and any other mocks used have to be cleaned between different tests
     }
   }
 

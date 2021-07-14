@@ -9,8 +9,8 @@ data class ProtocolOrder @Default constructor(
   val offers: List<ProtocolSelectMessageSelectedOffers>?,
   val billing: ProtocolBilling,
   val fulfillment: ProtocolFulfillment,
-  val quote: ProtocolQuotation?,
-  val payment: ProtocolPayment,
+  val quote: ProtocolQuotation? = null,
+  val payment: ProtocolPayment? = null, //todo: is this surely nullable?
   val id: String? = null,
   val state: String? = null,
   val createdAt: java.time.OffsetDateTime? = null,

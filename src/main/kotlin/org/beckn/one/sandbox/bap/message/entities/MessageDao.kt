@@ -17,7 +17,8 @@ data class MessageDao(
 ) {
   enum class Type {
     Search,
-    Select
+    Select,
+    Init
   }
 }
 

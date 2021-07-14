@@ -23,3 +23,12 @@ data class ProtocolSelectRequest @Default constructor(
 data class ProtocolSelectRequestMessage @Default constructor(
   val selected: ProtocolSelectMessageSelected
 )
+
+data class ProtocolInitRequest @Default constructor(
+  override val context: ProtocolContext,
+  val message: ProtocolInitRequestMessage
+): ProtocolRequest
+
+data class ProtocolInitRequestMessage @Default constructor(
+  val order: ProtocolOrder
+)

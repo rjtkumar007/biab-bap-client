@@ -4,7 +4,7 @@ import org.beckn.one.sandbox.bap.Default
 
 data class ProtocolFulfillment @Default constructor(
   val id: String? = null,
-  val type: String? = null,
+  val type: String? = null,//todo: is this a string or an enum?
   val state: ProtocolState? = null,
   val tracking: Boolean? = null,
   val agent: ProtocolPerson? = null,
