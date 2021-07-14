@@ -29,23 +29,21 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class ProtocolOnSearchControllerSpec : DescribeSpec() {
-
+internal class ProtocolOnSearchControllerSpec @Autowired constructor(
   @Autowired
-  private lateinit var mockMvc: MockMvc
-
+  private val mockMvc: MockMvc,
   @Autowired
-  private lateinit var mapper: ObjectMapper
-
+  private val mapper: ObjectMapper,
   @Autowired
-  private lateinit var searchResponseRepo: BecknResponseRepository<OnSearchDao>
-
+  private val searchResponseRepo: BecknResponseRepository<OnSearchDao>,
+  ) : DescribeSpec() {
   private val postOnSearchUrl = "/v1/on_search"
 
   val schemaSearchResponse = ProtocolOnSearch(
     context = ProtocolContextFactory.fixed,
     message = ProtocolOnSearchMessage(ProtocolCatalogFactory.create(2))
   )
+
   init {
 
     describe("Protocol Search API") {
@@ -69,12 +67,12 @@ internal class ProtocolOnSearchControllerSpec : DescribeSpec() {
       }
 
       context("when error occurs when processing request") {
-        val mockService = mock<ResponseStorageService<ProtocolOnSearch>>{
+        val mockService = mock<ResponseStorageService<ProtocolOnSearch>> {
           onGeneric { save(schemaSearchResponse) }.thenReturn(Either.Left(DatabaseError.OnWrite))
         }
         val controller = ProtocolOnSearchController(mockService)
 
-        it("should respond with internal server error"){
+        it("should respond with internal server error") {
           val response = controller.onSearch(schemaSearchResponse)
           response.statusCode shouldBe DatabaseError.OnWrite.status()
         }

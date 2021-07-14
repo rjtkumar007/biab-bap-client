@@ -29,17 +29,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class ProtocolOnInitControllerSpec : DescribeSpec() {
-
+internal class ProtocolOnInitControllerSpec @Autowired constructor(
   @Autowired
-  private lateinit var mockMvc: MockMvc
-
+  private val mockMvc: MockMvc,
   @Autowired
-  private lateinit var mapper: ObjectMapper
-
+  private val mapper: ObjectMapper,
   @Autowired
-  private lateinit var onInitResponseRepo: BecknResponseRepository<OnInitDao>
-
+  private val onInitResponseRepo: BecknResponseRepository<OnInitDao>,
+) : DescribeSpec() {
   private val postOnInitUrl = "/v1/on_init"
 
   val onInitResponse = ProtocolOnInit(
@@ -48,6 +45,7 @@ internal class ProtocolOnInitControllerSpec : DescribeSpec() {
       initialized = ProtocolOnInitMessageInitializedFactory.create(1, 2)
     )
   )
+
   init {
 
     describe("Protocol OnSelect API") {
@@ -71,12 +69,12 @@ internal class ProtocolOnInitControllerSpec : DescribeSpec() {
       }
 
       context("when error occurs when processing request") {
-        val mockService = mock<ResponseStorageService<ProtocolOnInit>>{
+        val mockService = mock<ResponseStorageService<ProtocolOnInit>> {
           onGeneric { save(onInitResponse) }.thenReturn(Either.Left(DatabaseError.OnWrite))
         }
         val controller = ProtocolOnInitController(mockService)
 
-        it("should respond with internal server error"){
+        it("should respond with internal server error") {
           val response = controller.onInit(onInitResponse)
           response.statusCode shouldBe DatabaseError.OnWrite.status()
         }

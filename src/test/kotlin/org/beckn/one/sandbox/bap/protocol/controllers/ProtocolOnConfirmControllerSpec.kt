@@ -29,17 +29,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class ProtocolOnConfirmControllerSpec : DescribeSpec() {
-
+internal class ProtocolOnConfirmControllerSpec @Autowired constructor(
   @Autowired
-  private lateinit var mockMvc: MockMvc
-
+  private val mockMvc: MockMvc,
   @Autowired
-  private lateinit var mapper: ObjectMapper
-
+  private val mapper: ObjectMapper,
   @Autowired
-  private lateinit var onConfirmResponseRepo: BecknResponseRepository<OnConfirm>
-
+  private val onConfirmResponseRepo: BecknResponseRepository<OnConfirm>,
+) : DescribeSpec() {
   private val postOnConfirmUrl = "/v1/on_confirm"
 
   val onConfirmResponse = ProtocolOnConfirm(
@@ -48,6 +45,7 @@ internal class ProtocolOnConfirmControllerSpec : DescribeSpec() {
       order = ProtocolOrderFactory.create(1, 2)
     )
   )
+
   init {
 
     describe("Protocol OnConfirm API") {
@@ -71,12 +69,12 @@ internal class ProtocolOnConfirmControllerSpec : DescribeSpec() {
       }
 
       context("when error occurs when processing request") {
-        val mockService = mock<ResponseStorageService<ProtocolOnConfirm>>{
+        val mockService = mock<ResponseStorageService<ProtocolOnConfirm>> {
           onGeneric { save(onConfirmResponse) }.thenReturn(Either.Left(DatabaseError.OnWrite))
         }
         val controller = ProtocolOnConfirmController(mockService)
 
-        it("should respond with internal server error"){
+        it("should respond with internal server error") {
           val response = controller.onConfirm(onConfirmResponse)
           response.statusCode shouldBe DatabaseError.OnWrite.status()
         }

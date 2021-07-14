@@ -29,19 +29,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class ProtocolOnSelectControllerSpec : DescribeSpec() {
-
+internal class ProtocolOnSelectControllerSpec @Autowired constructor(
   @Autowired
-  private lateinit var mockMvc: MockMvc
-
+  private val mockMvc: MockMvc,
   @Autowired
-  private lateinit var mapper: ObjectMapper
-
+  private val mapper: ObjectMapper,
   @Autowired
-  private lateinit var onSelectResponseRepo: BecknResponseRepository<OnSelectDao>
-
+  private val onSelectResponseRepo: BecknResponseRepository<OnSelectDao>,
+) : DescribeSpec() {
   private val postOnSelectUrl = "/v1/on_select"
-
   val onSelectResponse = ProtocolOnSelect(
     context = ProtocolContextFactory.fixed,
     message = ProtocolOnSelectMessage(
