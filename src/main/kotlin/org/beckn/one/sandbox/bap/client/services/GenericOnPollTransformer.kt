@@ -1,12 +1,14 @@
 package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.Either
+import org.beckn.one.sandbox.bap.client.dtos.ClientInitResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.client.mappers.ClientCatalogMapper
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
+import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
 import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
 import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
 
@@ -28,6 +30,19 @@ class SearchClientSearchResponseMapper(
           input.mapNotNull { response ->
             response.message?.catalog?.let(clientCatalogMapper::protocolToClientDto)
           })
+      )
+    )
+}
+
+class InitClientResponseMapper() : GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse> {
+  override fun transform(
+    input: List<ProtocolOnInit>,
+    context: ProtocolContext
+  ): Either<HttpError, ClientInitResponse> =
+    Either.Right(
+      ClientInitResponse(
+        context = context,
+        message = input.first().message
       )
     )
 }
