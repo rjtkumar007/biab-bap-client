@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.schemas
 import org.litote.kmongo.json
 
 data class ProtocolIntent(
-  val queryString: String?,
+  val queryString: String? = null,
   val fulfillment: ProtocolFulfillment?,
   val item: ProtocolIntentItem? = null,
   val provider: ProtocolProvider?

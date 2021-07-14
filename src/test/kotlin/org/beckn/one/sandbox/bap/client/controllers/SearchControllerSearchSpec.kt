@@ -7,12 +7,13 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
+import org.beckn.one.sandbox.bap.client.factories.SearchRequestFactory
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
 import org.beckn.one.sandbox.bap.schemas.ResponseStatus.ACK
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.hamcrest.CoreMatchers.`is`
@@ -122,7 +123,7 @@ class SearchControllerSearchSpec @Autowired constructor(
     providerId: String,
     providerLocation: String
   ) {
-    val protocolSearchRequest = getProtocolSearchRequest(searchResponse, providerId, providerLocation)
+    val protocolSearchRequest = SearchRequestFactory.create(searchResponse.context!!, providerId, providerLocation)
     MockNetwork.retailBengaluruBpp.verify(
       postRequestedFor(urlEqualTo("/search"))
         .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))
@@ -204,26 +205,4 @@ class SearchControllerSearchSpec @Autowired constructor(
         .param("providerId", providerId)
     )
 
-  private fun getProtocolSearchRequest(
-    searchResponse: ProtocolAckResponse,
-    providerId: String,
-    location: String
-  ): ProtocolSearchRequest {
-    return ProtocolSearchRequest(
-      context = searchResponse.context!!,
-      message = ProtocolSearchRequestMessage(
-        intent = ProtocolIntent(
-          queryString = null,
-          provider = ProtocolProvider(id = providerId),
-          fulfillment = ProtocolFulfillment(
-            end = ProtocolFulfillmentEnd(
-              location = ProtocolLocation(
-                gps = location
-              )
-            )
-          )
-        )
-      )
-    )
-  }
 }
