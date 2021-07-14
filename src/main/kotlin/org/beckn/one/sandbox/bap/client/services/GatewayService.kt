@@ -2,7 +2,6 @@ package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.Either
 import arrow.core.Either.Left
-import arrow.core.Either.Right
 import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
@@ -27,80 +26,43 @@ class GatewayService @Autowired constructor(
 
   fun search(gateway: SubscriberDto, context: ProtocolContext, criteria: SearchCriteria)
       : Either<GatewaySearchError, ProtocolAckResponse> {
-    return try {
+    return Either.catch {
       log.info("Initiating Search using gateway: {}", gateway)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
       log.info("Initiated Search for context: {}", context)
-      val httpResponse = gatewayServiceClient.search(
-        ProtocolSearchRequest(
-          context,
-          ProtocolSearchRequestMessage(
-            ProtocolIntent(
-              queryString = criteria.searchString,
-              provider = null,
-              fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.location))),
-              item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = criteria.searchString))
-            )
-          )
-        )
-      ).execute()
+      val httpResponse = gatewayServiceClient.search(buildProtocolSearchRequest(context, criteria)).execute()
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-      when {
+      return when {
         isInternalServerError(httpResponse) -> Left(GatewaySearchError.Internal)
         httpResponse.body() == null -> Left(GatewaySearchError.NullResponse)
         isAckNegative(httpResponse) -> Left(GatewaySearchError.Nack)
         else -> {
           log.info("Successfully invoked search on gateway. Response: {}", httpResponse.body())
-          Right(httpResponse.body()!!)
+          Either.Right(httpResponse.body()!!)
         }
       }
-    } catch (e: Exception) {
-      log.error("Error when initiating search", e)
-      Left(GatewaySearchError.Internal)
+    }.mapLeft {
+      log.error("Error when initiating search", it)
+      GatewaySearchError.Internal
     }
   }
+
+  private fun buildProtocolSearchRequest(context: ProtocolContext, criteria: SearchCriteria) =
+    ProtocolSearchRequest(
+      context,
+      ProtocolSearchRequestMessage(
+        ProtocolIntent(
+          queryString = criteria.searchString,
+          provider = null,
+          fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.location))),
+          item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = criteria.searchString))
+        )
+      )
+    )
 
   private fun isInternalServerError(httpAckAckResponse: retrofit2.Response<ProtocolAckResponse>) =
     httpAckAckResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
 
   private fun isAckNegative(httpAckAckResponse: retrofit2.Response<ProtocolAckResponse>) =
     httpAckAckResponse.body()!!.message.ack.status == ResponseStatus.NACK
-
-  fun searchProvider(gateway: SubscriberDto, context: ProtocolContext, criteria: SearchCriteria)
-      : Either<GatewaySearchError, ProtocolAckResponse> {
-    return try {
-      log.info("Initiating Search using gateway: {}", gateway)
-      val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
-      log.info("Initiated Search for context: {}", context)
-      val httpResponse = gatewayServiceClient.search(
-        ProtocolSearchRequest(
-          context,
-          ProtocolSearchRequestMessage(
-            ProtocolIntent(
-              queryString = null,
-              provider = ProtocolProvider(id = criteria.providerId),
-              fulfillment = when (criteria.location?.isNotEmpty()) {
-                true -> ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.location)))
-                else -> null
-              }
-            )
-          )
-        )
-      ).execute()
-
-      log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-      when {
-        isInternalServerError(httpResponse) -> Left(GatewaySearchError.Internal)
-        httpResponse.body() == null -> Left(GatewaySearchError.NullResponse)
-        isAckNegative(httpResponse) -> Left(GatewaySearchError.Nack)
-        else -> {
-          log.info("Successfully invoked search on gateway. Response: {}", httpResponse.body())
-          Right(httpResponse.body()!!)
-        }
-      }
-    } catch (e: Exception) {
-      log.error("Error when initiating search", e)
-      Left(GatewaySearchError.Internal)
-    }
-  }
 }

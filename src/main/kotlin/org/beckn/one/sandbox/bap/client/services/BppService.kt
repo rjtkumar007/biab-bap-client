@@ -5,6 +5,7 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import org.beckn.one.sandbox.bap.client.dtos.DeliveryInfoDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderItemDto
+import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.provider.BppServiceClient
 import org.beckn.one.sandbox.bap.schemas.*
@@ -13,13 +14,15 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.util.StringUtils.hasText
 import retrofit2.Response
 
 @Service
 class BppService @Autowired constructor(
   private val bppServiceClientFactory: BppServiceClientFactory,
-  private val log: Logger = LoggerFactory.getLogger(BppService::class.java)
 ) {
+  private val log: Logger = LoggerFactory.getLogger(BppService::class.java)
+
   fun select(
     context: ProtocolContext,
     bppUri: String,
@@ -135,7 +138,7 @@ class BppService @Autowired constructor(
               ), location = deliveryInfo.deliveryLocation
             ),
             type = "home_delivery",//todo: check if type is enum or string
-          //todo: HBO has a person and name here which isn't proper json as per spec, check spec
+            //todo: HBO has a person and name here which isn't proper json as per spec, check spec
           ),
           addOns = emptyList(),
           offers = emptyList(),
@@ -145,4 +148,46 @@ class BppService @Autowired constructor(
     log.info("Init API request body: {}", initRequest)
     return bppServiceClient.init(initRequest).execute()
   }
+
+  fun search(bppUri: String, context: ProtocolContext, criteria: SearchCriteria)
+      : Either<BppError, ProtocolAckResponse> {
+    return Either.catch {
+      log.info("Invoking Search API on BPP: {}", bppUri)
+      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
+      log.info("Initiated Search for context: {}", context)
+      val httpResponse = bppServiceClient.search(
+        ProtocolSearchRequest(
+          context,
+          ProtocolSearchRequestMessage(
+            ProtocolIntent(
+              queryString = criteria.searchString,
+              provider = ProtocolProvider(id = criteria.providerId),
+              fulfillment = getFulfillmentFilter(criteria),
+            )
+          )
+        )
+      ).execute()
+
+      log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+      return when {
+        isInternalServerError(httpResponse) -> Left(BppError.Internal)
+        httpResponse.body() == null -> Left(BppError.NullResponse)
+        isAckNegative(httpResponse) -> Left(BppError.Nack)
+        else -> {
+          log.info("Successfully invoked search on Bpp. Response: {}", httpResponse.body())
+          Right(httpResponse.body()!!)
+        }
+      }
+    }.mapLeft {
+      log.error("Error when initiating search", it)
+      BppError.Internal
+    }
+  }
+
+  private fun getFulfillmentFilter(criteria: SearchCriteria) =
+    when {
+      hasText(criteria.location) ->
+        ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.location)))
+      else -> null
+    }
 }

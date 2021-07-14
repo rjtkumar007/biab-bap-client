@@ -11,26 +11,33 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.util.StringUtils.hasText
 
 @Service
 class SearchService(
   @Autowired val registryService: RegistryService,
   @Autowired val gatewayService: GatewayService,
+  @Autowired val bppService: BppService,
   @Autowired val messageService: MessageService
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
   fun search(context: ProtocolContext, criteria: SearchCriteria): Either<HttpError, MessageDao> {
     log.info("Got search request with criteria: {} ", criteria)
-    return when (criteria.providerId) {
-      null -> registryService
-        .lookupGateways()
-        .flatMap { gatewayService.search(it.first(), context, criteria) }
-        .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
-      else -> registryService
-        .lookupGateways()
-        .flatMap { gatewayService.searchProvider(it.first(), context, criteria) }
+    if (isBppFilterSpecified(criteria)) {
+      val criteriaForExploringProviderCatalog = criteria.copy(searchString = null)
+      return registryService
+        .lookupBppById(criteriaForExploringProviderCatalog.bppId!!)
+        .flatMap { bppService.search(it.first().subscriber_url, context, criteriaForExploringProviderCatalog) }
         .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
     }
+    return registryService
+      .lookupGateways()
+      .flatMap { gatewayService.search(it.first(), context, criteria) }
+      .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
   }
+
+  private fun isBppFilterSpecified(criteria: SearchCriteria) =
+    hasText(criteria.bppId)
+
 }

@@ -63,7 +63,7 @@ object MockNetwork {
     number = 3, mockServer = deliveryPuneBg, city = City.Pune.value, domain = Domain.Delivery.value
   )
 
-  private fun getRetailBengaluruBpp() = createSubscriberDto(
+  fun getRetailBengaluruBpp() = createSubscriberDto(
     number = 4, mockServer = retailBengaluruBpp, type = SubscriberDto.Type.BPP
   )
 

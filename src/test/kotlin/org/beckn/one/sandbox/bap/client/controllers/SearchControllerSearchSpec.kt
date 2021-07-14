@@ -1,12 +1,15 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
+import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.*
@@ -67,8 +70,7 @@ class SearchControllerSearchSpec @Autowired constructor(
       }
 
       it("should invoke Beckn /search API on first gateway and persist message") {
-        val gatewaysJson = objectMapper.writeValueAsString(MockNetwork.getAllGateways())
-        stubLookupApi(gatewaysJson)
+        stubLookupApi()
         stubSearchApi()
 
         val result: MvcResult = invokeSearchApi()
@@ -82,8 +84,7 @@ class SearchControllerSearchSpec @Autowired constructor(
       }
 
       it("should invoke Beckn /search API on first gateway and persist message with location") {
-        val gatewaysJson = objectMapper.writeValueAsString(MockNetwork.getAllGateways())
-        stubLookupApi(gatewaysJson)
+        stubLookupApi()
         stubSearchApi()
 
         val result: MvcResult = invokeSearchApi(location = "40.741895,-73.989308")
@@ -97,45 +98,84 @@ class SearchControllerSearchSpec @Autowired constructor(
       }
 
       it("should invoke Beckn /search API on specified BPP using gateway and persist message with location") {
-        val gatewaysJson = objectMapper.writeValueAsString(MockNetwork.getAllGateways())
-        stubLookupApi(gatewaysJson)
-        stubSearchApi()
+        val bpp = MockNetwork.getRetailBengaluruBpp()
+        val registryBppLookupApi = WireMockServer(4010)
+        registryBppLookupApi.start()
+        stubBppSearchApi()
+        stubBppLookupApi(registryBppLookupApi, MockNetwork.retailBengaluruBpp, bpp.subscriber_id)
 
-        val result: MvcResult = invokeSearchApi(location = "12.9259,77.583", providerId = "tulsidev")
-          .andExpect(status().is2xxSuccessful)
-          .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
-          .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
-          .andReturn()
+        val result: MvcResult =
+          invokeSearchApi(location = "12.9259,77.583", providerId = "tulsidev", bppId = bpp.subscriber_id)
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
+            .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
+            .andReturn()
 
-        verifyThatSearchApiWasInvoked()
-        verifyThatSearchMessageWasPersisted(result)
-//        val protocolSearchRequest = getProtocolSearchRequest(
-//          searchResponse,
-//          "tulsidev",
-//          "12.9259,77.583"
-//        )
-//        retailBengaluruBpp.verify(
-//          postRequestedFor(urlEqualTo("/search"))
-//            .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))
-//        ) todo: verify that the BPP gets a request?
+        val searchResponse = verifyThatSearchMessageWasPersisted(result)
+        verifyThatBppSearchWasInvoked(searchResponse, "tulsidev", "12.9259,77.583")
       }
-
     }
   }
 
-  private fun verifyThatSearchMessageWasPersisted(result: MvcResult) {
+  private fun verifyThatBppSearchWasInvoked(
+    searchResponse: ProtocolAckResponse,
+    providerId: String,
+    providerLocation: String
+  ) {
+    val protocolSearchRequest = getProtocolSearchRequest(searchResponse, providerId, providerLocation)
+    MockNetwork.retailBengaluruBpp.verify(
+      postRequestedFor(urlEqualTo("/search"))
+        .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))
+    )
+  }
+
+  private fun stubBppSearchApi() {
+    MockNetwork.retailBengaluruBpp
+      .stubFor(
+        post("/search")
+          .willReturn(okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory))))
+      )
+  }
+
+  private fun stubBppLookupApi(
+    registryBppLookupApi: WireMockServer,
+    bppApi: WireMockServer,
+    bppId: String,
+  ) {
+    registryBppLookupApi
+      .stubFor(
+        post("/lookup")
+          .withRequestBody(matchingJsonPath("$.subscriber_id", equalTo(bppId)))
+          .willReturn(okJson(getSubscriberForBpp(bppApi)))
+      )
+  }
+
+  private fun getSubscriberForBpp(bppApi: WireMockServer) =
+    objectMapper.writeValueAsString(
+      listOf(
+        SubscriberDtoFactory.getDefault(
+          subscriber_id = bppApi.baseUrl(),
+          baseUrl = bppApi.baseUrl(),
+          type = SubscriberDto.Type.BPP,
+        )
+      )
+    )
+
+  private fun verifyThatSearchMessageWasPersisted(result: MvcResult): ProtocolAckResponse {
     val searchResponse = objectMapper.readValue(result.response.contentAsString, ProtocolAckResponse::class.java)
     val savedMessage = messageRepository.findOne(MessageDao::id eq searchResponse.context?.messageId)
     savedMessage shouldNotBe null
     savedMessage?.id shouldBe searchResponse.context?.messageId
     savedMessage?.type shouldBe MessageDao.Type.Search
+    return searchResponse
   }
 
   private fun verifyThatSearchApiWasInvoked() {
     MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
   }
 
-  private fun stubLookupApi(gatewaysJson: String?) {
+  private fun stubLookupApi() {
+    val gatewaysJson = objectMapper.writeValueAsString(MockNetwork.getAllGateways())
     MockNetwork.registry
       .stubFor(post("/lookup").willReturn(okJson(gatewaysJson)))
   }
@@ -151,11 +191,16 @@ class SearchControllerSearchSpec @Autowired constructor(
       )
   }
 
-  private fun invokeSearchApi(location: String = "", providerId: String = "") = mockMvc
+  private fun invokeSearchApi(
+    location: String = "",
+    providerId: String = "",
+    bppId: String = ""
+  ) = mockMvc
     .perform(
       get("/client/v1/search")
         .param("searchString", "Fictional mystery books")
         .param("location", location)
+        .param("bppId", bppId)
         .param("providerId", providerId)
     )
 
