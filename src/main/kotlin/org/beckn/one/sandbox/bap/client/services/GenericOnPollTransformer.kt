@@ -1,16 +1,10 @@
 package org.beckn.one.sandbox.bap.client.services
 
 import arrow.core.Either
-import org.beckn.one.sandbox.bap.client.dtos.ClientInitResponse
-import org.beckn.one.sandbox.bap.client.dtos.ClientResponse
-import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
-import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
+import org.beckn.one.sandbox.bap.client.dtos.*
 import org.beckn.one.sandbox.bap.client.mappers.ClientCatalogMapper
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
+import org.beckn.one.sandbox.bap.schemas.*
 
 interface GenericOnPollTransformer<in Protocol : ProtocolResponse, out Output : ClientResponse> {
   fun transform(input: List<Protocol>, context: ProtocolContext): Either<HttpError, Output>
@@ -34,7 +28,20 @@ class SearchClientSearchResponseMapper(
     )
 }
 
-class InitClientResponseMapper() : GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse> {
+class QuoteClientQuoteResponseMapper : GenericOnPollTransformer<ProtocolOnSelect, ClientQuoteResponse> {
+  override fun transform(
+    input: List<ProtocolOnSelect>,
+    context: ProtocolContext
+  ): Either<HttpError, ClientQuoteResponse> =
+    Either.Right(
+      ClientQuoteResponse(
+        context = context,
+        message = input.first().message?.selected?.quote?.let { ClientQuoteResponseMessage(quote = it) }
+      )
+    )
+}
+
+class InitClientResponseMapper : GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse> {
   override fun transform(
     input: List<ProtocolOnInit>,
     context: ProtocolContext

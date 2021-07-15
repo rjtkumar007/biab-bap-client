@@ -11,6 +11,7 @@ data class ProtocolOnSelectMessageSelected @Default constructor(
   val offers: List<ProtocolOffer>? = null,
   val quote: ProtocolQuotation? = null
 )
+
 //TODO Duplicate hierarchy...needs resolving
 data class ProtocolSelectMessageSelected @Default constructor(
   val provider: ProtocolProvider? = null,
@@ -20,6 +21,7 @@ data class ProtocolSelectMessageSelected @Default constructor(
   val offers: List<ProtocolOffer>? = null,
   val quote: ProtocolQuotation? = null
 )
+
 data class ProtocolOnSelectedItem @Default constructor(
   val id: String,
   val parentItemId: String? = null,

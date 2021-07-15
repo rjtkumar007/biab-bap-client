@@ -2,6 +2,7 @@ package org.beckn.one.sandbox.bap.client.dtos
 
 import org.beckn.one.sandbox.bap.Default
 import org.beckn.one.sandbox.bap.schemas.ProtocolContext
+import org.beckn.one.sandbox.bap.schemas.ProtocolQuotation
 import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
 
 data class GetQuoteRequestDto @Default constructor(
@@ -22,6 +23,7 @@ data class CartItemDto @Default constructor(
   val quantity: CartSelectedItemQuantity,
   val bppId: String,
   val provider: CartItemProviderDto,
+  val quote: ProtocolQuotation? = null
 )
 
 data class CartSelectedItemQuantity @Default constructor(

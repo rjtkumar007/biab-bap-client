@@ -5,7 +5,7 @@ import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelectMessageSelected
 
 object ProtocolOnSelectMessageSelectedFactory {
 
-  fun create(index: Int, numberOfItems: Int = 2): ProtocolOnSelectMessageSelected {
+  fun create(index: Int = 1, numberOfItems: Int = 2): ProtocolOnSelectMessageSelected {
     val provider = ProtocolProviderFactory.create(index)
     val itemIds = IdFactory.forItems(provider.id!!, numberOfItems)
 
@@ -44,7 +44,9 @@ object IdFactory {
   fun forFulfillment(id: Int) = "fulfillment-$id"
   fun forProvider(id: Int) = "provider-$id"
   fun forOrder(id: Int) = "order-$id"
-  fun forCategory(providerId: String, numberOfCategories: Int) = seqTill(numberOfCategories).map { "$providerId-category-$it" }
+  fun forCategory(providerId: String, numberOfCategories: Int) =
+    seqTill(numberOfCategories).map { "$providerId-category-$it" }
+
   fun forItems(providerId: String, numberOfItems: Int) = seqTill(numberOfItems).map { "$providerId-item-$it" }
 
 }
