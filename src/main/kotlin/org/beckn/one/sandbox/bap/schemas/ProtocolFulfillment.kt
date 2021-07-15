@@ -12,7 +12,21 @@ data class ProtocolFulfillment @Default constructor(
   val start: ProtocolFulfillmentStart? = null,
   val end: ProtocolFulfillmentEnd? = null,
   val purpose: String? = null,
+  val customer: HboCustomer? = null,// todo: This has to be moved to spec the name object in HBO is not as per spec
   val tags: Map<String, String>? = null
+)
+
+data class HboCustomer @Default constructor(
+  val person: HboPerson
+) {
+  data class HboPerson @Default constructor(
+    val name: String
+  )
+}
+
+data class ProtocolCustomer @Default constructor(
+  val person: ProtocolPerson? = null,
+  val contact: ProtocolContact? = null
 )
 
 

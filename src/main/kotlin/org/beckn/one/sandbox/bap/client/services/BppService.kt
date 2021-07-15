@@ -137,8 +137,8 @@ class BppService @Autowired constructor(
                 email = deliveryInfo.email
               ), location = deliveryInfo.location
             ),
-            type = "home_delivery",//todo: check if type is enum or string
-            //todo: HBO has a person and name here which isn't proper json as per spec, check spec
+            type = "home_delivery",
+            customer = HboCustomer(HboCustomer.HboPerson(name = deliveryInfo.name))
           ),
           addOns = emptyList(),
           offers = emptyList(),
