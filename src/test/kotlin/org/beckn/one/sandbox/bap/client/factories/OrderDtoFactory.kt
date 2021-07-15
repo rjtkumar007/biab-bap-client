@@ -66,6 +66,7 @@ class OrderDtoFactory {
           )
         ),
         deliveryInfo = DeliveryDto(
+          name = "Test",
           phone = "9999999999",
           email = "test@gmail.com",
           location = ProtocolLocation(

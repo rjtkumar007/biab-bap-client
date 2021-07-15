@@ -279,6 +279,7 @@ class InitControllerSpec @Autowired constructor(
               ), location = orderRequest.message.deliveryInfo.location
             ),
             type = "home_delivery",
+            customer = HboCustomer(person = HboCustomer.HboPerson(name = orderRequest.message.deliveryInfo.name))
           ),
           addOns = emptyList(),
           offers = emptyList()
