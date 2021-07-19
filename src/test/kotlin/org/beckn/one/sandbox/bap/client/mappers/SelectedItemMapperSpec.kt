@@ -5,7 +5,9 @@ import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
 import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDto
 import org.beckn.one.sandbox.bap.client.dtos.CartSelectedItemQuantity
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.ProtocolItemQuantityAllocated
+import org.beckn.protocol.schemas.ProtocolScalar
+import org.beckn.protocol.schemas.ProtocolSelectedItem
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles

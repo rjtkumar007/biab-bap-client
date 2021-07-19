@@ -1,9 +1,9 @@
 package org.beckn.one.sandbox.bap.client.external.provider
 
-import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
-import org.beckn.one.sandbox.bap.schemas.ProtocolInitRequest
-import org.beckn.one.sandbox.bap.schemas.ProtocolSearchRequest
-import org.beckn.one.sandbox.bap.schemas.ProtocolSelectRequest
+import org.beckn.protocol.schemas.ProtocolAckResponse
+import org.beckn.protocol.schemas.ProtocolInitRequest
+import org.beckn.protocol.schemas.ProtocolSearchRequest
+import org.beckn.protocol.schemas.ProtocolSelectRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST

@@ -13,8 +13,8 @@ import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
-import org.beckn.one.sandbox.bap.schemas.ResponseStatus.ACK
+import org.beckn.protocol.schemas.ProtocolAckResponse
+import org.beckn.protocol.schemas.ResponseStatus.ACK
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
@@ -119,9 +119,9 @@ class SearchControllerSearchSpec @Autowired constructor(
   }
 
   private fun verifyThatBppSearchWasInvoked(
-    searchResponse: ProtocolAckResponse,
-    providerId: String,
-    providerLocation: String
+      searchResponse: ProtocolAckResponse,
+      providerId: String,
+      providerLocation: String
   ) {
     val protocolSearchRequest = SearchRequestFactory.create(searchResponse.context!!, providerId, providerLocation)
     MockNetwork.retailBengaluruBpp.verify(

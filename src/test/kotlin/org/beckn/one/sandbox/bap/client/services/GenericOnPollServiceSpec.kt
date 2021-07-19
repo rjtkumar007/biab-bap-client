@@ -8,8 +8,8 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.message.entities.*
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
+import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolOnSearch
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -23,9 +23,9 @@ import java.time.ZoneId
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class GenericOnPollServiceSpec @Autowired constructor(
-  private val onSearchPollService: GenericOnPollService<ProtocolOnSearch, ClientSearchResponse>,
-  private val searchResultRepo: BecknResponseRepository<OnSearchDao>,
-  private val messageRepository: GenericRepository<MessageDao>
+    private val onSearchPollService: GenericOnPollService<ProtocolOnSearch, ClientSearchResponse>,
+    private val searchResultRepo: BecknResponseRepository<OnSearchDao>,
+    private val messageRepository: GenericRepository<MessageDao>
 ) : DescribeSpec() {
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),

@@ -5,7 +5,7 @@ import arrow.core.Either.Left
 import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

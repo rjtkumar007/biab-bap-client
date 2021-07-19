@@ -18,7 +18,7 @@ import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.litote.kmongo.eq
@@ -221,10 +221,10 @@ class InitControllerSpec @Autowired constructor(
     )
 
   private fun verifyInitResponseMessage(
-    initializeOrderResponseString: String,
-    orderRequest: OrderRequestDto,
-    expectedMessage: ResponseMessage,
-    expectedError: ProtocolError? = null
+      initializeOrderResponseString: String,
+      orderRequest: OrderRequestDto,
+      expectedMessage: ResponseMessage,
+      expectedError: ProtocolError? = null
   ): ProtocolAckResponse {
     val initOrderResponse = objectMapper.readValue(initializeOrderResponseString, ProtocolAckResponse::class.java)
     initOrderResponse.context shouldNotBe null
@@ -237,9 +237,9 @@ class InitControllerSpec @Autowired constructor(
   }
 
   private fun verifyThatBppInitApiWasInvoked(
-    initializeOrderResponse: ProtocolAckResponse,
-    orderRequest: OrderRequestDto,
-    providerApi: WireMockServer
+      initializeOrderResponse: ProtocolAckResponse,
+      orderRequest: OrderRequestDto,
+      providerApi: WireMockServer
   ) {
     val protocolInitRequest = getProtocolInitRequest(initializeOrderResponse, orderRequest)
     providerApi.verify(
@@ -249,8 +249,8 @@ class InitControllerSpec @Autowired constructor(
   }
 
   private fun getProtocolInitRequest(
-    initializeOrderResponse: ProtocolAckResponse,
-    orderRequest: OrderRequestDto
+      initializeOrderResponse: ProtocolAckResponse,
+      orderRequest: OrderRequestDto
   ): ProtocolInitRequest {
     val locations =
       orderRequest.message.items?.first()?.provider?.locations?.map { ProtocolSelectMessageSelectedProviderLocations(id = it) }
@@ -279,7 +279,7 @@ class InitControllerSpec @Autowired constructor(
               ), location = orderRequest.message.deliveryInfo.location
             ),
             type = "home_delivery",
-            customer = HboCustomer(person = HboCustomer.HboPerson(name = orderRequest.message.deliveryInfo.name))
+            customer = ProtocolCustomer(person = ProtocolPerson(name = orderRequest.message.deliveryInfo.name))
           ),
           addOns = emptyList(),
           offers = emptyList()

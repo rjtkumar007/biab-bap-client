@@ -4,7 +4,7 @@ import arrow.core.Either
 import org.beckn.one.sandbox.bap.client.dtos.*
 import org.beckn.one.sandbox.bap.client.mappers.ClientCatalogMapper
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.*
 
 interface GenericOnPollTransformer<in Protocol : ProtocolResponse, out Output : ClientResponse> {
   fun transform(input: List<Protocol>, context: ProtocolContext): Either<HttpError, Output>
@@ -14,8 +14,8 @@ class SearchClientSearchResponseMapper(
   private val clientCatalogMapper: ClientCatalogMapper
 ) : GenericOnPollTransformer<ProtocolOnSearch, ClientSearchResponse> {
   override fun transform(
-    input: List<ProtocolOnSearch>,
-    context: ProtocolContext
+      input: List<ProtocolOnSearch>,
+      context: ProtocolContext
   ): Either<HttpError, ClientSearchResponse> =
     Either.Right(
       ClientSearchResponse(
@@ -30,8 +30,8 @@ class SearchClientSearchResponseMapper(
 
 class QuoteClientQuoteResponseMapper : GenericOnPollTransformer<ProtocolOnSelect, ClientQuoteResponse> {
   override fun transform(
-    input: List<ProtocolOnSelect>,
-    context: ProtocolContext
+      input: List<ProtocolOnSelect>,
+      context: ProtocolContext
   ): Either<HttpError, ClientQuoteResponse> =
     Either.Right(
       ClientQuoteResponse(
@@ -43,8 +43,8 @@ class QuoteClientQuoteResponseMapper : GenericOnPollTransformer<ProtocolOnSelect
 
 class InitClientResponseMapper : GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse> {
   override fun transform(
-    input: List<ProtocolOnInit>,
-    context: ProtocolContext
+      input: List<ProtocolOnInit>,
+      context: ProtocolContext
   ): Either<HttpError, ClientInitResponse> =
     Either.Right(
       ClientInitResponse(

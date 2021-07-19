@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.client.mappers
 
 import org.beckn.one.sandbox.bap.client.dtos.ClientCatalog
-import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
+import org.beckn.protocol.schemas.ProtocolCatalog
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy

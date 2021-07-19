@@ -9,8 +9,8 @@ import org.beckn.one.sandbox.bap.client.mappers.SelectedItemMapper
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.services.MessageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolLocation
+import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolLocation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.DescriptorDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolDescriptor
+import org.beckn.protocol.schemas.ProtocolDescriptor
 
 object ProtocolDescriptorFactory {
 

@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.PaymentDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolPayment
+import org.beckn.protocol.schemas.ProtocolPayment
 import java.net.URI
 
 object ProtocolPaymentFactory {

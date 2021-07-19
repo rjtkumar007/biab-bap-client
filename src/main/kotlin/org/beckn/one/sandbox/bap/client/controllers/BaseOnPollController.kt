@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.controllers
 import org.beckn.one.sandbox.bap.client.dtos.ClientErrorResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.services.GenericOnPollService
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
+import org.beckn.protocol.schemas.ProtocolResponse
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

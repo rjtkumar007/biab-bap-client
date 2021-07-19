@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolError
+import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolError
 
 interface ClientResponse {
   val context: ProtocolContext
@@ -9,6 +9,6 @@ interface ClientResponse {
 }
 
 data class ClientErrorResponse(
-  override val context: ProtocolContext,
-  override val error: ProtocolError? = null
+    override val context: ProtocolContext,
+    override val error: ProtocolError? = null
 ) : ClientResponse

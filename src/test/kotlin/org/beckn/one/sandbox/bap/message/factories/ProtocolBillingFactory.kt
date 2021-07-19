@@ -3,9 +3,9 @@ package org.beckn.one.sandbox.bap.message.factories
 import org.beckn.one.sandbox.bap.message.entities.AddressDao
 import org.beckn.one.sandbox.bap.message.entities.BillingDao
 import org.beckn.one.sandbox.bap.message.entities.OrganizationDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolAddress
-import org.beckn.one.sandbox.bap.schemas.ProtocolBilling
-import org.beckn.one.sandbox.bap.schemas.ProtocolOrganization
+import org.beckn.protocol.schemas.ProtocolAddress
+import org.beckn.protocol.schemas.ProtocolBilling
+import org.beckn.protocol.schemas.ProtocolOrganization
 
 object ProtocolBillingFactory {
 

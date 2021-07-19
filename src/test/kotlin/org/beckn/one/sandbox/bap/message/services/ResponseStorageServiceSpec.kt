@@ -12,8 +12,8 @@ import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.mappers.OnSearchResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
+import org.beckn.protocol.schemas.ProtocolOnSearch
+import org.beckn.protocol.schemas.ProtocolOnSearchMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest

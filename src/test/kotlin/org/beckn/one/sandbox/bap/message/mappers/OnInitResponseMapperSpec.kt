@@ -6,8 +6,8 @@ import org.beckn.one.sandbox.bap.message.entities.OnInitDao
 import org.beckn.one.sandbox.bap.message.entities.OnInitMessageDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnInitMessageInitializedFactory
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInitMessage
+import org.beckn.protocol.schemas.ProtocolOnInit
+import org.beckn.protocol.schemas.ProtocolOnInitMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles

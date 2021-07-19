@@ -4,7 +4,7 @@ import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDto
 import org.beckn.one.sandbox.bap.client.dtos.DeliveryDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderItemDto
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.*
 import java.math.BigDecimal
 import java.util.*
 

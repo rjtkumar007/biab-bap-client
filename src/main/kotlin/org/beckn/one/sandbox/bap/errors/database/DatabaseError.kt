@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.errors.database
 
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.schemas.ProtocolError
-import org.beckn.one.sandbox.bap.schemas.ResponseMessage
+import org.beckn.protocol.schemas.ProtocolError
+import org.beckn.protocol.schemas.ResponseMessage
 import org.springframework.http.HttpStatus
 
 sealed class DatabaseError : HttpError {

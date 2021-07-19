@@ -2,8 +2,8 @@ package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.services.SearchService
-import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
-import org.beckn.one.sandbox.bap.schemas.ResponseMessage
+import org.beckn.protocol.schemas.ProtocolAckResponse
+import org.beckn.protocol.schemas.ResponseMessage
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

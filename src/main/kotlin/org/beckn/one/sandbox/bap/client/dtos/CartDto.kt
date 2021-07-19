@@ -1,13 +1,13 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
 import org.beckn.one.sandbox.bap.Default
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolQuotation
-import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
+import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolQuotation
+import org.beckn.protocol.schemas.ProtocolScalar
 
 data class GetQuoteRequestDto @Default constructor(
-  val context: ProtocolContext,
-  val message: GetQuoteRequestMessageDto,
+    val context: ProtocolContext,
+    val message: GetQuoteRequestMessageDto,
 )
 
 data class GetQuoteRequestMessageDto @Default constructor(

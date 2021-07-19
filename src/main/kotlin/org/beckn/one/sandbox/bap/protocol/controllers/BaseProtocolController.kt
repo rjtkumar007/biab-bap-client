@@ -1,9 +1,9 @@
 package org.beckn.one.sandbox.bap.protocol.controllers
 
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolAckResponse
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
-import org.beckn.one.sandbox.bap.schemas.ResponseMessage
+import org.beckn.protocol.schemas.ProtocolAckResponse
+import org.beckn.protocol.schemas.ProtocolResponse
+import org.beckn.protocol.schemas.ResponseMessage
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity

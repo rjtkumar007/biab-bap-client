@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.dtos.ClientCatalog
 import org.beckn.one.sandbox.bap.message.factories.*
-import org.beckn.one.sandbox.bap.schemas.ProtocolProviderCatalog
+import org.beckn.protocol.schemas.ProtocolProviderCatalog
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles

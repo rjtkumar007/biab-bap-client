@@ -7,9 +7,9 @@ import org.beckn.one.sandbox.bap.client.mappers.ClientCatalogMapper
 import org.beckn.one.sandbox.bap.client.services.*
 import org.beckn.one.sandbox.bap.message.services.MessageService
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelect
+import org.beckn.protocol.schemas.ProtocolOnInit
+import org.beckn.protocol.schemas.ProtocolOnSearch
+import org.beckn.protocol.schemas.ProtocolOnSelect
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -34,23 +34,23 @@ class ClientServicesConfiguration @Autowired constructor(
 
   @Bean
   fun searchResultReplyService(
-    @Autowired messageService: MessageService,
-    @Autowired responseStorageService: ResponseStorageService<ProtocolOnSearch>,
-    @Autowired transformer: GenericOnPollTransformer<ProtocolOnSearch, ClientSearchResponse>
+      @Autowired messageService: MessageService,
+      @Autowired responseStorageService: ResponseStorageService<ProtocolOnSearch>,
+      @Autowired transformer: GenericOnPollTransformer<ProtocolOnSearch, ClientSearchResponse>
   ) = GenericOnPollService(messageService, responseStorageService, transformer)
 
   @Bean
   fun quoteReplyService(
-    @Autowired messageService: MessageService,
-    @Autowired responseStorageService: ResponseStorageService<ProtocolOnSelect>,
-    @Autowired transformer: GenericOnPollTransformer<ProtocolOnSelect, ClientQuoteResponse>
+      @Autowired messageService: MessageService,
+      @Autowired responseStorageService: ResponseStorageService<ProtocolOnSelect>,
+      @Autowired transformer: GenericOnPollTransformer<ProtocolOnSelect, ClientQuoteResponse>
   ) = GenericOnPollService(messageService, responseStorageService, transformer)
 
   @Bean
   @Qualifier("InitResults")
   fun initResultReplyService(
-    @Autowired messageService: MessageService,
-    @Autowired responseStorageService: ResponseStorageService<ProtocolOnInit>,
-    @Qualifier("InitTransformer") transformer: GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse>
+      @Autowired messageService: MessageService,
+      @Autowired responseStorageService: ResponseStorageService<ProtocolOnInit>,
+      @Qualifier("InitTransformer") transformer: GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse>
   ) = GenericOnPollService(messageService, responseStorageService, transformer)
 }

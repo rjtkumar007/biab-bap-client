@@ -6,10 +6,10 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.client.mappers.ClientCatalogMapperImpl
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
-import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
+import org.beckn.protocol.schemas.ProtocolCatalog
+import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolOnSearch
+import org.beckn.protocol.schemas.ProtocolOnSearchMessage
 import java.time.Clock
 import java.time.Instant
 import java.time.OffsetDateTime

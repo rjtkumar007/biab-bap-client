@@ -6,8 +6,8 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.services.MessageService
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
+import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

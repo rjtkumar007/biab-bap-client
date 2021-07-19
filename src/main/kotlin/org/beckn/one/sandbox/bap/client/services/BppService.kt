@@ -8,7 +8,7 @@ import org.beckn.one.sandbox.bap.client.dtos.OrderItemDto
 import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.provider.BppServiceClient
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,11 +24,11 @@ class BppService @Autowired constructor(
   private val log: Logger = LoggerFactory.getLogger(BppService::class.java)
 
   fun select(
-    context: ProtocolContext,
-    bppUri: String,
-    providerId: String,
-    providerLocation: ProtocolLocation,
-    items: List<ProtocolSelectedItem>
+      context: ProtocolContext,
+      bppUri: String,
+      providerId: String,
+      providerLocation: ProtocolLocation,
+      items: List<ProtocolSelectedItem>
   ): Either<BppError, ProtocolAckResponse> {
     return Either
       .catch {
@@ -49,11 +49,11 @@ class BppService @Autowired constructor(
   }
 
   private fun invokeBppSelectApi(
-    providerServiceClient: BppServiceClient,
-    context: ProtocolContext,
-    providerId: String,
-    providerLocation: ProtocolLocation,
-    items: List<ProtocolSelectedItem>
+      providerServiceClient: BppServiceClient,
+      context: ProtocolContext,
+      providerId: String,
+      providerLocation: ProtocolLocation,
+      items: List<ProtocolSelectedItem>
   ): Response<ProtocolAckResponse> {
     val selectRequest = ProtocolSelectRequest(
       context = context,
@@ -77,13 +77,13 @@ class BppService @Autowired constructor(
     httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
 
   fun init(
-    context: ProtocolContext,
-    bppUri: String,
-    providerId: String,
-    billingInfo: ProtocolBilling,
-    providerLocation: ProtocolSelectMessageSelectedProviderLocations,
-    deliveryInfo: DeliveryDto,
-    items: List<OrderItemDto>
+      context: ProtocolContext,
+      bppUri: String,
+      providerId: String,
+      billingInfo: ProtocolBilling,
+      providerLocation: ProtocolSelectMessageSelectedProviderLocations,
+      deliveryInfo: DeliveryDto,
+      items: List<OrderItemDto>
   ): Either<BppError, ProtocolAckResponse> {
     return Either.catch {
       log.info("Invoking Init API on BPP: {}", bppUri)
@@ -112,13 +112,13 @@ class BppService @Autowired constructor(
   }
 
   private fun invokeBppInitApi(
-    bppServiceClient: BppServiceClient,
-    context: ProtocolContext,
-    providerId: String,
-    billingInfo: ProtocolBilling,
-    providerLocation: ProtocolSelectMessageSelectedProviderLocations,
-    deliveryInfo: DeliveryDto,
-    items: List<OrderItemDto>
+      bppServiceClient: BppServiceClient,
+      context: ProtocolContext,
+      providerId: String,
+      billingInfo: ProtocolBilling,
+      providerLocation: ProtocolSelectMessageSelectedProviderLocations,
+      deliveryInfo: DeliveryDto,
+      items: List<OrderItemDto>
   ): Response<ProtocolAckResponse> {
     val initRequest = ProtocolInitRequest(
       context = context,
@@ -138,7 +138,7 @@ class BppService @Autowired constructor(
               ), location = deliveryInfo.location
             ),
             type = "home_delivery",
-            customer = HboCustomer(HboCustomer.HboPerson(name = deliveryInfo.name))
+            customer = ProtocolCustomer(ProtocolPerson(name = deliveryInfo.name))
           ),
           addOns = emptyList(),
           offers = emptyList(),

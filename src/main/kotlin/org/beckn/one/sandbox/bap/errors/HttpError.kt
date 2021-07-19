@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.errors
 
-import org.beckn.one.sandbox.bap.schemas.ProtocolError
-import org.beckn.one.sandbox.bap.schemas.ResponseMessage
+import org.beckn.protocol.schemas.ProtocolError
+import org.beckn.protocol.schemas.ResponseMessage
 import org.springframework.http.HttpStatus
 
 interface HttpError {

@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.factories
 import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
 import org.beckn.one.sandbox.bap.client.dtos.CartItemProviderDto
 import org.beckn.one.sandbox.bap.client.dtos.CartSelectedItemQuantity
-import org.beckn.one.sandbox.bap.schemas.ProtocolScalar
+import org.beckn.protocol.schemas.ProtocolScalar
 import java.math.BigDecimal
 
 class CartItemFactory {

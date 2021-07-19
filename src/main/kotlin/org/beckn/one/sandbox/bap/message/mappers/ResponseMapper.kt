@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.mappers
 
 import org.beckn.one.sandbox.bap.message.entities.*
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.*
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy

@@ -1,13 +1,13 @@
 package org.beckn.one.sandbox.bap.client.factories
 
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.*
 
 class SearchRequestFactory {
   companion object {
     fun create(
-      context: ProtocolContext,
-      providerId: String?,
-      location: String?
+        context: ProtocolContext,
+        providerId: String?,
+        location: String?
     ): ProtocolSearchRequest {
       return ProtocolSearchRequest(
         context = context,

@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.ContextDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolContext
 import java.time.OffsetDateTime
 
 object ProtocolContextFactory {

@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
 import org.beckn.one.sandbox.bap.Default
-import org.beckn.one.sandbox.bap.schemas.ProtocolLocation
+import org.beckn.protocol.schemas.ProtocolLocation
 
 data class DeliveryDto @Default constructor(
   val name: String,

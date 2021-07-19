@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.protocol.controllers
 
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnConfirm
+import org.beckn.protocol.schemas.ProtocolOnConfirm
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.ProviderDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolProvider
+import org.beckn.protocol.schemas.ProtocolProvider
 
 object ProtocolProviderFactory {
 

@@ -9,9 +9,9 @@ import org.beckn.one.sandbox.bap.client.errors.validation.MultipleProviderError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.services.MessageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolBilling
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolSelectMessageSelectedProviderLocations
+import org.beckn.protocol.schemas.ProtocolBilling
+import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolSelectMessageSelectedProviderLocations
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,10 +25,10 @@ class InitializeOrderService @Autowired constructor(
   private val log: Logger = LoggerFactory.getLogger(InitializeOrderService::class.java)
 ) {
   fun initOrder(
-    context: ProtocolContext,
-    order: OrderDto,
-    deliveryInfo: DeliveryDto,
-    billingInfo: ProtocolBilling
+      context: ProtocolContext,
+      order: OrderDto,
+      deliveryInfo: DeliveryDto,
+      billingInfo: ProtocolBilling
   ): Either<HttpError, MessageDao?> {
     log.info("Got initialize order request. Context: {}, Order: {}, Delivery Info: {}", context, order, deliveryInfo)
     if (order.items.isNullOrEmpty()) {
