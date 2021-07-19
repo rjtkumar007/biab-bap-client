@@ -20,7 +20,14 @@ allOpen {
 }
 
 repositories {
+  mavenLocal()
   mavenCentral()
+  maven {
+    url = uri("s3://beckn-maven-artifacts/releases")
+    authentication {
+      val awsIm by registering(AwsImAuthentication::class)
+    }
+  }
 }
 
 dependencies {
@@ -44,6 +51,9 @@ dependencies {
   implementation("com.squareup.retrofit2:retrofit-mock:$retrofitVersion")
   implementation("org.litote.kmongo:kmongo:4.2.8")
   implementation("org.mapstruct:mapstruct:1.4.2.Final")
+  implementation("org.beckn.jvm:beckn-protocol-dtos:0.9.1.1")
+  //api("com.github.pozo:mapstruct-kotlin:1.3.1.2")
+  //kapt("com.github.pozo:mapstruct-kotlin-processor:1.3.1.2")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("io.kotest:kotest-runner-junit5:4.4.3")

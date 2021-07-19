@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.OnSelectMessageSelectedDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelectMessageSelected
+import org.beckn.protocol.schemas.ProtocolOnSelectMessageSelected
 
 object ProtocolOnSelectMessageSelectedFactory {
 

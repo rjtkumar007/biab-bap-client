@@ -2,8 +2,8 @@ package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.TimeDao
 import org.beckn.one.sandbox.bap.message.entities.TimeRangeDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolTime
-import org.beckn.one.sandbox.bap.schemas.ProtocolTimeRange
+import org.beckn.protocol.schemas.ProtocolTime
+import org.beckn.protocol.schemas.ProtocolTimeRange
 import java.time.Clock
 import java.time.Instant
 import java.time.OffsetDateTime

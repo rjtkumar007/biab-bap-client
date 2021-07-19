@@ -6,6 +6,7 @@ import org.beckn.one.sandbox.bap.message.entities.ContextDao
 import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.protocol.schemas.ProtocolContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
@@ -66,7 +67,7 @@ class ContextMapperSpec @Autowired constructor(
         mappedSchema.domain shouldBe entity.domain
         mappedSchema.country shouldBe entity.country
         mappedSchema.city shouldBe entity.city
-        mappedSchema.action shouldBe org.beckn.one.sandbox.bap.schemas.ProtocolContext.Action.SEARCH
+        mappedSchema.action shouldBe ProtocolContext.Action.SEARCH
         mappedSchema.coreVersion shouldBe entity.coreVersion
         mappedSchema.bapId shouldBe entity.bapId
         mappedSchema.bapUri shouldBe entity.bapUri

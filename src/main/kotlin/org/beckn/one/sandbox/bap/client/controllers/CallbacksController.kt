@@ -3,9 +3,9 @@ package org.beckn.one.sandbox.bap.client.controllers
 import org.beckn.one.sandbox.bap.client.dtos.ClientErrorResponse
 import org.beckn.one.sandbox.bap.client.dtos.ListWrapperResponseMessage
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnConfirm
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelect
+import org.beckn.protocol.schemas.ProtocolOnConfirm
+import org.beckn.protocol.schemas.ProtocolOnInit
+import org.beckn.protocol.schemas.ProtocolOnSelect
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity

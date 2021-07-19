@@ -7,8 +7,8 @@ import org.beckn.one.sandbox.bap.message.entities.OnSearchDao
 import org.beckn.one.sandbox.bap.message.entities.OnSearchMessageDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolCatalogFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearchMessage
+import org.beckn.protocol.schemas.ProtocolOnSearch
+import org.beckn.protocol.schemas.ProtocolOnSearchMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles

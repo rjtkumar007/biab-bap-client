@@ -1,7 +1,6 @@
 package org.beckn.one.sandbox.bap.common.factories
 
-import org.beckn.one.sandbox.bap.schemas.*
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.protocol.schemas.*
 
 class ResponseFactory {
   companion object {

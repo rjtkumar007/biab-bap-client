@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.controllers
 import org.beckn.one.sandbox.bap.client.dtos.ClientInitResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.services.GenericOnPollService
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
+import org.beckn.protocol.schemas.ProtocolOnInit
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier

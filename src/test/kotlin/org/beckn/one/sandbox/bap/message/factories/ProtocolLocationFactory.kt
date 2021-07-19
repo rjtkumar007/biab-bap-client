@@ -4,10 +4,10 @@ import org.beckn.one.sandbox.bap.message.entities.AddressDao
 import org.beckn.one.sandbox.bap.message.entities.CityDao
 import org.beckn.one.sandbox.bap.message.entities.CountryDao
 import org.beckn.one.sandbox.bap.message.entities.LocationDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolAddress
-import org.beckn.one.sandbox.bap.schemas.ProtocolCity
-import org.beckn.one.sandbox.bap.schemas.ProtocolCountry
-import org.beckn.one.sandbox.bap.schemas.ProtocolLocation
+import org.beckn.protocol.schemas.ProtocolAddress
+import org.beckn.protocol.schemas.ProtocolCity
+import org.beckn.protocol.schemas.ProtocolCountry
+import org.beckn.protocol.schemas.ProtocolLocation
 
 object ProtocolLocationFactory {
 

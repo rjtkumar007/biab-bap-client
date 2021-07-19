@@ -1,11 +1,11 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
-import org.beckn.one.sandbox.bap.schemas.ProtocolError
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInitMessage
+import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolError
+import org.beckn.protocol.schemas.ProtocolOnInitMessage
 
 data class ClientInitResponse(
-  override val context: ProtocolContext,
-  val message: ProtocolOnInitMessage? = null,
-  override val error: ProtocolError? = null
+    override val context: ProtocolContext,
+    val message: ProtocolOnInitMessage? = null,
+    override val error: ProtocolError? = null
 ): ClientResponse

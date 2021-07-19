@@ -21,9 +21,9 @@ import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.protocol.schemas.*
 import org.litote.kmongo.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -210,10 +210,10 @@ class GetQuoteControllerSpec @Autowired constructor(
   }
 
   private fun verifyResponseMessage(
-    getQuoteResponseString: String,
-    expectedMessage: ResponseMessage,
-    expectedError: ProtocolError? = null,
-    expectedContext: ProtocolContext,
+      getQuoteResponseString: String,
+      expectedMessage: ResponseMessage,
+      expectedError: ProtocolError? = null,
+      expectedContext: ProtocolContext,
   ): ProtocolAckResponse {
     val getQuoteResponse = objectMapper.readValue(getQuoteResponseString, ProtocolAckResponse::class.java)
     getQuoteResponse.context shouldNotBe null
@@ -233,9 +233,9 @@ class GetQuoteControllerSpec @Autowired constructor(
   }
 
   private fun verifyThatBppSelectApiWasInvoked(
-    getQuoteResponse: ProtocolAckResponse,
-    cart: CartDto,
-    bppApi: WireMockServer
+      getQuoteResponse: ProtocolAckResponse,
+      cart: CartDto,
+      bppApi: WireMockServer
   ) {
     val protocolSelectRequest = getProtocolSelectRequest(getQuoteResponse, cart)
     bppApi.verify(

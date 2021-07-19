@@ -5,7 +5,7 @@ import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.BecknResponseDao
 import org.beckn.one.sandbox.bap.message.mappers.GenericResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolResponse
+import org.beckn.protocol.schemas.ProtocolResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

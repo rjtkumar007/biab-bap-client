@@ -10,7 +10,7 @@ import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.*
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSearch
+import org.beckn.protocol.schemas.ProtocolOnSearch
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock

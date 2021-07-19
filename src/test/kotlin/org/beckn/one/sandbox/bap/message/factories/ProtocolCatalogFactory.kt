@@ -3,9 +3,9 @@ package org.beckn.one.sandbox.bap.message.factories
 import org.beckn.one.sandbox.bap.message.entities.CatalogDao
 import org.beckn.one.sandbox.bap.message.entities.PriceDao
 import org.beckn.one.sandbox.bap.message.entities.ProviderCatalogDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolCatalog
-import org.beckn.one.sandbox.bap.schemas.ProtocolPrice
-import org.beckn.one.sandbox.bap.schemas.ProtocolProviderCatalog
+import org.beckn.protocol.schemas.ProtocolCatalog
+import org.beckn.protocol.schemas.ProtocolPrice
+import org.beckn.protocol.schemas.ProtocolProviderCatalog
 
 object ProtocolCatalogFactory {
   fun create(index: Int = 1): ProtocolCatalog {

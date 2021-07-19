@@ -2,8 +2,8 @@ package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.QuotationDao
 import org.beckn.one.sandbox.bap.message.entities.QuotationBreakupDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolQuotation
-import org.beckn.one.sandbox.bap.schemas.ProtocolQuotationBreakup
+import org.beckn.protocol.schemas.ProtocolQuotation
+import org.beckn.protocol.schemas.ProtocolQuotationBreakup
 
 object ProtocolQuotationFactory {
 

@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.*
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.*
 import java.time.OffsetDateTime
 
 object ProtocolOrderFactory {

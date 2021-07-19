@@ -6,8 +6,8 @@ import org.beckn.one.sandbox.bap.message.entities.OnConfirm
 import org.beckn.one.sandbox.bap.message.entities.OnConfirmMessage
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOrderFactory
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnConfirm
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnConfirmMessage
+import org.beckn.protocol.schemas.ProtocolOnConfirm
+import org.beckn.protocol.schemas.ProtocolOnConfirmMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles

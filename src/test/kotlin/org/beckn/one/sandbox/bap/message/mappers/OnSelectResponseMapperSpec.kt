@@ -6,8 +6,8 @@ import org.beckn.one.sandbox.bap.message.entities.OnSelectDao
 import org.beckn.one.sandbox.bap.message.entities.OnSelectMessageDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnSelectMessageSelectedFactory
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelect
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelectMessage
+import org.beckn.protocol.schemas.ProtocolOnSelect
+import org.beckn.protocol.schemas.ProtocolOnSelectMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles

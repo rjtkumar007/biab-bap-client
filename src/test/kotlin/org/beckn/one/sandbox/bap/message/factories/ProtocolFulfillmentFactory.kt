@@ -1,8 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.*
-import org.beckn.one.sandbox.bap.message.entities.FulfillmentDao
-import org.beckn.one.sandbox.bap.schemas.*
+import org.beckn.protocol.schemas.*
 import java.time.LocalDate
 import java.time.OffsetDateTime
 
@@ -35,6 +34,9 @@ object ProtocolFulfillmentFactory {
       location = ProtocolLocationFactory.addressLocation(1),
       time = ProtocolTimeFactory.fixedTimestamp("start-on"),
       contact = ProtocolContact(phone = "9890098900", email = "ab@gmail.com")
+    ),
+    customer = ProtocolCustomer(
+      person = ProtocolPersonFactory.create()
     )
   )
 
@@ -81,7 +83,10 @@ object ProtocolFulfillmentFactory {
             ContactDao(phone = c.phone, email = c.email, tags = c.tags)
           }
         )
-      }
+      },
+      customer = CustomerDao(
+        person = ProtocolPersonFactory.createAsEntity(it.customer?.person)
+      )
     )
   }
 }
@@ -90,7 +95,7 @@ object ProtocolFulfillmentFactory {
 object ProtocolPersonFactory {
 
   fun create() = ProtocolPerson(
-    name = ProtocolName(full = "Ben Beckman"),
+    name = "Ben Beckman",
     gender = "Male",
     image = "/image.jpg",
     dob = LocalDate.now(fixedClock),
@@ -99,17 +104,7 @@ object ProtocolPersonFactory {
 
   fun createAsEntity(protocol: ProtocolPerson?) = protocol?.let {
     PersonDao(
-      name = it.name?.let { n ->
-        NameDao(
-          full = n.full,
-          additionalName = n.additionalName,
-          familyName = n.familyName,
-          givenName = n.givenName,
-          callSign = n.callSign,
-          honorificPrefix = n.honorificPrefix,
-          honorificSuffix = n.honorificSuffix
-        )
-      },
+      name = it.name,
       image = it.image,
       dob = it.dob,
       gender = it.gender,

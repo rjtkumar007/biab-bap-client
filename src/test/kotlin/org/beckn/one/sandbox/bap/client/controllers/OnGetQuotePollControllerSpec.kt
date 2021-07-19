@@ -15,8 +15,8 @@ import org.beckn.one.sandbox.bap.message.mappers.ContextMapper
 import org.beckn.one.sandbox.bap.message.mappers.OnSelectResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelect
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnSelectMessage
+import org.beckn.protocol.schemas.ProtocolOnSelect
+import org.beckn.protocol.schemas.ProtocolOnSelectMessage
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock

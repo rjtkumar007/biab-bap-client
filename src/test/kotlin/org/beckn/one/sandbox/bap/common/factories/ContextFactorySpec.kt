@@ -6,7 +6,7 @@ import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
-import org.beckn.one.sandbox.bap.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.mockito.Mockito.`when`

@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.client.mappers
 
 import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
-import org.beckn.one.sandbox.bap.schemas.ProtocolSelectedItem
+import org.beckn.protocol.schemas.ProtocolSelectedItem
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping

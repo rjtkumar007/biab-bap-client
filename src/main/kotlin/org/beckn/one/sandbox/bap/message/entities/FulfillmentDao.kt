@@ -12,9 +12,15 @@ data class FulfillmentDao  @Default constructor(
   val start: FulfillmentStartDao? = null,
   val end: FulfillmentEndDao? = null,
   val purpose: String? = null,
+  val customer: CustomerDao,
   val tags: Map<String, String>? = null
 )
 
+
+data class CustomerDao @Default constructor(
+  val person: PersonDao? = null,
+  val contact: ContactDao? = null
+)
 
 data class StateDao  @Default constructor(
   val descriptor: DescriptorDao? = null,
@@ -23,22 +29,12 @@ data class StateDao  @Default constructor(
 )
 
 data class PersonDao  @Default constructor(
-  val name: NameDao? = null,
+  val name: String? = null,
   val image: String? = null,
   val dob: java.time.LocalDate? = null,
   val gender: String? = null,
   val cred: String? = null,
   val tags: Map<String, String>? = null
-)
-
-data class NameDao  @Default constructor(
-  val full: String? = null,
-  val additionalName: String? = null,
-  val familyName: String? = null,
-  val givenName: String? = null,
-  val callSign: String? = null,
-  val honorificPrefix: String? = null,
-  val honorificSuffix: String? = null
 )
 
 data class VehicleDao  @Default constructor(

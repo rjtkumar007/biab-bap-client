@@ -2,8 +2,8 @@ package org.beckn.one.sandbox.bap.message.factories
 
 import org.beckn.one.sandbox.bap.message.entities.CategoryDao
 import org.beckn.one.sandbox.bap.message.entities.ProviderCatalogDao
-import org.beckn.one.sandbox.bap.schemas.ProtocolCategory
-import org.beckn.one.sandbox.bap.schemas.ProtocolProviderCatalog
+import org.beckn.protocol.schemas.ProtocolCategory
+import org.beckn.protocol.schemas.ProtocolProviderCatalog
 
 object ProtocolProviderCatalogFactory {
 

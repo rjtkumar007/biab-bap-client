@@ -11,8 +11,8 @@ import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnInitMessageInitializedFactory
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInit
-import org.beckn.one.sandbox.bap.schemas.ProtocolOnInitMessage
+import org.beckn.protocol.schemas.ProtocolOnInit
+import org.beckn.protocol.schemas.ProtocolOnInitMessage
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc

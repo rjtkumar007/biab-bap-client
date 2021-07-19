@@ -7,9 +7,9 @@ import org.beckn.one.sandbox.bap.client.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.external.gateway.GatewayServiceClient
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
-import org.beckn.one.sandbox.bap.schemas.*
-import org.beckn.one.sandbox.bap.schemas.ResponseMessage.Companion.nack
+import org.beckn.protocol.schemas.ResponseMessage.Companion.nack
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.protocol.schemas.*
 import org.junit.jupiter.api.Assertions
 import org.mockito.Mockito.*
 import retrofit2.mock.Calls
