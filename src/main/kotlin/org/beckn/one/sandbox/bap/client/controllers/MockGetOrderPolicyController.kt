@@ -1,8 +1,8 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.GetOrderPolicyDto
-import org.beckn.one.sandbox.bap.schemas.ProtocolDescriptor
-import org.beckn.one.sandbox.bap.schemas.ProtocolOption
+import org.beckn.protocol.schemas.ProtocolDescriptor
+import org.beckn.protocol.schemas.ProtocolOption
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
