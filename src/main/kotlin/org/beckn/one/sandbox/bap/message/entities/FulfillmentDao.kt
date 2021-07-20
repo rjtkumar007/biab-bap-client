@@ -12,7 +12,7 @@ data class FulfillmentDao  @Default constructor(
   val start: FulfillmentStartDao? = null,
   val end: FulfillmentEndDao? = null,
   val purpose: String? = null,
-  val customer: CustomerDao,
+  val customer: CustomerDao? = null,
   val tags: Map<String, String>? = null
 )
 
