@@ -7,6 +7,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
+import org.beckn.one.sandbox.bap.client.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.dtos.GetQuoteRequestDto
 import org.beckn.one.sandbox.bap.client.dtos.GetQuoteRequestMessageDto
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
@@ -50,7 +51,7 @@ class GetQuoteControllerSpec @Autowired constructor(
 
   init {
     describe("Get Quote") {
-      val context = contextFactory.create()
+      val context = ClientContext(transactionId = uuidFactory.create())
       val registryBppLookupApi = WireMockServer(4010)
       registryBppLookupApi.start()
       val bppApi = WireMockServer(4011)
@@ -86,7 +87,7 @@ class GetQuoteControllerSpec @Autowired constructor(
         bppApi
           .stubFor(
             post("/select").willReturn(
-              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(context)))
+              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create(transactionId = context.transactionId))))
             )
           )
 
@@ -210,10 +211,10 @@ class GetQuoteControllerSpec @Autowired constructor(
   }
 
   private fun verifyResponseMessage(
-      getQuoteResponseString: String,
-      expectedMessage: ResponseMessage,
-      expectedError: ProtocolError? = null,
-      expectedContext: ProtocolContext,
+    getQuoteResponseString: String,
+    expectedMessage: ResponseMessage,
+    expectedError: ProtocolError? = null,
+    expectedContext: ClientContext,
   ): ProtocolAckResponse {
     val getQuoteResponse = objectMapper.readValue(getQuoteResponseString, ProtocolAckResponse::class.java)
     getQuoteResponse.context shouldNotBe null
@@ -233,9 +234,9 @@ class GetQuoteControllerSpec @Autowired constructor(
   }
 
   private fun verifyThatBppSelectApiWasInvoked(
-      getQuoteResponse: ProtocolAckResponse,
-      cart: CartDto,
-      bppApi: WireMockServer
+    getQuoteResponse: ProtocolAckResponse,
+    cart: CartDto,
+    bppApi: WireMockServer
   ) {
     val protocolSelectRequest = getProtocolSelectRequest(getQuoteResponse, cart)
     bppApi.verify(
@@ -271,7 +272,7 @@ class GetQuoteControllerSpec @Autowired constructor(
     )
   }
 
-  private fun invokeGetQuoteApi(context: ProtocolContext, cart: CartDto) = mockMvc
+  private fun invokeGetQuoteApi(context: ClientContext, cart: CartDto) = mockMvc
     .perform(
       put("/client/v1/get_quote")
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

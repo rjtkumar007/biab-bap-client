@@ -6,7 +6,7 @@ import org.beckn.protocol.schemas.ProtocolQuotation
 import org.beckn.protocol.schemas.ProtocolScalar
 
 data class GetQuoteRequestDto @Default constructor(
-    val context: ProtocolContext,
+    val context: ClientContext,
     val message: GetQuoteRequestMessageDto,
 )
 
