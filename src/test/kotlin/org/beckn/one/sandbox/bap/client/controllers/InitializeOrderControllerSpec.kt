@@ -12,6 +12,7 @@ import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
 import org.beckn.one.sandbox.bap.client.factories.OrderDtoFactory
+import org.beckn.one.sandbox.bap.client.factories.OrderItemDtoFactory
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
@@ -37,7 +38,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-class InitControllerSpec @Autowired constructor(
+class InitializeOrderControllerSpec @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
   val contextFactory: ContextFactory,
@@ -147,22 +148,57 @@ class InitControllerSpec @Autowired constructor(
         verifyThatSubscriberLookupApiWasNotInvoked(provider2Api)
       }
 
-      it("should invoke provide select api and save message") {
+      it("should return null when cart items are empty") {
+        val initRequestForTest = OrderRequestDto(
+          message = OrderDtoFactory.create(
+            bpp1_id = providerApi.baseUrl(),
+            provider1_id = "padma coffee works",
+            items = emptyList()
+          ), context = context
+        )
         providerApi
           .stubFor(
-            post("/init")
-              .willReturn(okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create()))))
+            post("/init").willReturn(
+              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
+            )
           )
 
-        val initializeOrderResponseString = invokeInitializeOrder(orderRequest)
+        val initializeOrderResponseString = invokeInitializeOrder(initRequestForTest)
           .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
 
-        val initializeOrderResponse =
-          verifyInitResponseMessage(initializeOrderResponseString, orderRequest, ResponseMessage.ack())
-        verifyThatMessageWasPersisted(initializeOrderResponse)
-        verifyThatBppInitApiWasInvoked(initializeOrderResponse, orderRequest, providerApi)
+        val confirmOrderResponse =
+          verifyInitResponseMessage(initializeOrderResponseString, initRequestForTest, ResponseMessage.ack())
+        verifyThatMessageWasNotPersisted(confirmOrderResponse)
+        verifyThatBppInitApiWasNotInvoked(providerApi)
+        verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
+      }
+
+      it("should invoke provide init api and save message") {
+        val initRequestForTest = OrderRequestDto(
+          message = OrderDtoFactory.create(
+            bpp1_id = providerApi.baseUrl(),
+            provider1_id = "padma coffee works",
+            items = listOf(OrderItemDtoFactory.create(providerId = "padma coffee works", bppId = providerApi.baseUrl()))
+          ), context = context
+        )
+        providerApi
+          .stubFor(
+            post("/init").willReturn(
+              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
+            )
+          )
+
+        val initializeOrderResponseString = invokeInitializeOrder(initRequestForTest)
+          .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+          .andReturn()
+          .response.contentAsString
+
+        val confirmOrderResponse =
+          verifyInitResponseMessage(initializeOrderResponseString, initRequestForTest, ResponseMessage.ack())
+        verifyThatMessageWasPersisted(confirmOrderResponse)
+        verifyThatBppInitApiWasInvoked(confirmOrderResponse, initRequestForTest, providerApi)
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, providerApi)
       }
 
