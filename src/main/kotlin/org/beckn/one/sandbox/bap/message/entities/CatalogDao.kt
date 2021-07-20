@@ -8,7 +8,7 @@ data class CatalogDao @Default constructor(
   val bppProviders: List<ProviderCatalogDao>? = null,
   val bppCategories: List<CategoryDao>? = null,
   val exp: LocalDateTime? = null,
-  val id: String? = null,
+  val bppId: String? = null,
 )
 
 data class ProviderCatalogDao @Default constructor(

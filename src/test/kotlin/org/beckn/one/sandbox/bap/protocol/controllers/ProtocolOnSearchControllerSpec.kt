@@ -36,7 +36,7 @@ internal class ProtocolOnSearchControllerSpec @Autowired constructor(
   private val mapper: ObjectMapper,
   @Autowired
   private val searchResponseRepo: BecknResponseRepository<OnSearchDao>,
-  ) : DescribeSpec() {
+) : DescribeSpec() {
   private val postOnSearchUrl = "/v1/on_search"
 
   val schemaSearchResponse = ProtocolOnSearch(
