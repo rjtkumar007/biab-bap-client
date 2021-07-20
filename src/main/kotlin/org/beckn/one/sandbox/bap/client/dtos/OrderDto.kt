@@ -6,7 +6,7 @@ import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolItemQuantityAllocated
 
 data class OrderRequestDto @Default constructor(
-    val context: ProtocolContext,
+    val context: ClientContext,
     val message: OrderDto
 )
 

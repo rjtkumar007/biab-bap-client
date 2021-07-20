@@ -2,10 +2,11 @@ package org.beckn.one.sandbox.bap.client.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.beckn.one.sandbox.bap.client.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.dtos.OrderRequestDto
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
@@ -18,9 +19,9 @@ import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
-import org.beckn.protocol.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.protocol.schemas.*
 import org.litote.kmongo.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -51,11 +52,13 @@ class InitControllerSpec @Autowired constructor(
       providerApi.start()
       val provider2Api = WireMockServer(4014)
       provider2Api.start()
+      val context = ClientContext(transactionId = uuidFactory.create())
       val orderRequest = OrderRequestDto(
+        context = context,
         message = OrderDtoFactory.create(
           bpp1_id = providerApi.baseUrl(),
           provider1_id = "padma coffee works"
-        ), context = contextFactory.create()
+        ),
       )
 
       beforeEach {
@@ -66,7 +69,7 @@ class InitControllerSpec @Autowired constructor(
       }
 
       it("should return error when BPP init call fails") {
-        providerApi.stubFor(WireMock.post("/init").willReturn(WireMock.serverError()))
+        providerApi.stubFor(post("/init").willReturn(serverError()))
 
         val initializeOrderResponseString =
           invokeInitializeOrder(orderRequest).andExpect(MockMvcResultMatchers.status().isInternalServerError)
@@ -88,7 +91,7 @@ class InitControllerSpec @Autowired constructor(
 
         val orderRequestWithMultipleBppItems =
           OrderRequestDto(
-            context = contextFactory.create(),
+            context = context,
             message = OrderDtoFactory.create(
               null,
               bpp1_id = providerApi.baseUrl(),
@@ -117,7 +120,7 @@ class InitControllerSpec @Autowired constructor(
 
       it("should validate that order contains items from only one provider") {
         val orderRequestWithMultipleProviderItems = OrderRequestDto(
-          context = contextFactory.create(),
+          context = context,
           message = OrderDtoFactory.create(
             null,
             bpp1_id = providerApi.baseUrl(),
@@ -147,9 +150,8 @@ class InitControllerSpec @Autowired constructor(
       it("should invoke provide select api and save message") {
         providerApi
           .stubFor(
-            WireMock.post("/init").willReturn(
-              WireMock.okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
-            )
+            post("/init")
+              .willReturn(okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create()))))
           )
 
         val initializeOrderResponseString = invokeInitializeOrder(orderRequest)
@@ -174,9 +176,9 @@ class InitControllerSpec @Autowired constructor(
     bppApi: WireMockServer
   ) {
     registryBppLookupApi.verify(
-      WireMock.postRequestedFor(WireMock.urlEqualTo("/lookup"))
+      postRequestedFor(urlEqualTo("/lookup"))
         .withRequestBody(
-          WireMock.equalToJson(
+          equalToJson(
             objectMapper.writeValueAsString(
               SubscriberLookupRequest(
                 subscriber_id = bppApi.baseUrl(),
@@ -192,10 +194,10 @@ class InitControllerSpec @Autowired constructor(
   }
 
   private fun verifyThatBppInitApiWasNotInvoked(bppApi: WireMockServer) =
-    bppApi.verify(0, WireMock.postRequestedFor(WireMock.urlEqualTo("/init")))
+    bppApi.verify(0, postRequestedFor(urlEqualTo("/init")))
 
   private fun verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi: WireMockServer) =
-    registryBppLookupApi.verify(0, WireMock.postRequestedFor(WireMock.urlEqualTo("/lookup")))
+    registryBppLookupApi.verify(0, postRequestedFor(urlEqualTo("/lookup")))
 
   private fun stubBppLookupApi(
     registryBppLookupApi: WireMockServer,
@@ -203,9 +205,9 @@ class InitControllerSpec @Autowired constructor(
   ) {
     registryBppLookupApi
       .stubFor(
-        WireMock.post("/lookup")
-          .withRequestBody(WireMock.matchingJsonPath("$.subscriber_id", WireMock.equalTo(providerApi.baseUrl())))
-          .willReturn(WireMock.okJson(getSubscriberForBpp(providerApi)))
+        post("/lookup")
+          .withRequestBody(matchingJsonPath("$.subscriber_id", equalTo(providerApi.baseUrl())))
+          .willReturn(okJson(getSubscriberForBpp(providerApi)))
       )
   }
 
@@ -221,10 +223,10 @@ class InitControllerSpec @Autowired constructor(
     )
 
   private fun verifyInitResponseMessage(
-      initializeOrderResponseString: String,
-      orderRequest: OrderRequestDto,
-      expectedMessage: ResponseMessage,
-      expectedError: ProtocolError? = null
+    initializeOrderResponseString: String,
+    orderRequest: OrderRequestDto,
+    expectedMessage: ResponseMessage,
+    expectedError: ProtocolError? = null
   ): ProtocolAckResponse {
     val initOrderResponse = objectMapper.readValue(initializeOrderResponseString, ProtocolAckResponse::class.java)
     initOrderResponse.context shouldNotBe null
@@ -237,20 +239,20 @@ class InitControllerSpec @Autowired constructor(
   }
 
   private fun verifyThatBppInitApiWasInvoked(
-      initializeOrderResponse: ProtocolAckResponse,
-      orderRequest: OrderRequestDto,
-      providerApi: WireMockServer
+    initializeOrderResponse: ProtocolAckResponse,
+    orderRequest: OrderRequestDto,
+    providerApi: WireMockServer
   ) {
     val protocolInitRequest = getProtocolInitRequest(initializeOrderResponse, orderRequest)
     providerApi.verify(
-      WireMock.postRequestedFor(WireMock.urlEqualTo("/init"))
-        .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(protocolInitRequest)))
+      postRequestedFor(urlEqualTo("/init"))
+        .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolInitRequest)))
     )
   }
 
   private fun getProtocolInitRequest(
-      initializeOrderResponse: ProtocolAckResponse,
-      orderRequest: OrderRequestDto
+    initializeOrderResponse: ProtocolAckResponse,
+    orderRequest: OrderRequestDto
   ): ProtocolInitRequest {
     val locations =
       orderRequest.message.items?.first()?.provider?.locations?.map { ProtocolSelectMessageSelectedProviderLocations(id = it) }
