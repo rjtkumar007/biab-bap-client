@@ -15,9 +15,9 @@ import org.beckn.one.sandbox.bap.message.mappers.ContextMapper
 import org.beckn.one.sandbox.bap.message.mappers.OnSelectResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
+import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnSelect
 import org.beckn.protocol.schemas.ProtocolOnSelectMessage
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
@@ -84,7 +84,7 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
           val body = results.response.contentAsString
           val clientResponse = mapper.readValue(body, ClientQuoteResponse::class.java)
           clientResponse.message?.quote shouldNotBe null
-          clientResponse.message?.quote shouldBe protocolOnSelect.message?.selected?.quote
+          clientResponse.message?.quote?.quote shouldBe protocolOnSelect.message?.selected?.quote
         }
       }
 

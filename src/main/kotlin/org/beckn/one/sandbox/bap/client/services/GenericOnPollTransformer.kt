@@ -14,8 +14,8 @@ class SearchClientSearchResponseMapper(
   private val clientCatalogMapper: ClientCatalogMapper
 ) : GenericOnPollTransformer<ProtocolOnSearch, ClientSearchResponse> {
   override fun transform(
-      input: List<ProtocolOnSearch>,
-      context: ProtocolContext
+    input: List<ProtocolOnSearch>,
+    context: ProtocolContext
   ): Either<HttpError, ClientSearchResponse> =
     Either.Right(
       ClientSearchResponse(
@@ -30,21 +30,21 @@ class SearchClientSearchResponseMapper(
 
 class QuoteClientQuoteResponseMapper : GenericOnPollTransformer<ProtocolOnSelect, ClientQuoteResponse> {
   override fun transform(
-      input: List<ProtocolOnSelect>,
-      context: ProtocolContext
+    input: List<ProtocolOnSelect>,
+    context: ProtocolContext
   ): Either<HttpError, ClientQuoteResponse> =
     Either.Right(
       ClientQuoteResponse(
         context = context,
-        message = input.first().message?.selected?.quote?.let { ClientQuoteResponseMessage(quote = it) }
+        message = ClientQuoteResponseMessage(quote = input.first().message?.selected)
       )
     )
 }
 
 class InitClientResponseMapper : GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse> {
   override fun transform(
-      input: List<ProtocolOnInit>,
-      context: ProtocolContext
+    input: List<ProtocolOnInit>,
+    context: ProtocolContext
   ): Either<HttpError, ClientInitResponse> =
     Either.Right(
       ClientInitResponse(
