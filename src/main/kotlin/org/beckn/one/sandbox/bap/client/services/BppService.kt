@@ -3,10 +3,7 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import org.beckn.one.sandbox.bap.client.dtos.DeliveryDto
-import org.beckn.one.sandbox.bap.client.dtos.OrderItemDto
-import org.beckn.one.sandbox.bap.client.dtos.OrderPayment
-import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
+import org.beckn.one.sandbox.bap.client.dtos.*
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.provider.BppServiceClient
 import org.beckn.protocol.schemas.*
@@ -25,11 +22,11 @@ class BppService @Autowired constructor(
   private val log: Logger = LoggerFactory.getLogger(BppService::class.java)
 
   fun select(
-      context: ProtocolContext,
-      bppUri: String,
-      providerId: String,
-      providerLocation: ProtocolLocation,
-      items: List<ProtocolSelectedItem>
+    context: ProtocolContext,
+    bppUri: String,
+    providerId: String,
+    providerLocation: ProtocolLocation,
+    items: List<ProtocolSelectedItem>
   ): Either<BppError, ProtocolAckResponse> {
     return Either
       .catch {
@@ -50,11 +47,11 @@ class BppService @Autowired constructor(
   }
 
   private fun invokeBppSelectApi(
-      providerServiceClient: BppServiceClient,
-      context: ProtocolContext,
-      providerId: String,
-      providerLocation: ProtocolLocation,
-      items: List<ProtocolSelectedItem>
+    bppServiceClient: BppServiceClient,
+    context: ProtocolContext,
+    providerId: String,
+    providerLocation: ProtocolLocation,
+    items: List<ProtocolSelectedItem>
   ): Response<ProtocolAckResponse> {
     val selectRequest = ProtocolSelectRequest(
       context = context,
@@ -66,7 +63,7 @@ class BppService @Autowired constructor(
       )
     )
     log.info("Select API request body: {}", selectRequest)
-    return providerServiceClient.select(selectRequest).execute()
+    return bppServiceClient.select(selectRequest).execute()
   }
 
   private fun isInternalServerError(httpResponse: Response<ProtocolAckResponse>) =
@@ -78,13 +75,13 @@ class BppService @Autowired constructor(
     httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
 
   fun init(
-      context: ProtocolContext,
-      bppUri: String,
-      providerId: String,
-      billingInfo: ProtocolBilling,
-      providerLocation: ProtocolSelectMessageSelectedProviderLocations,
-      deliveryInfo: DeliveryDto,
-      items: List<OrderItemDto>
+    context: ProtocolContext,
+    bppUri: String,
+    providerId: String,
+    billingInfo: ProtocolBilling,
+    providerLocation: ProtocolSelectMessageSelectedProviderLocations,
+    deliveryInfo: DeliveryDto,
+    items: List<OrderItemDto>
   ): Either<BppError, ProtocolAckResponse> {
     return Either.catch {
       log.info("Invoking Init API on BPP: {}", bppUri)
@@ -113,13 +110,13 @@ class BppService @Autowired constructor(
   }
 
   private fun invokeBppInitApi(
-      bppServiceClient: BppServiceClient,
-      context: ProtocolContext,
-      providerId: String,
-      billingInfo: ProtocolBilling,
-      providerLocation: ProtocolSelectMessageSelectedProviderLocations,
-      deliveryInfo: DeliveryDto,
-      items: List<OrderItemDto>
+    bppServiceClient: BppServiceClient,
+    context: ProtocolContext,
+    providerId: String,
+    billingInfo: ProtocolBilling,
+    providerLocation: ProtocolSelectMessageSelectedProviderLocations,
+    deliveryInfo: DeliveryDto,
+    items: List<OrderItemDto>
   ): Response<ProtocolAckResponse> {
     val initRequest = ProtocolInitRequest(
       context = context,
@@ -271,4 +268,26 @@ class BppService @Autowired constructor(
     log.info("Confirm API request body: {}", confirmRequest)
     return bppServiceClient.confirm(confirmRequest).execute()
   }
+
+  fun track(bppUri: String, context: ProtocolContext, request: TrackRequestDto): Either<BppError, ProtocolAckResponse> =
+    Either.catch {
+      log.info("Invoking Track API on BPP: {}", bppUri)
+      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
+      val httpResponse = bppServiceClient.track(ProtocolTrackRequest(context = context, message = request.message))
+        .execute()
+      log.info("BPP Track API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+      return when {
+        isInternalServerError(httpResponse) -> Left(BppError.Internal)
+//        isBodyNull(httpResponse) -> Left(BppError.NullResponse)
+//        isAckNegative(httpResponse) -> Left(BppError.Nack)
+//        else -> Right(httpResponse.body()!!)
+        else -> TODO("Not yet implemented")
+      }
+
+
+      return Right(httpResponse.body()!!)
+    }.mapLeft {
+      log.error("Error when initiating track", it)
+      BppError.Internal
+    }
 }

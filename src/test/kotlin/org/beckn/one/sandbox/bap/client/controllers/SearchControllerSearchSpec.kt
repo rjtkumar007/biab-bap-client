@@ -13,9 +13,9 @@ import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
+import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ResponseStatus.ACK
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.litote.kmongo.eq
@@ -119,9 +119,9 @@ class SearchControllerSearchSpec @Autowired constructor(
   }
 
   private fun verifyThatBppSearchWasInvoked(
-      searchResponse: ProtocolAckResponse,
-      providerId: String,
-      providerLocation: String
+    searchResponse: ProtocolAckResponse,
+    providerId: String,
+    providerLocation: String
   ) {
     val protocolSearchRequest = SearchRequestFactory.create(searchResponse.context!!, providerId, providerLocation)
     MockNetwork.retailBengaluruBpp.verify(
@@ -192,11 +192,7 @@ class SearchControllerSearchSpec @Autowired constructor(
       )
   }
 
-  private fun invokeSearchApi(
-    location: String = "",
-    providerId: String = "",
-    bppId: String = ""
-  ) = mockMvc
+  private fun invokeSearchApi(location: String = "", providerId: String = "", bppId: String = "") = mockMvc
     .perform(
       get("/client/v1/search")
         .param("searchString", "Fictional mystery books")
@@ -204,5 +200,4 @@ class SearchControllerSearchSpec @Autowired constructor(
         .param("bppId", bppId)
         .param("providerId", providerId)
     )
-
 }

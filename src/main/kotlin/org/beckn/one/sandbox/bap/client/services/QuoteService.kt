@@ -42,10 +42,11 @@ class QuoteService @Autowired constructor(
       return Either.Left(MultipleProviderError.MultipleProviders)
     }
     return registryService.lookupBppById(cart.items.first().bppId)
+      .flatMap { Either.Right(it.first()) }
       .flatMap {
         bppService.select(
           context,
-          bppUri = it.first().subscriber_url,
+          bppUri = it.subscriber_url,
           providerId = cart.items.first().provider.id,
           providerLocation = ProtocolLocation(id = cart.items.first().provider.locations?.first()),
           items = cart.items.map { cartItem -> selectedItemMapper.dtoToProtocol(cartItem) }
