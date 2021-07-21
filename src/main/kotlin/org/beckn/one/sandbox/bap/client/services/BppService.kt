@@ -278,8 +278,8 @@ class BppService @Autowired constructor(
       log.info("BPP Track API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       return when {
         isInternalServerError(httpResponse) -> Left(BppError.Internal)
-//        isBodyNull(httpResponse) -> Left(BppError.NullResponse)
-//        isAckNegative(httpResponse) -> Left(BppError.Nack)
+        isBodyNull(httpResponse) -> Left(BppError.NullResponse)
+        isAckNegative(httpResponse) -> Left(BppError.Nack)
 //        else -> Right(httpResponse.body()!!)
         else -> TODO("Not yet implemented")
       }
