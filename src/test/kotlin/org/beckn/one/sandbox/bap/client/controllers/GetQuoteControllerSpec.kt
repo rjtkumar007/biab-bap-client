@@ -18,6 +18,10 @@ import org.beckn.one.sandbox.bap.client.factories.CartFactory
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.anotherRetailBengaluruBpp
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.registryBppLookupApi
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.retailBengaluruBpp
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
@@ -51,24 +55,20 @@ class GetQuoteControllerSpec @Autowired constructor(
 
   init {
     describe("Get Quote") {
+      MockNetwork.startAllSubscribers()
       val context = ClientContext(transactionId = uuidFactory.create())
-      val registryBppLookupApi = WireMockServer(4010)
-      registryBppLookupApi.start()
-      val bppApi = WireMockServer(4011)
-      bppApi.start()
-      val anotherBppApi = WireMockServer(4012)
-      anotherBppApi.start()
-      val cart = CartFactory.create(bpp1Uri = bppApi.baseUrl())
+      val cart = CartFactory.create(bpp1Uri = retailBengaluruBpp.baseUrl())
 
       beforeEach {
-        bppApi.resetAll()
+        MockNetwork.resetAllSubscribers()
+        retailBengaluruBpp.resetAll()
         registryBppLookupApi.resetAll()
-        stubBppLookupApi(registryBppLookupApi, bppApi)
-        stubBppLookupApi(registryBppLookupApi, anotherBppApi)
+        stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp)
+        stubBppLookupApi(registryBppLookupApi, anotherRetailBengaluruBpp)
       }
 
       it("should return error when bpp select call fails") {
-        bppApi.stubFor(post("/select").willReturn(serverError()))
+        retailBengaluruBpp.stubFor(post("/select").willReturn(serverError()))
 
         val getQuoteResponseString = invokeGetQuoteApi(context = context, cart = cart)
           .andExpect(status().isInternalServerError)
@@ -78,13 +78,13 @@ class GetQuoteControllerSpec @Autowired constructor(
         val getQuoteResponse =
           verifyResponseMessage(getQuoteResponseString, ResponseMessage.nack(), BppError.Internal.error(), context)
         verifyThatMessageWasNotPersisted(getQuoteResponse)
-        verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, bppApi)
-        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, bppApi)
+        verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
 
       }
 
       it("should invoke provide select api and save message") {
-        bppApi
+        retailBengaluruBpp
           .stubFor(
             post("/select").willReturn(
               okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create(transactionId = context.transactionId))))
@@ -102,14 +102,14 @@ class GetQuoteControllerSpec @Autowired constructor(
           expectedContext = context
         )
         verifyThatMessageForSelectRequestIsPersisted(getQuoteResponse)
-        verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, bppApi)
-        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, bppApi)
+        verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
 
       it("should validate that cart contains items from only one bpp") {
 
         val cartWithMultipleBppItems =
-          CartFactory.create(bpp1Uri = bppApi.baseUrl(), bpp2Uri = anotherBppApi.baseUrl())
+          CartFactory.create(bpp1Uri = retailBengaluruBpp.baseUrl(), bpp2Uri = anotherRetailBengaluruBpp.baseUrl())
 
         val getQuoteResponseString = invokeGetQuoteApi(context = context, cart = cartWithMultipleBppItems)
           .andExpect(status().is4xxClientError)
@@ -124,15 +124,15 @@ class GetQuoteControllerSpec @Autowired constructor(
             context
           )
         verifyThatMessageWasNotPersisted(getQuoteResponse)
-        verifyThatBppSelectApiWasNotInvoked(bppApi)
+        verifyThatBppSelectApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
-        verifyThatSubscriberLookupApiWasNotInvoked(anotherBppApi)
+        verifyThatSubscriberLookupApiWasNotInvoked(anotherRetailBengaluruBpp)
       }
 
       it("should validate that cart contains items from only one provider") {
         val cartWithMultipleProviderItems =
           CartFactory.create(
-            bpp1Uri = bppApi.baseUrl(),
+            bpp1Uri = retailBengaluruBpp.baseUrl(),
             provider2Id = "padma coffee works",
             provider2Location = listOf("padma coffee works location 1")
           )
@@ -150,7 +150,7 @@ class GetQuoteControllerSpec @Autowired constructor(
             context
           )
         verifyThatMessageWasNotPersisted(getQuoteResponse)
-        verifyThatBppSelectApiWasNotInvoked(bppApi)
+        verifyThatBppSelectApiWasNotInvoked(retailBengaluruBpp)
       }
 
       registryBppLookupApi.stop() //todo: this and any other mocks used have to be cleaned between different tests

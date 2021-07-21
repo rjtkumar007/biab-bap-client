@@ -16,12 +16,17 @@ import org.beckn.one.sandbox.bap.client.factories.OrderDtoFactory
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.anotherRetailBengaluruBpp
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.registryBppLookupApi
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.retailBengaluruBpp
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.protocol.schemas.*
 import org.litote.kmongo.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -32,7 +37,6 @@ import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.beckn.protocol.schemas.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -47,30 +51,24 @@ class ConfirmOrderControllerSpec @Autowired constructor(
 ) : DescribeSpec() {
   init {
     describe("Confirm order with BPP") {
-      val registryBppLookupApi = WireMockServer(4010)
-      registryBppLookupApi.start()
-      val providerApi = WireMockServer(4015)
-      providerApi.start()
-      val provider2Api = WireMockServer(4016)
-      provider2Api.start()
+      MockNetwork.startAllSubscribers()
       val context = ClientContext(transactionId = uuidFactory.create())
       val orderRequest = OrderRequestDto(
         message = OrderDtoFactory.create(
-          bpp1_id = providerApi.baseUrl(),
+          bpp1_id = retailBengaluruBpp.baseUrl(),
           provider1_id = "padma coffee works",
           payment = OrderPayment(100.0)
         ), context = context
       )
 
       beforeEach {
-        providerApi.resetAll()
-        registryBppLookupApi.resetAll()
-        stubBppLookupApi(registryBppLookupApi, providerApi)
-        stubBppLookupApi(registryBppLookupApi, provider2Api)
+        MockNetwork.resetAllSubscribers()
+        stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp)
+        stubBppLookupApi(registryBppLookupApi, anotherRetailBengaluruBpp)
       }
 
       it("should return error when BPP confirm call fails") {
-        providerApi.stubFor(post("/confirm").willReturn(serverError()))
+        retailBengaluruBpp.stubFor(post("/confirm").willReturn(serverError()))
 
         val confirmOrderResponseString =
           invokeConfirmOrder(orderRequest).andExpect(MockMvcResultMatchers.status().isInternalServerError)
@@ -84,8 +82,8 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             ProtocolError("BAP_011", "BPP returned error")
           )
         verifyThatMessageWasNotPersisted(confirmOrderResponse)
-        verifyThatBppConfirmApiWasInvoked(confirmOrderResponse, orderRequest, providerApi)
-        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, providerApi)
+        verifyThatBppConfirmApiWasInvoked(confirmOrderResponse, orderRequest, retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
 
       it("should validate that order contains items from only one bpp") {
@@ -95,8 +93,8 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             context = context,
             message = OrderDtoFactory.create(
               null,
-              bpp1_id = providerApi.baseUrl(),
-              bpp2_id = provider2Api.baseUrl(),
+              bpp1_id = retailBengaluruBpp.baseUrl(),
+              bpp2_id = anotherRetailBengaluruBpp.baseUrl(),
               provider1_id = "padma coffee works",
               payment = OrderPayment(100.0)
             )
@@ -115,9 +113,9 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             ProtocolError("BAP_014", "More than one BPP's item(s) selected/initialized")
           )
         verifyThatMessageWasNotPersisted(confirmOrderResponse)
-        verifyThatBppConfirmApiWasNotInvoked(providerApi)
+        verifyThatBppConfirmApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
-        verifyThatSubscriberLookupApiWasNotInvoked(provider2Api)
+        verifyThatSubscriberLookupApiWasNotInvoked(anotherRetailBengaluruBpp)
       }
 
       it("should validate that order contains items from only one provider") {
@@ -125,7 +123,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
           context = context,
           message = OrderDtoFactory.create(
             null,
-            bpp1_id = providerApi.baseUrl(),
+            bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
             provider2_id = "Venugopal store",
             payment = OrderPayment(100.0)
@@ -145,20 +143,20 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             ProtocolError("BAP_010", "More than one Provider's item(s) selected/initialized")
           )
         verifyThatMessageWasNotPersisted(confirmOrderResponse)
-        verifyThatBppConfirmApiWasNotInvoked(providerApi)
+        verifyThatBppConfirmApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
-        verifyThatSubscriberLookupApiWasNotInvoked(provider2Api)
+        verifyThatSubscriberLookupApiWasNotInvoked(anotherRetailBengaluruBpp)
       }
 
       it("should validate if payment is done") {
         val orderRequestForTest = OrderRequestDto(
           message = OrderDtoFactory.create(
-            bpp1_id = providerApi.baseUrl(),
+            bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
             payment = OrderPayment(0.0)
           ), context = context
         )
-        providerApi
+        retailBengaluruBpp
           .stubFor(
             post("/confirm").willReturn(
               okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
@@ -176,20 +174,20 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             ProtocolError("BAP_015", "BAP hasn't received payment yet")
           )
         verifyThatMessageWasNotPersisted(confirmOrderResponse)
-        verifyThatBppConfirmApiWasNotInvoked(providerApi)
+        verifyThatBppConfirmApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
       }
 
       it("should return null when cart items are empty") {
         val orderRequestForTest = OrderRequestDto(
           message = OrderDtoFactory.create(
-            bpp1_id = providerApi.baseUrl(),
+            bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
             payment = OrderPayment(100.0),
             items = emptyList()
           ), context = context
         )
-        providerApi
+        retailBengaluruBpp
           .stubFor(
             post("/confirm").willReturn(
               okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
@@ -204,12 +202,12 @@ class ConfirmOrderControllerSpec @Autowired constructor(
         val confirmOrderResponse =
           verifyConfirmResponseMessage(confirmOrderResponseString, orderRequestForTest, ResponseMessage.ack())
         verifyThatMessageWasNotPersisted(confirmOrderResponse)
-        verifyThatBppConfirmApiWasNotInvoked(providerApi)
+        verifyThatBppConfirmApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
       }
 
       it("should invoke provider confirm api and save message when payment is done") {
-        providerApi
+        retailBengaluruBpp
           .stubFor(
             post("/confirm").willReturn(
               okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
@@ -224,8 +222,8 @@ class ConfirmOrderControllerSpec @Autowired constructor(
         val confirmOrderResponse =
           verifyConfirmResponseMessage(confirmOrderResponseString, orderRequest, ResponseMessage.ack())
         verifyThatMessageWasPersisted(confirmOrderResponse)
-        verifyThatBppConfirmApiWasInvoked(confirmOrderResponse, orderRequest, providerApi)
-        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, providerApi)
+        verifyThatBppConfirmApiWasInvoked(confirmOrderResponse, orderRequest, retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
 
       registryBppLookupApi.stop()

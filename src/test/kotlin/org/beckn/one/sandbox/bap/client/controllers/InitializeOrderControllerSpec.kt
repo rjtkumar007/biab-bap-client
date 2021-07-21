@@ -16,6 +16,10 @@ import org.beckn.one.sandbox.bap.client.factories.OrderItemDtoFactory
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.anotherRetailBengaluruBpp
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.registryBppLookupApi
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.retailBengaluruBpp
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
@@ -47,30 +51,24 @@ class InitializeOrderControllerSpec @Autowired constructor(
 ) : DescribeSpec() {
   init {
     describe("Initialize order with BPP") {
-      val registryBppLookupApi = WireMockServer(4010)
-      registryBppLookupApi.start()
-      val providerApi = WireMockServer(4013)
-      providerApi.start()
-      val provider2Api = WireMockServer(4014)
-      provider2Api.start()
+      MockNetwork.startAllSubscribers()
       val context = ClientContext(transactionId = uuidFactory.create())
       val orderRequest = OrderRequestDto(
         context = context,
         message = OrderDtoFactory.create(
-          bpp1_id = providerApi.baseUrl(),
+          bpp1_id = retailBengaluruBpp.baseUrl(),
           provider1_id = "padma coffee works"
         ),
       )
 
       beforeEach {
-        providerApi.resetAll()
-        registryBppLookupApi.resetAll()
-        stubBppLookupApi(registryBppLookupApi, providerApi)
-        stubBppLookupApi(registryBppLookupApi, provider2Api)
+        MockNetwork.resetAllSubscribers()
+        stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp)
+        stubBppLookupApi(registryBppLookupApi, anotherRetailBengaluruBpp)
       }
 
       it("should return error when BPP init call fails") {
-        providerApi.stubFor(post("/init").willReturn(serverError()))
+        retailBengaluruBpp.stubFor(post("/init").willReturn(serverError()))
 
         val initializeOrderResponseString =
           invokeInitializeOrder(orderRequest).andExpect(MockMvcResultMatchers.status().isInternalServerError)
@@ -84,8 +82,8 @@ class InitializeOrderControllerSpec @Autowired constructor(
             ProtocolError("BAP_011", "BPP returned error")
           )
         verifyThatMessageWasNotPersisted(initializeOrderResponse)
-        verifyThatBppInitApiWasInvoked(initializeOrderResponse, orderRequest, providerApi)
-        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, providerApi)
+        verifyThatBppInitApiWasInvoked(initializeOrderResponse, orderRequest, retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
 
       it("should validate that order contains items from only one bpp") {
@@ -95,8 +93,8 @@ class InitializeOrderControllerSpec @Autowired constructor(
             context = context,
             message = OrderDtoFactory.create(
               null,
-              bpp1_id = providerApi.baseUrl(),
-              bpp2_id = provider2Api.baseUrl(),
+              bpp1_id = retailBengaluruBpp.baseUrl(),
+              bpp2_id = anotherRetailBengaluruBpp.baseUrl(),
               provider1_id = "padma coffee works"
             )
           )
@@ -114,9 +112,9 @@ class InitializeOrderControllerSpec @Autowired constructor(
             ProtocolError("BAP_014", "More than one BPP's item(s) selected/initialized")
           )
         verifyThatMessageWasNotPersisted(initializeOrderResponse)
-        verifyThatBppInitApiWasNotInvoked(providerApi)
+        verifyThatBppInitApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
-        verifyThatSubscriberLookupApiWasNotInvoked(provider2Api)
+        verifyThatSubscriberLookupApiWasNotInvoked(anotherRetailBengaluruBpp)
       }
 
       it("should validate that order contains items from only one provider") {
@@ -124,7 +122,7 @@ class InitializeOrderControllerSpec @Autowired constructor(
           context = context,
           message = OrderDtoFactory.create(
             null,
-            bpp1_id = providerApi.baseUrl(),
+            bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
             provider2_id = "Venugopal store"
           )
@@ -143,20 +141,20 @@ class InitializeOrderControllerSpec @Autowired constructor(
             ProtocolError("BAP_010", "More than one Provider's item(s) selected/initialized")
           )
         verifyThatMessageWasNotPersisted(initializeOrderResponse)
-        verifyThatBppInitApiWasNotInvoked(providerApi)
+        verifyThatBppInitApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
-        verifyThatSubscriberLookupApiWasNotInvoked(provider2Api)
+        verifyThatSubscriberLookupApiWasNotInvoked(anotherRetailBengaluruBpp)
       }
 
       it("should return null when cart items are empty") {
         val initRequestForTest = OrderRequestDto(
           message = OrderDtoFactory.create(
-            bpp1_id = providerApi.baseUrl(),
+            bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
             items = emptyList()
           ), context = context
         )
-        providerApi
+        retailBengaluruBpp
           .stubFor(
             post("/init").willReturn(
               okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
@@ -171,19 +169,24 @@ class InitializeOrderControllerSpec @Autowired constructor(
         val confirmOrderResponse =
           verifyInitResponseMessage(initializeOrderResponseString, initRequestForTest, ResponseMessage.ack())
         verifyThatMessageWasNotPersisted(confirmOrderResponse)
-        verifyThatBppInitApiWasNotInvoked(providerApi)
+        verifyThatBppInitApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
       }
 
       it("should invoke provide init api and save message") {
         val initRequestForTest = OrderRequestDto(
           message = OrderDtoFactory.create(
-            bpp1_id = providerApi.baseUrl(),
+            bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
-            items = listOf(OrderItemDtoFactory.create(providerId = "padma coffee works", bppId = providerApi.baseUrl()))
+            items = listOf(
+              OrderItemDtoFactory.create(
+                providerId = "padma coffee works",
+                bppId = retailBengaluruBpp.baseUrl()
+              )
+            )
           ), context = context
         )
-        providerApi
+        retailBengaluruBpp
           .stubFor(
             post("/init").willReturn(
               okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
@@ -198,8 +201,8 @@ class InitializeOrderControllerSpec @Autowired constructor(
         val confirmOrderResponse =
           verifyInitResponseMessage(initializeOrderResponseString, initRequestForTest, ResponseMessage.ack())
         verifyThatMessageWasPersisted(confirmOrderResponse)
-        verifyThatBppInitApiWasInvoked(confirmOrderResponse, initRequestForTest, providerApi)
-        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, providerApi)
+        verifyThatBppInitApiWasInvoked(confirmOrderResponse, initRequestForTest, retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
 
       registryBppLookupApi.stop()

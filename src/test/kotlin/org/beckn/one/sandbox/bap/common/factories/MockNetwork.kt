@@ -1,14 +1,15 @@
 package org.beckn.one.sandbox.bap.common.factories
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
-import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 
 object MockNetwork {
 
   val registry = WireMockServer(4000)
+  val registryBppLookupApi = WireMockServer(4010)
   val retailBengaluruBg = WireMockServer(4001)
   val anotherRetailBengaluruBg = WireMockServer(4002)
   val deliveryPuneBg = WireMockServer(4003)
@@ -18,6 +19,7 @@ object MockNetwork {
 
   fun startAllSubscribers() {
     registry.start()
+    registryBppLookupApi.start()
     retailBengaluruBg.start()
     anotherRetailBengaluruBg.start()
     deliveryPuneBg.start()
@@ -28,6 +30,7 @@ object MockNetwork {
 
   fun resetAllSubscribers() {
     registry.resetAll()
+    registryBppLookupApi.resetAll()
     retailBengaluruBg.resetAll()
     anotherRetailBengaluruBg.resetAll()
     deliveryPuneBg.resetAll()

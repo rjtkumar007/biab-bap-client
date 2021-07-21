@@ -10,6 +10,7 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
@@ -41,32 +42,29 @@ class TrackControllerSpec @Autowired constructor(
   init {
     describe("Track") {
       val verifier = Verifier(objectMapper, messageRepository)
-      val registryBppLookupApi = WireMockServer(4010)
-      val bppApi = WireMockServer(4011)
-      val anotherBppApi = WireMockServer(4012)
-      bppApi.start()
-      registryBppLookupApi.start()
-      anotherBppApi.start()
+      MockNetwork.startAllSubscribers()
 
       beforeEach {
-        bppApi.resetAll()
-        registryBppLookupApi.resetAll()
-        stubBppLookupApi(registryBppLookupApi, bppApi)
-        stubBppLookupApi(registryBppLookupApi, anotherBppApi)
+        MockNetwork.resetAllSubscribers()
+        stubBppLookupApi(MockNetwork.registryBppLookupApi, MockNetwork.retailBengaluruBpp)
+        stubBppLookupApi(MockNetwork.registryBppLookupApi, MockNetwork.anotherRetailBengaluruBpp)
       }
 
       it("should return error when bpp track call fails") {
-        bppApi.stubFor(post("/track").willReturn(serverError()))
+        MockNetwork.retailBengaluruBpp.stubFor(post("/track").willReturn(serverError()))
 
-        val trackResponseString = invokeTrackApi(getTrackRequestDto(bppApi.baseUrl()))
+        val trackResponseString = invokeTrackApi(getTrackRequestDto(MockNetwork.retailBengaluruBpp.baseUrl()))
           .andExpect(status().is5xxServerError)
           .andReturn().response.contentAsString
 
         val getQuoteResponse =
           verifyResponseMessage(trackResponseString, ResponseMessage.nack(), BppError.Internal.error())
         verifier.verifyThatMessageWasNotPersisted(getQuoteResponse)
-        verifyThatBppTrackApiWasInvoked(getQuoteResponse, bppApi)
-        verifier.verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, bppApi)
+        verifyThatBppTrackApiWasInvoked(getQuoteResponse, MockNetwork.retailBengaluruBpp)
+        verifier.verifyThatSubscriberLookupApiWasInvoked(
+          MockNetwork.registryBppLookupApi,
+          MockNetwork.retailBengaluruBpp
+        )
       }
     }
   }

@@ -9,6 +9,10 @@ import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.factories.SearchRequestFactory
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.registry
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.registryBppLookupApi
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.retailBengaluruBg
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.retailBengaluruBpp
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
@@ -49,7 +53,7 @@ class SearchControllerSearchSpec @Autowired constructor(
       }
 
       it("should return error response when registry lookup fails") {
-        MockNetwork.registry
+        registry
           .stubFor(post("/lookup").willReturn(serverError()))
 
         invokeSearchApi()
@@ -60,7 +64,7 @@ class SearchControllerSearchSpec @Autowired constructor(
       }
 
       it("should return error response when registry lookup fails with location") {
-        MockNetwork.registry
+        registry
           .stubFor(post("/lookup").willReturn(serverError()))
 
         invokeSearchApi(location = "40.741895,-73.989308")
@@ -100,10 +104,8 @@ class SearchControllerSearchSpec @Autowired constructor(
 
       it("should invoke Beckn /search API on specified BPP using gateway and persist message with location") {
         val bpp = MockNetwork.getRetailBengaluruBpp()
-        val registryBppLookupApi = WireMockServer(4010)
-        registryBppLookupApi.start()
         stubBppSearchApi()
-        stubBppLookupApi(registryBppLookupApi, MockNetwork.retailBengaluruBpp, bpp.subscriber_id)
+        stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp, bpp.subscriber_id)
 
         val result: MvcResult =
           invokeSearchApi(location = "12.9259,77.583", providerId = "tulsidev", bppId = bpp.subscriber_id)
@@ -124,14 +126,14 @@ class SearchControllerSearchSpec @Autowired constructor(
     providerLocation: String
   ) {
     val protocolSearchRequest = SearchRequestFactory.create(searchResponse.context!!, providerId, providerLocation)
-    MockNetwork.retailBengaluruBpp.verify(
+    retailBengaluruBpp.verify(
       postRequestedFor(urlEqualTo("/search"))
         .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))
     )
   }
 
   private fun stubBppSearchApi() {
-    MockNetwork.retailBengaluruBpp
+    retailBengaluruBpp
       .stubFor(
         post("/search")
           .willReturn(okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create()))))
@@ -172,17 +174,17 @@ class SearchControllerSearchSpec @Autowired constructor(
   }
 
   private fun verifyThatSearchApiWasInvoked() {
-    MockNetwork.retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
+    retailBengaluruBg.verify(postRequestedFor(urlEqualTo("/search")))
   }
 
   private fun stubLookupApi() {
     val gatewaysJson = objectMapper.writeValueAsString(MockNetwork.getAllGateways())
-    MockNetwork.registry
+    registry
       .stubFor(post("/lookup").willReturn(okJson(gatewaysJson)))
   }
 
   private fun stubSearchApi() {
-    MockNetwork.retailBengaluruBg
+    retailBengaluruBg
       .stubFor(
         post("/search").willReturn(
           okJson(
