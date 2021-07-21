@@ -2,8 +2,9 @@ package org.beckn.one.sandbox.bap.client.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
 import org.beckn.one.sandbox.bap.common.City
@@ -18,6 +19,14 @@ class Verifier(
   val objectMapper: ObjectMapper,
   val messageRepository: GenericRepository<MessageDao>,
 ) {
+  fun verifyThatMessageForRequestIsPersisted(response: ProtocolAckResponse, type: MessageDao.Type) {
+    val savedMessage = messageRepository.findOne(MessageDao::id eq response.context?.messageId)
+    savedMessage shouldNotBe null
+    savedMessage?.id shouldBe response.context?.messageId
+    savedMessage?.type shouldBe type
+  }
+
+
   fun verifyThatMessageWasNotPersisted(response: ProtocolAckResponse) {
     val savedMessage = messageRepository.findOne(MessageDao::id eq response.context?.messageId)
     savedMessage shouldBe null
@@ -28,9 +37,9 @@ class Verifier(
     bppApi: WireMockServer
   ) {
     registryBppLookupApi.verify(
-      WireMock.postRequestedFor(WireMock.urlEqualTo("/lookup"))
+      postRequestedFor(urlEqualTo("/lookup"))
         .withRequestBody(
-          WireMock.equalToJson(
+          equalToJson(
             objectMapper.writeValueAsString(
               SubscriberLookupRequest(
                 subscriber_id = bppApi.baseUrl(),

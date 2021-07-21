@@ -11,12 +11,17 @@ import org.beckn.one.sandbox.bap.client.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.anotherRetailBengaluruBpp
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.registryBppLookupApi
+import org.beckn.one.sandbox.bap.common.factories.MockNetwork.retailBengaluruBpp
+import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.beckn.protocol.schemas.*
+import org.litote.kmongo.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -37,34 +42,58 @@ class TrackControllerSpec @Autowired constructor(
   val objectMapper: ObjectMapper,
   val contextFactory: ContextFactory,
   val uuidFactory: UuidFactory,
-  val messageRepository: GenericRepository<MessageDao>
+  val messageRepository: GenericRepository<MessageDao>,
 ) : DescribeSpec() {
+  private val verifier = Verifier(objectMapper, messageRepository)
+
   init {
     describe("Track") {
-      val verifier = Verifier(objectMapper, messageRepository)
       MockNetwork.startAllSubscribers()
 
       beforeEach {
         MockNetwork.resetAllSubscribers()
-        stubBppLookupApi(MockNetwork.registryBppLookupApi, MockNetwork.retailBengaluruBpp)
-        stubBppLookupApi(MockNetwork.registryBppLookupApi, MockNetwork.anotherRetailBengaluruBpp)
+        stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp)
+        stubBppLookupApi(registryBppLookupApi, anotherRetailBengaluruBpp)
       }
 
       it("should return error when bpp track call fails") {
-        MockNetwork.retailBengaluruBpp.stubFor(post("/track").willReturn(serverError()))
+        retailBengaluruBpp.stubFor(post("/track").willReturn(serverError()))
 
-        val trackResponseString = invokeTrackApi(getTrackRequestDto(MockNetwork.retailBengaluruBpp.baseUrl()))
+        val trackResponseString = invokeTrackApi(getTrackRequestDto())
           .andExpect(status().is5xxServerError)
           .andReturn().response.contentAsString
 
-        val getQuoteResponse =
+        val trackResponse =
           verifyResponseMessage(trackResponseString, ResponseMessage.nack(), BppError.Internal.error())
-        verifier.verifyThatMessageWasNotPersisted(getQuoteResponse)
-        verifyThatBppTrackApiWasInvoked(getQuoteResponse, MockNetwork.retailBengaluruBpp)
+        verifier.verifyThatMessageWasNotPersisted(trackResponse)
+        verifyThatBppTrackApiWasInvoked(trackResponse, retailBengaluruBpp)
         verifier.verifyThatSubscriberLookupApiWasInvoked(
-          MockNetwork.registryBppLookupApi,
-          MockNetwork.retailBengaluruBpp
+          registryBppLookupApi,
+          retailBengaluruBpp
         )
+      }
+
+      it("should invoke provide track api and save message") {
+        retailBengaluruBpp
+          .stubFor(
+            post("/track").willReturn(
+              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
+            )
+          )
+
+        val trackResponseString = invokeTrackApi(getTrackRequestDto())
+          .andExpect(status().is2xxSuccessful)
+          .andReturn()
+          .response.contentAsString
+
+        val trackResponse = verifyResponseMessage(
+          responseString = trackResponseString,
+          expectedMessage = ResponseMessage.ack(),
+          expectedError = null
+        )
+        verifier.verifyThatMessageForRequestIsPersisted(trackResponse, MessageDao.Type.Track)
+        verifyThatBppTrackApiWasInvoked(trackResponse, retailBengaluruBpp)
+        verifier.verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
     }
   }
@@ -78,7 +107,7 @@ class TrackControllerSpec @Autowired constructor(
       )
   }
 
-  private fun getTrackRequestDto(bppId: String): TrackRequestDto {
+  private fun getTrackRequestDto(bppId: String = retailBengaluruBpp.baseUrl()): TrackRequestDto {
     return TrackRequestDto(
       context = ClientContext(bppId = bppId, transactionId = ""),
       message = ProtocolTrackRequestMessage(orderId = "order id 1"),
@@ -109,11 +138,11 @@ class TrackControllerSpec @Autowired constructor(
     )
 
   private fun verifyResponseMessage(
-    trackResponseString: String,
+    responseString: String,
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null
   ): ProtocolAckResponse {
-    val getQuoteResponse = objectMapper.readValue(trackResponseString, ProtocolAckResponse::class.java)
+    val getQuoteResponse = objectMapper.readValue(responseString, ProtocolAckResponse::class.java)
     getQuoteResponse.context shouldNotBe null
     getQuoteResponse.context?.messageId shouldNotBe null
     getQuoteResponse.context?.action shouldBe ProtocolContext.Action.TRACK
@@ -138,5 +167,12 @@ class TrackControllerSpec @Autowired constructor(
       context = trackResponse.context!!,
       message = ProtocolTrackRequestMessage(orderId = "order id 1"),
     )
+  }
+
+  private fun verifyThatMessageForSelectRequestIsPersisted(trackResponse: ProtocolAckResponse) {
+    val savedMessage = messageRepository.findOne(MessageDao::id eq trackResponse.context?.messageId)
+    savedMessage shouldNotBe null
+    savedMessage?.id shouldBe trackResponse.context?.messageId
+    savedMessage?.type shouldBe MessageDao.Type.Select
   }
 }

@@ -2,9 +2,11 @@ package org.beckn.one.sandbox.bap.client.controllers
 
 import org.beckn.one.sandbox.bap.client.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.client.services.TrackService
+import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ResponseMessage
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,9 +30,18 @@ class TrackController @Autowired constructor(
     return trackService.track(context, request)
       .fold(
         {
-          ResponseEntity.status(500)
-            .body(ProtocolAckResponse(context = context, message = it.message(), error = it.error()))
+          log.error("Error when getting tracking information: {}", it)
+          mapToErrorResponse(it, context)
         },
-        { TODO("Not yet implemented") })
+        {
+          log.info("Successfully initiated track api. Message: {}", it)
+          ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
+        }
+      )
   }
+
+  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext) = ResponseEntity
+    .status(it.status())
+    .body(ProtocolAckResponse(context = context, message = it.message(), error = it.error()))
+
 }

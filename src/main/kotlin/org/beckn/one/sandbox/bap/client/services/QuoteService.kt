@@ -52,9 +52,7 @@ class QuoteService @Autowired constructor(
           items = cart.items.map { cartItem -> selectedItemMapper.dtoToProtocol(cartItem) }
         )
       }
-      .flatMap {
-        messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Select))
-      }
+      .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Select)) }
   }
 
   private fun areMultipleProviderItemsSelected(items: List<CartItemDto>) =

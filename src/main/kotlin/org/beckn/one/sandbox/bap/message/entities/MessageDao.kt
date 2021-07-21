@@ -19,7 +19,8 @@ data class MessageDao(
     Search,
     Select,
     Init,
-    Confirm
+    Confirm,
+    Track
   }
 }
 

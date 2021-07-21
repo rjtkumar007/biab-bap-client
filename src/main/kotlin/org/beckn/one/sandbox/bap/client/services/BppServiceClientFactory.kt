@@ -10,7 +10,8 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 @Service
 class BppServiceClientFactory @Autowired constructor(val objectMapper: ObjectMapper) {
   fun getClient(bppUri: String): BppServiceClient {
-    val url = if (bppUri.endsWith("/")) bppUri else "$bppUri/" //todo: Should the spec define if subscriber url ends with /
+    val url =
+      if (bppUri.endsWith("/")) bppUri else "$bppUri/" //todo: Should the spec define if subscriber url ends with /
     val retrofit = Retrofit.Builder().baseUrl(url)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper)).build()
     return retrofit.create(BppServiceClient::class.java)

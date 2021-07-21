@@ -280,12 +280,8 @@ class BppService @Autowired constructor(
         isInternalServerError(httpResponse) -> Left(BppError.Internal)
         isBodyNull(httpResponse) -> Left(BppError.NullResponse)
         isAckNegative(httpResponse) -> Left(BppError.Nack)
-//        else -> Right(httpResponse.body()!!)
-        else -> TODO("Not yet implemented")
+        else -> Right(httpResponse.body()!!)
       }
-
-
-      return Right(httpResponse.body()!!)
     }.mapLeft {
       log.error("Error when initiating track", it)
       BppError.Internal

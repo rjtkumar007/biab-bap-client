@@ -11,13 +11,8 @@ import org.beckn.one.sandbox.bap.client.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.dtos.GetQuoteRequestDto
 import org.beckn.one.sandbox.bap.client.dtos.GetQuoteRequestMessageDto
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
-import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
-import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
 import org.beckn.one.sandbox.bap.client.factories.CartFactory
-import org.beckn.one.sandbox.bap.common.City
-import org.beckn.one.sandbox.bap.common.Country
-import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork.anotherRetailBengaluruBpp
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork.registryBppLookupApi
@@ -29,7 +24,6 @@ import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.beckn.protocol.schemas.*
-import org.litote.kmongo.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -50,8 +44,9 @@ class GetQuoteControllerSpec @Autowired constructor(
   val objectMapper: ObjectMapper,
   val contextFactory: ContextFactory,
   val uuidFactory: UuidFactory,
-  val messageRepository: GenericRepository<MessageDao>
+  val messageRepository: GenericRepository<MessageDao>,
 ) : DescribeSpec() {
+  private val verifier: Verifier = Verifier(objectMapper, messageRepository)
 
   init {
     describe("Get Quote") {
@@ -77,9 +72,9 @@ class GetQuoteControllerSpec @Autowired constructor(
 
         val getQuoteResponse =
           verifyResponseMessage(getQuoteResponseString, ResponseMessage.nack(), BppError.Internal.error(), context)
-        verifyThatMessageWasNotPersisted(getQuoteResponse)
+        verifier.verifyThatMessageWasNotPersisted(getQuoteResponse)
         verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, retailBengaluruBpp)
-        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
+        verifier.verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
 
       }
 
@@ -101,9 +96,9 @@ class GetQuoteControllerSpec @Autowired constructor(
           ResponseMessage.ack(),
           expectedContext = context
         )
-        verifyThatMessageForSelectRequestIsPersisted(getQuoteResponse)
+        verifier.verifyThatMessageForRequestIsPersisted(getQuoteResponse, MessageDao.Type.Select)
         verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, retailBengaluruBpp)
-        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
+        verifier.verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
 
       it("should validate that cart contains items from only one bpp") {
@@ -123,7 +118,7 @@ class GetQuoteControllerSpec @Autowired constructor(
             ProtocolError("BAP_014", "More than one BPP's item(s) selected/initialized"),
             context
           )
-        verifyThatMessageWasNotPersisted(getQuoteResponse)
+        verifier.verifyThatMessageWasNotPersisted(getQuoteResponse)
         verifyThatBppSelectApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
         verifyThatSubscriberLookupApiWasNotInvoked(anotherRetailBengaluruBpp)
@@ -149,7 +144,7 @@ class GetQuoteControllerSpec @Autowired constructor(
             ProtocolError("BAP_010", "More than one Provider's item(s) selected/initialized"),
             context
           )
-        verifyThatMessageWasNotPersisted(getQuoteResponse)
+        verifier.verifyThatMessageWasNotPersisted(getQuoteResponse)
         verifyThatBppSelectApiWasNotInvoked(retailBengaluruBpp)
       }
 
@@ -169,28 +164,6 @@ class GetQuoteControllerSpec @Autowired constructor(
       )
   }
 
-  private fun verifyThatSubscriberLookupApiWasInvoked(
-    registryBppLookupApi: WireMockServer,
-    bppApi: WireMockServer
-  ) {
-    registryBppLookupApi.verify(
-      postRequestedFor(urlEqualTo("/lookup"))
-        .withRequestBody(
-          equalToJson(
-            objectMapper.writeValueAsString(
-              SubscriberLookupRequest(
-                subscriber_id = bppApi.baseUrl(),
-                type = Subscriber.Type.BPP,
-                domain = Domain.LocalRetail.value,
-                country = Country.India.value,
-                city = City.Bengaluru.value
-              )
-            )
-          )
-        )
-    )
-  }
-
   private fun verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi: WireMockServer) =
     registryBppLookupApi.verify(0, postRequestedFor(urlEqualTo("/lookup")))
 
@@ -204,11 +177,6 @@ class GetQuoteControllerSpec @Autowired constructor(
         )
       )
     )
-
-  private fun verifyThatMessageWasNotPersisted(getQuoteResponse: ProtocolAckResponse) {
-    val savedMessage = messageRepository.findOne(MessageDao::id eq getQuoteResponse.context?.messageId)
-    savedMessage shouldBe null
-  }
 
   private fun verifyResponseMessage(
     getQuoteResponseString: String,
@@ -224,13 +192,6 @@ class GetQuoteControllerSpec @Autowired constructor(
     getQuoteResponse.message shouldBe expectedMessage
     getQuoteResponse.error shouldBe expectedError
     return getQuoteResponse
-  }
-
-  private fun verifyThatMessageForSelectRequestIsPersisted(getQuoteResponse: ProtocolAckResponse) {
-    val savedMessage = messageRepository.findOne(MessageDao::id eq getQuoteResponse.context?.messageId)
-    savedMessage shouldNotBe null
-    savedMessage?.id shouldBe getQuoteResponse.context?.messageId
-    savedMessage?.type shouldBe MessageDao.Type.Select
   }
 
   private fun verifyThatBppSelectApiWasInvoked(
