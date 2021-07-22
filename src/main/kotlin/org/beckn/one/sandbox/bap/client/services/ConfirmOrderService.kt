@@ -6,7 +6,7 @@ import org.beckn.one.sandbox.bap.client.dtos.OrderDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderItemDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderPayment
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
-import org.beckn.one.sandbox.bap.client.errors.validation.CartError
+import org.beckn.one.sandbox.bap.client.errors.CartError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.services.MessageService

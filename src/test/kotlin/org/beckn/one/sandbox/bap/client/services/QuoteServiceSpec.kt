@@ -4,7 +4,7 @@ import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
-import org.beckn.one.sandbox.bap.client.errors.validation.CartError
+import org.beckn.one.sandbox.bap.client.errors.CartError
 import org.beckn.one.sandbox.bap.client.factories.CartFactory
 import org.beckn.one.sandbox.bap.client.mappers.SelectedItemMapperImpl
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance

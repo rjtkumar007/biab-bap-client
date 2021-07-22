@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
 import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
-import org.beckn.one.sandbox.bap.client.errors.validation.CartError
+import org.beckn.one.sandbox.bap.client.errors.CartError
 import org.beckn.one.sandbox.bap.client.mappers.SelectedItemMapper
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao

@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.client.errors.validation
+package org.beckn.one.sandbox.bap.client.errors
 
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.protocol.schemas.ProtocolError

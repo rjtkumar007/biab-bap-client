@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.dtos.TrackRequestDto
+import org.beckn.one.sandbox.bap.client.errors.TrackError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.services.MessageService
@@ -22,10 +23,17 @@ class TrackService @Autowired constructor(
 
   fun track(context: ProtocolContext, request: TrackRequestDto): Either<HttpError, MessageDao?> {
     log.info("Got track request. Request: {}", request)
-    return registryService.lookupBppById(request.context.bppId!!)
+
+    return validate(request)
+      .flatMap { registryService.lookupBppById(request.context.bppId!!) }
       .flatMap { Either.Right(it.first()) }
       .flatMap { bppService.track(it.subscriber_url, context, request) }
       .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Track)) }
+  }
+
+  private fun validate(request: TrackRequestDto): Either<TrackError, Nothing?> {
+    if (request.context.bppId == null) return Either.Left(TrackError.BppIdNotPresent)
+    return Either.Right(null)
   }
 
 }
