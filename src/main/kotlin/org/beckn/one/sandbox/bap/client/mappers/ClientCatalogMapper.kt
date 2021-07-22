@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.client.mappers
+package org.beckn.one.sandbox.bap.client.discovery.mappers
 
 import org.beckn.one.sandbox.bap.client.dtos.ClientCatalog
 import org.beckn.protocol.schemas.ProtocolCatalog
