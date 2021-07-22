@@ -57,7 +57,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
         message = OrderDtoFactory.create(
           bpp1_id = retailBengaluruBpp.baseUrl(),
           provider1_id = "padma coffee works",
-          payment = OrderPayment(100.0)
+          payment = OrderPayment(100.0, status = OrderPayment.Status.PAID, transactionId = "abc")
         ), context = context
       )
 
@@ -96,7 +96,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
               bpp1_id = retailBengaluruBpp.baseUrl(),
               bpp2_id = anotherRetailBengaluruBpp.baseUrl(),
               provider1_id = "padma coffee works",
-              payment = OrderPayment(100.0)
+              payment = OrderPayment(100.0, status = OrderPayment.Status.NOTPAID, transactionId = "abc")
             )
           )
 
@@ -126,7 +126,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
             provider2_id = "Venugopal store",
-            payment = OrderPayment(100.0)
+            payment = OrderPayment(100.0, status = OrderPayment.Status.NOTPAID, transactionId = "abc")
           )
         )
 
@@ -153,7 +153,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
           message = OrderDtoFactory.create(
             bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
-            payment = OrderPayment(0.0)
+            payment = OrderPayment(0.0, status = OrderPayment.Status.NOTPAID, transactionId = "abc")
           ), context = context
         )
         retailBengaluruBpp
@@ -183,7 +183,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
           message = OrderDtoFactory.create(
             bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
-            payment = OrderPayment(100.0),
+            payment = OrderPayment(100.0, status = OrderPayment.Status.NOTPAID, transactionId = "abc"),
             items = emptyList()
           ), context = context
         )

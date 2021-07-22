@@ -5,7 +5,7 @@ import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.provider.BppServiceClient
-import org.beckn.one.sandbox.bap.client.factories.DeliveryDtoFactory
+import org.beckn.one.sandbox.bap.client.factories.OrderDtoFactory
 import org.beckn.one.sandbox.bap.client.factories.OrderItemDtoFactory
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.message.factories.ProtocolBillingFactory
@@ -74,14 +74,20 @@ internal class BppServiceInitSpec : DescribeSpec() {
   }
 
   private fun invokeBppInit(): Either<BppError, ProtocolAckResponse> {
-    return bppService.init(
+    return bppService.initialize(
       context = contextFactory.create(),
       bppUri = bppUri,
-      providerId = "padma coffee works",
-      billingInfo = ProtocolBillingFactory.create(),
-      providerLocation = ProtocolSelectMessageSelectedProviderLocations("A-11 Vedanta, High Street, 435667"),
-      deliveryInfo = DeliveryDtoFactory.create(),
-      items = listOf(OrderItemDtoFactory.create(bppUri, "padma coffee works", "123"))
+      order = OrderDtoFactory.create(
+        bpp1_id = bppUri,
+        provider1_id = "padma coffee works",
+        items = listOf(
+          OrderItemDtoFactory.create(
+            bppUri,
+            "padma coffee works",
+            "123"
+          )
+        )
+      )
     )
   }
 
@@ -91,7 +97,7 @@ internal class BppServiceInitSpec : DescribeSpec() {
       order = ProtocolOrder(
         provider = ProtocolSelectMessageSelectedProvider(
           id = "padma coffee works",
-          locations = listOf(ProtocolSelectMessageSelectedProviderLocations("A-11 Vedanta, High Street, 435667"))
+          locations = listOf(ProtocolSelectMessageSelectedProviderLocations("13.001581,77.5703686"))
         ),
         items = listOf(
           OrderItemDtoFactory.create(

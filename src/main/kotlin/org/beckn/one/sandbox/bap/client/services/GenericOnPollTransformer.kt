@@ -42,13 +42,13 @@ class QuoteClientQuoteResponseMapper : GenericOnPollTransformer<ProtocolOnSelect
     )
 }
 
-class InitClientResponseMapper : GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse> {
+class InitClientResponseMapper : GenericOnPollTransformer<ProtocolOnInit, ClientInitializeResponse> {
   override fun transform(
     input: List<ProtocolOnInit>,
     context: ProtocolContext
-  ): Either<HttpError, ClientInitResponse> =
+  ): Either<HttpError, ClientInitializeResponse> =
     Either.Right(
-      ClientInitResponse(
+      ClientInitializeResponse(
         context = context,
         message = input.first().message
       )

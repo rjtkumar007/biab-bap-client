@@ -31,10 +31,7 @@ class ConfirmOrderController @Autowired constructor(
     val context = getContext(orderRequest.context.transactionId)
     return confirmOrderService.confirmOrder(
       context = context,
-      order = orderRequest.message,
-      deliveryInfo = orderRequest.message.deliveryInfo,
-      billingInfo = orderRequest.message.billingInfo,
-      payment = orderRequest.message.payment
+      order = orderRequest.message
     )
       .fold(
         {

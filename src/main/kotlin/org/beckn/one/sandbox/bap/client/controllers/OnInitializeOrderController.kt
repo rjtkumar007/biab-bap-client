@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.client.controllers
 
-import org.beckn.one.sandbox.bap.client.dtos.ClientInitResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientInitializeResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.services.GenericOnPollService
 import org.beckn.protocol.schemas.ProtocolOnInit
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OnInitializeOrderController @Autowired constructor(
-  onPollService: GenericOnPollService<ProtocolOnInit, ClientInitResponse>,
+  onPollService: GenericOnPollService<ProtocolOnInit, ClientInitializeResponse>,
   contextFactory: ContextFactory
-) : BaseOnPollController<ProtocolOnInit, ClientInitResponse>(onPollService, contextFactory) {
+) : BaseOnPollController<ProtocolOnInit, ClientInitializeResponse>(onPollService, contextFactory) {
 
   @RequestMapping("/client/v1/on_initialize_order")
   @ResponseBody

@@ -1,7 +1,7 @@
 package org.beckn.one.sandbox.bap.configurations
 
 import org.beckn.one.sandbox.bap.client.dtos.ClientConfirmResponse
-import org.beckn.one.sandbox.bap.client.dtos.ClientInitResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientInitializeResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientQuoteResponse
 import org.beckn.one.sandbox.bap.client.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.mappers.ClientCatalogMapper
@@ -29,7 +29,7 @@ class ClientServicesConfiguration @Autowired constructor(
     QuoteClientQuoteResponseMapper()
 
   @Bean
-  fun forInitResults(): GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse> =
+  fun forInitResults(): GenericOnPollTransformer<ProtocolOnInit, ClientInitializeResponse> =
     InitClientResponseMapper()
 
   @Bean
@@ -54,7 +54,7 @@ class ClientServicesConfiguration @Autowired constructor(
   fun initResultReplyService(
     @Autowired messageService: MessageService,
     @Autowired responseStorageService: ResponseStorageService<ProtocolOnInit>,
-    @Autowired transformer: GenericOnPollTransformer<ProtocolOnInit, ClientInitResponse>
+    @Autowired transformer: GenericOnPollTransformer<ProtocolOnInit, ClientInitializeResponse>
   ) = GenericOnPollService(messageService, responseStorageService, transformer)
 
   @Bean

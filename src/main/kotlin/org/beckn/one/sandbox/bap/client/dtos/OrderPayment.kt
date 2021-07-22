@@ -1,7 +1,17 @@
 package org.beckn.one.sandbox.bap.client.dtos
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.one.sandbox.bap.Default
 
 data class OrderPayment @Default constructor(
-  val paidAmount: Double
-)
+  val paidAmount: Double,
+  val status: Status,
+  val transactionId: String
+) {
+  enum class Status(val value: String) {
+    @JsonProperty("PAID")
+    PAID("PAID"),
+    @JsonProperty("NOT-PAID")
+    NOTPAID("NOT-PAID");
+  }
+}

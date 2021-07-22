@@ -24,13 +24,11 @@ class InitializeOrderService @Autowired constructor(
   private val registryService: RegistryService,
   private val log: Logger = LoggerFactory.getLogger(InitializeOrderService::class.java)
 ) {
-  fun initOrder(
+  fun initializeOrder(
       context: ProtocolContext,
-      order: OrderDto,
-      deliveryInfo: DeliveryDto,
-      billingInfo: ProtocolBilling
+      order: OrderDto
   ): Either<HttpError, MessageDao?> {
-    log.info("Got initialize order request. Context: {}, Order: {}, Delivery Info: {}", context, order, deliveryInfo)
+    log.info("Got initialize order request. Context: {}, Order: {}", context, order)
     if (order.items.isNullOrEmpty()) {
       log.info("Empty order received, no op. Order: {}", order)
       return Either.Right(null)
@@ -48,14 +46,10 @@ class InitializeOrderService @Autowired constructor(
 
     return registryService.lookupBppById(order.items.first().bppId)
       .flatMap {
-        bppService.init(
+        bppService.initialize(
           context,
           bppUri = it.first().subscriber_url,
-          providerId = order.items.first().provider.id,
-          billingInfo = billingInfo,
-          items = order.items,
-          providerLocation = ProtocolSelectMessageSelectedProviderLocations(id = order.items.first().provider.locations!!.first()), //todo: is this for sure non nullable?
-          deliveryInfo = deliveryInfo
+          order = order
         )
       }
       .flatMap {

@@ -3,17 +3,14 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
-import org.beckn.one.sandbox.bap.client.dtos.OrderPayment
-import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
+import org.beckn.one.sandbox.bap.client.dtos.OrderDto
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.provider.BppServiceClient
 import org.beckn.one.sandbox.bap.client.factories.DeliveryDtoFactory
 import org.beckn.one.sandbox.bap.client.factories.OrderItemDtoFactory
-import org.beckn.one.sandbox.bap.client.factories.SearchRequestFactory
+import org.beckn.one.sandbox.bap.client.factories.OrderPaymentFactory
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
-import org.beckn.one.sandbox.bap.message.factories.IdFactory
 import org.beckn.one.sandbox.bap.message.factories.*
-import org.beckn.one.sandbox.bap.schemas.*
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.beckn.protocol.schemas.*
 import org.mockito.Mockito.*
@@ -82,12 +79,12 @@ internal class BppServiceConfirmSpec : DescribeSpec() {
     return bppService.confirm(
       context = contextFactory.create(),
       bppUri = bppUri,
-      providerId = "padma coffee works",
-      billingInfo  = ProtocolBillingFactory.create(),
-      items = listOf(OrderItemDtoFactory.create(bppUri, "padma coffee works","123")),
-      providerLocation = ProtocolSelectMessageSelectedProviderLocations("A-11 Vedanta, High Street, 435667"),
-      deliveryInfo = DeliveryDtoFactory.create(),
-      payment = OrderPayment(23.3)
+      order = OrderDto(
+        deliveryInfo = DeliveryDtoFactory.create(),
+        billingInfo = ProtocolBillingFactory.create(),
+        items = listOf(OrderItemDtoFactory.create(bppUri, "padma coffee works", "123")),
+        payment = OrderPaymentFactory.create()
+      )
     )
   }
 
@@ -97,7 +94,7 @@ internal class BppServiceConfirmSpec : DescribeSpec() {
       order = ProtocolOrder(
         provider = ProtocolSelectMessageSelectedProvider(
           id = "padma coffee works",
-          locations = listOf(ProtocolSelectMessageSelectedProviderLocations("A-11 Vedanta, High Street, 435667"))
+          locations = listOf(ProtocolSelectMessageSelectedProviderLocations("13.001581,77.5703686"))
         ),
         items = listOf(
           OrderItemDtoFactory.create(

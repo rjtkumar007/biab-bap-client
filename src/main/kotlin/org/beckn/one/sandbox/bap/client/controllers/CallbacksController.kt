@@ -24,7 +24,7 @@ class CallbacksController @Autowired constructor(
 
   @RequestMapping("/client/v1/on_init")
   @ResponseBody
-  fun onInitV1(
+  fun onInitializeV1(
     @RequestParam messageId: String
   ) = initStore.findByMessageId(messageId)
     .fold(

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.beckn.one.sandbox.bap.client.dtos.ClientInitResponse
+import org.beckn.one.sandbox.bap.client.dtos.ClientInitializeResponse
 import org.beckn.one.sandbox.bap.client.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
@@ -72,13 +72,13 @@ internal class OnInitializeOrderControllerSpec @Autowired constructor(
         it("should respond with all on init responses in body") {
           val results = onInitCallBack.andReturn()
           val body = results.response.contentAsString
-          val clientResponse = mapper.readValue(body, ClientInitResponse::class.java)
+          val clientResponse = mapper.readValue(body, ClientInitializeResponse::class.java)
           clientResponse.message shouldNotBe null
         }
       }
 
       context("when failure occurs during request processing") {
-        val mockOnPollService = mock<GenericOnPollService<ProtocolOnInit, ClientInitResponse>> {
+        val mockOnPollService = mock<GenericOnPollService<ProtocolOnInit, ClientInitializeResponse>> {
           onGeneric { onPoll(any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
         }
         val onInitPollController = OnInitializeOrderController(mockOnPollService, contextFactory)

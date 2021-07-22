@@ -29,11 +29,9 @@ class InitializeOrderController @Autowired constructor(
     @RequestBody orderRequest: OrderRequestDto
   ): ResponseEntity<ProtocolAckResponse> {
     val context = getContext(orderRequest.context.transactionId)
-    return initializeOrderService.initOrder(
+    return initializeOrderService.initializeOrder(
       context = context,
-      order = orderRequest.message,
-      deliveryInfo = orderRequest.message.deliveryInfo,
-      billingInfo = orderRequest.message.billingInfo
+      order = orderRequest.message
     )
       .fold(
         {
