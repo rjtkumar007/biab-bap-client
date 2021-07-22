@@ -6,7 +6,7 @@ import org.beckn.one.sandbox.bap.client.dtos.OrderDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderItemDto
 import org.beckn.one.sandbox.bap.client.dtos.OrderPayment
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
-import org.beckn.one.sandbox.bap.client.errors.validation.MultipleProviderError
+import org.beckn.one.sandbox.bap.client.errors.validation.CartError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
 import org.beckn.one.sandbox.bap.message.services.MessageService
@@ -36,12 +36,12 @@ class ConfirmOrderService @Autowired constructor(
 
     if (areMultipleBppItemsSelected(order.items)) {
       log.info("Order contains items from more than one BPP, returning error. Order: {}", order)
-      return Either.Left(MultipleProviderError.MultipleBpps)
+      return Either.Left(CartError.MultipleBpps)
     }
 
     if (areMultipleProviderItemsSelected(order.items)) {
       log.info("Order contains items from more than one provider, returning error. Cart: {}", order)
-      return Either.Left(MultipleProviderError.MultipleProviders)
+      return Either.Left(CartError.MultipleProviders)
     }
 
     if (arePaymentsPending(order.payment)) {

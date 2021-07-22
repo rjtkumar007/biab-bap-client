@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.dtos.CartDto
 import org.beckn.one.sandbox.bap.client.dtos.CartItemDto
-import org.beckn.one.sandbox.bap.client.errors.validation.MultipleProviderError
+import org.beckn.one.sandbox.bap.client.errors.validation.CartError
 import org.beckn.one.sandbox.bap.client.mappers.SelectedItemMapper
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
@@ -34,12 +34,12 @@ class QuoteService @Autowired constructor(
 
     if (areMultipleBppItemsSelected(cart.items)) {
       log.info("Cart contains items from more than one BPP, returning error. Cart: {}", cart)
-      return Either.Left(MultipleProviderError.MultipleBpps)
+      return Either.Left(CartError.MultipleBpps)
     }
 
     if (areMultipleProviderItemsSelected(cart.items)) {
       log.info("Cart contains items from more than one provider, returning error. Cart: {}", cart)
-      return Either.Left(MultipleProviderError.MultipleProviders)
+      return Either.Left(CartError.MultipleProviders)
     }
     return registryService.lookupBppById(cart.items.first().bppId)
       .flatMap { Either.Right(it.first()) }

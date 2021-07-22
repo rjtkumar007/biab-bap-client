@@ -100,55 +100,6 @@ class GetQuoteControllerSpec @Autowired constructor(
         verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, retailBengaluruBpp)
         verifier.verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
-
-      it("should validate that cart contains items from only one bpp") {
-
-        val cartWithMultipleBppItems =
-          CartFactory.create(bpp1Uri = retailBengaluruBpp.baseUrl(), bpp2Uri = anotherRetailBengaluruBpp.baseUrl())
-
-        val getQuoteResponseString = invokeGetQuoteApi(context = context, cart = cartWithMultipleBppItems)
-          .andExpect(status().is4xxClientError)
-          .andReturn()
-          .response.contentAsString
-
-        val getQuoteResponse =
-          verifyResponseMessage(
-            getQuoteResponseString,
-            ResponseMessage.nack(),
-            ProtocolError("BAP_014", "More than one BPP's item(s) selected/initialized"),
-            context
-          )
-        verifier.verifyThatMessageWasNotPersisted(getQuoteResponse)
-        verifyThatBppSelectApiWasNotInvoked(retailBengaluruBpp)
-        verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
-        verifyThatSubscriberLookupApiWasNotInvoked(anotherRetailBengaluruBpp)
-      }
-
-      it("should validate that cart contains items from only one provider") {
-        val cartWithMultipleProviderItems =
-          CartFactory.create(
-            bpp1Uri = retailBengaluruBpp.baseUrl(),
-            provider2Id = "padma coffee works",
-            provider2Location = listOf("padma coffee works location 1")
-          )
-
-        val getQuoteResponseString = invokeGetQuoteApi(context = context, cart = cartWithMultipleProviderItems)
-          .andExpect(status().is4xxClientError)
-          .andReturn()
-          .response.contentAsString
-
-        val getQuoteResponse =
-          verifyResponseMessage(
-            getQuoteResponseString,
-            ResponseMessage.nack(),
-            ProtocolError("BAP_010", "More than one Provider's item(s) selected/initialized"),
-            context
-          )
-        verifier.verifyThatMessageWasNotPersisted(getQuoteResponse)
-        verifyThatBppSelectApiWasNotInvoked(retailBengaluruBpp)
-      }
-
-      registryBppLookupApi.stop() //todo: this and any other mocks used have to be cleaned between different tests
     }
   }
 

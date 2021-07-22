@@ -77,7 +77,7 @@ internal class BppServiceTrackSpec : DescribeSpec() {
       bppUri,
       contextFactory.create(action = ProtocolContext.Action.TRACK),
       TrackRequestDto(
-        context = ClientContext(bppId = bppUri, transactionId = ""),
+        context = ClientContext(bppId = bppUri, transactionId = uuidFactory.create()),
         message = getProtocolTrackRequest().message
       )
     )
