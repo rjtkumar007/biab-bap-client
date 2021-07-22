@@ -22,7 +22,7 @@ data class OnSelectDao @Default constructor(
   override val context: ContextDao,
   val message: OnSelectMessageDao? = null,
   override val error: ErrorDao? = null
-): BecknResponseDao
+) : BecknResponseDao
 
 data class OnSelectMessageDao @Default constructor(
   val selected: OnSelectMessageSelectedDao? = null
@@ -32,7 +32,7 @@ data class OnInitDao @Default constructor(
   override val context: ContextDao,
   val message: OnInitMessageDao? = null,
   override val error: ErrorDao? = null
-): BecknResponseDao
+) : BecknResponseDao
 
 data class OnInitMessageDao @Default constructor(
   val initialized: OnInitMessageInitializedDao? = null
@@ -42,8 +42,18 @@ data class OnConfirmDao @Default constructor(
   override val context: ContextDao,
   val message: OnConfirmMessageDao? = null,
   override val error: ErrorDao? = null
-): BecknResponseDao
+) : BecknResponseDao
 
 data class OnConfirmMessageDao @Default constructor(
   val order: OrderDao? = null
+)
+
+data class OnTrackDao @Default constructor(
+  override val context: ContextDao,
+  val message: OnTrackMessageDao? = null,
+  override val error: ErrorDao? = null
+) : BecknResponseDao
+
+data class OnTrackMessageDao @Default constructor(
+  val tracking: OnTrackMessageTrackingDao? = null
 )

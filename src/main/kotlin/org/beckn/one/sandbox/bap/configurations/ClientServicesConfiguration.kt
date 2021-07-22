@@ -5,18 +5,13 @@ import org.beckn.one.sandbox.bap.client.discovery.mappers.SearchClientResponseMa
 import org.beckn.one.sandbox.bap.client.order.confirm.mapers.ConfirmClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientSearchResponse
+import org.beckn.one.sandbox.bap.client.order.track.mappers.TrackClientResponseMapper
+import org.beckn.one.sandbox.bap.client.shared.dtos.*
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollMapper
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.message.services.MessageService
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.protocol.schemas.ProtocolOnConfirm
-import org.beckn.protocol.schemas.ProtocolOnInit
-import org.beckn.protocol.schemas.ProtocolOnSearch
-import org.beckn.protocol.schemas.ProtocolOnSelect
+import org.beckn.protocol.schemas.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -40,6 +35,10 @@ class ClientServicesConfiguration @Autowired constructor(
   @Bean
   fun forConfirmResults(): GenericOnPollMapper<ProtocolOnConfirm, ClientConfirmResponse> =
     ConfirmClientResponseMapper()
+
+  @Bean
+  fun forTrackResults(): GenericOnPollMapper<ProtocolOnTrack, ClientTrackResponse> =
+    TrackClientResponseMapper()
 
   @Bean
   fun searchResultReplyService(
@@ -68,4 +67,12 @@ class ClientServicesConfiguration @Autowired constructor(
     @Autowired responseStorageService: ResponseStorageService<ProtocolOnConfirm>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnConfirm, ClientConfirmResponse>
   ) = GenericOnPollService(messageService, responseStorageService, transformer)
+
+  @Bean
+  fun trackReplyService(
+    @Autowired messageService: MessageService,
+    @Autowired responseStorageService: ResponseStorageService<ProtocolOnTrack>,
+    @Autowired transformer: GenericOnPollMapper<ProtocolOnTrack, ClientTrackResponse>
+  ) = GenericOnPollService(messageService, responseStorageService, transformer)
+
 }

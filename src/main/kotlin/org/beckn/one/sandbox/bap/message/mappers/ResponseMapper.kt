@@ -60,6 +60,17 @@ interface OnConfirmResponseMapper : GenericResponseMapper<ProtocolOnConfirm, OnC
   override fun protocolToEntity(schema: ProtocolOnConfirm): OnConfirmDao
 }
 
+@Mapper(
+  componentModel = "spring",
+  unmappedTargetPolicy = ReportingPolicy.WARN,
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
+)
+interface OnTrackResponseMapper : GenericResponseMapper<ProtocolOnTrack, OnTrackDao> {
+  override fun entityToProtocol(entity: OnTrackDao): ProtocolOnTrack
+  override fun protocolToEntity(schema: ProtocolOnTrack): OnTrackDao
+}
+
 @Component
 class DateMapper {
   fun map(instant: Instant?): OffsetDateTime? {
