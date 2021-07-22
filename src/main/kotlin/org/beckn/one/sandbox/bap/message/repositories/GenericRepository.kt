@@ -33,10 +33,6 @@ class GenericRepository<R : Any>(private val collection: MongoCollection<R>) {
     return document;
   }
 
-  fun upsert(document: R, filter: Bson) = collection.replaceOne(filter, document, ReplaceOptions().upsert(true))
-
-  fun upsertById(document: R) = collection.save(document)
-
   fun findAll(query: Bson) = collection.find(query).toList()
 
   fun findOne(query: Bson) = collection.findOne(query)
@@ -44,7 +40,4 @@ class GenericRepository<R : Any>(private val collection: MongoCollection<R>) {
   fun all() = collection.find().toList()
 
   fun clear() = collection.deleteMany(Document())
-
-  fun deleteOne(filter: Bson) = collection.findOneAndDelete(filter)
-
 }
