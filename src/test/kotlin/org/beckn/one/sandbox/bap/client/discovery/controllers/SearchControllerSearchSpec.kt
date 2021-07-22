@@ -102,7 +102,7 @@ class SearchControllerSpec @Autowired constructor(
         verifyThatSearchMessageWasPersisted(result)
       }
 
-      it("should invoke Beckn /search API on specified BPP using gateway and persist message with location") {
+      it("should invoke Beckn /search API on specified BPP directly and persist message") {
         val bpp = MockNetwork.getRetailBengaluruBpp()
         stubBppSearchApi()
         stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp, bpp.subscriber_id)
@@ -116,6 +116,26 @@ class SearchControllerSpec @Autowired constructor(
 
         val searchResponse = verifyThatSearchMessageWasPersisted(result)
         verifyThatBppSearchWasInvoked(searchResponse, "tulsidev", "12.9259,77.583")
+      }
+
+      it("should invoke Beckn /search API on specified BPP using gateway and persist message") {
+        val bpp = MockNetwork.getRetailBengaluruBpp()
+        stubBppSearchApi()
+        stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp, bpp.subscriber_id)
+
+        val result: MvcResult =
+          invokeSearchApi(location = "12.9259,77.583", providerId = "tulsidev", bppId = bpp.subscriber_id)
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
+            .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
+            .andReturn()
+
+        val searchResponse = verifyThatSearchMessageWasPersisted(result)
+        val protocolSearchRequest = SearchRequestFactory.create(searchResponse.context!!, "tulsidev", "12.9259,77.583")
+        retailBengaluruBg.verify(
+          postRequestedFor(urlEqualTo("/search"))
+            .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))
+        )
       }
     }
   }

@@ -24,6 +24,41 @@ class BppService @Autowired constructor(
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppService::class.java)
 
+  fun search(bppUri: String, context: ProtocolContext, criteria: SearchCriteria)
+      : Either<BppError, ProtocolAckResponse> {
+    return Either.catch {
+      log.info("Invoking Search API on BPP: {}", bppUri)
+      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
+      log.info("Initiated Search for context: {}", context)
+      val httpResponse = bppServiceClient.search(
+        ProtocolSearchRequest(
+          context,
+          ProtocolSearchRequestMessage(
+            ProtocolIntent(
+              queryString = criteria.searchString,
+              provider = ProtocolProvider(id = criteria.providerId),
+              fulfillment = getFulfillmentFilter(criteria),
+            )
+          )
+        )
+      ).execute()
+
+      log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+      return when {
+        isInternalServerError(httpResponse) -> Left(BppError.Internal)
+        httpResponse.body() == null -> Left(BppError.NullResponse)
+        isAckNegative(httpResponse) -> Left(BppError.Nack)
+        else -> {
+          log.info("Successfully invoked search on Bpp. Response: {}", httpResponse.body())
+          Right(httpResponse.body()!!)
+        }
+      }
+    }.mapLeft {
+      log.error("Error when initiating search", it)
+      BppError.Internal
+    }
+  }
+
   fun select(
     context: ProtocolContext,
     bppUri: String,
@@ -136,41 +171,6 @@ class BppService @Autowired constructor(
     )
     log.info("Init API request body: {}", initRequest)
     return bppServiceClient.init(initRequest).execute()
-  }
-
-  fun search(bppUri: String, context: ProtocolContext, criteria: SearchCriteria)
-      : Either<BppError, ProtocolAckResponse> {
-    return Either.catch {
-      log.info("Invoking Search API on BPP: {}", bppUri)
-      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
-      log.info("Initiated Search for context: {}", context)
-      val httpResponse = bppServiceClient.search(
-        ProtocolSearchRequest(
-          context,
-          ProtocolSearchRequestMessage(
-            ProtocolIntent(
-              queryString = criteria.searchString,
-              provider = ProtocolProvider(id = criteria.providerId),
-              fulfillment = getFulfillmentFilter(criteria),
-            )
-          )
-        )
-      ).execute()
-
-      log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-      return when {
-        isInternalServerError(httpResponse) -> Left(BppError.Internal)
-        httpResponse.body() == null -> Left(BppError.NullResponse)
-        isAckNegative(httpResponse) -> Left(BppError.Nack)
-        else -> {
-          log.info("Successfully invoked search on Bpp. Response: {}", httpResponse.body())
-          Right(httpResponse.body()!!)
-        }
-      }
-    }.mapLeft {
-      log.error("Error when initiating search", it)
-      BppError.Internal
-    }
   }
 
   private fun getFulfillmentFilter(criteria: SearchCriteria) =
