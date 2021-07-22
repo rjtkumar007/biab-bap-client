@@ -2,9 +2,9 @@ package org.beckn.one.sandbox.bap.configurations
 
 import org.beckn.one.sandbox.bap.client.discovery.mappers.ClientCatalogMapper
 import org.beckn.one.sandbox.bap.client.discovery.mappers.SearchClientResponseMapper
-import org.beckn.one.sandbox.bap.client.orders.confirm.mappers.ConfirmClientResponseMapper
-import org.beckn.one.sandbox.bap.client.orders.init.mappers.InitClientResponseMapper
-import org.beckn.one.sandbox.bap.client.orders.quote.mappers.QuoteClientResponseMapper
+import org.beckn.one.sandbox.bap.client.order.confirm.mapers.ConfirmClientResponseMapper
+import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
+import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitializeResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
