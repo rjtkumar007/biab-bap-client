@@ -31,9 +31,9 @@ class TrackService @Autowired constructor(
       .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Track)) }
   }
 
-  private fun validate(request: TrackRequestDto): Either<TrackError, Nothing?> {
-    if (request.context.bppId == null) return Either.Left(TrackError.BppIdNotPresent)
-    return Either.Right(null)
-  }
-
+  private fun validate(request: TrackRequestDto): Either<TrackError, Nothing?> =
+    when (request.context.bppId) {
+      null -> Either.Left(TrackError.BppIdNotPresent)
+      else -> Either.Right(null)
+    }
 }

@@ -3,7 +3,9 @@ package org.beckn.one.sandbox.bap.client.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import org.beckn.one.sandbox.bap.client.dtos.*
+import org.beckn.one.sandbox.bap.client.dtos.OrderDto
+import org.beckn.one.sandbox.bap.client.dtos.SearchCriteria
+import org.beckn.one.sandbox.bap.client.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.client.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.external.provider.BppServiceClient
 import org.beckn.protocol.schemas.*
@@ -75,9 +77,9 @@ class BppService @Autowired constructor(
     httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
 
   fun initialize(
-      context: ProtocolContext,
-      bppUri: String,
-      order: OrderDto
+    context: ProtocolContext,
+    bppUri: String,
+    order: OrderDto
   ): Either<BppError, ProtocolAckResponse> {
     return Either.catch {
       log.info("Invoking Init API on BPP: {}", bppUri)
@@ -256,7 +258,7 @@ class BppService @Autowired constructor(
         else -> Right(httpResponse.body()!!)
       }
     }.mapLeft {
-      log.error("Error when initiating track", it)
+      log.error("Error when invoking BPP Track API", it)
       BppError.Internal
     }
 }
