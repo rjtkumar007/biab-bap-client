@@ -106,10 +106,9 @@ internal class GatewayServiceSpec : DescribeSpec() {
     contextFactory.create(),
     ProtocolSearchRequestMessage(
       ProtocolIntent(
-        queryString = queryString,
         fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString))),
         item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = queryString)),
-        provider = null
+        provider = ProtocolProvider()
       )
     )
   )

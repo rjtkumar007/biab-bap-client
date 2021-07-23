@@ -80,5 +80,5 @@ internal class BppServiceSearchSpec : DescribeSpec() {
   private fun getSearchRequest(
     context: ProtocolContext,
     criteria: SearchCriteria
-  ) = SearchRequestFactory.create(context, criteria.providerId, criteria.location)
+  ) = SearchRequestFactory.create(context = context, providerId = criteria.providerId, location = criteria.location)
 }

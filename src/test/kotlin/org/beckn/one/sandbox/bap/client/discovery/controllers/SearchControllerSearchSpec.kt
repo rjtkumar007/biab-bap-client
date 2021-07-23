@@ -115,23 +115,27 @@ class SearchControllerSpec @Autowired constructor(
             .andReturn()
 
         val searchResponse = verifyThatSearchMessageWasPersisted(result)
-        verifyThatBppSearchWasInvoked(searchResponse, "tulsidev", "12.9259,77.583")
+        verifyThatBppSearchWasInvoked(searchResponse, "tulsidev", "12.9259,77.583", "Fictional mystery books")
       }
 
       it("should invoke Beckn /search API on specified BPP using gateway and persist message") {
-        val bpp = MockNetwork.getRetailBengaluruBpp()
-        stubBppSearchApi()
-        stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp, bpp.subscriber_id)
+        stubLookupApi()
+        stubSearchApi()
 
         val result: MvcResult =
-          invokeSearchApi(location = "12.9259,77.583", providerId = "tulsidev", bppId = bpp.subscriber_id)
+          invokeSearchApi(location = "12.9259,77.583", providerId = "tulsidev")
             .andExpect(status().is2xxSuccessful)
             .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
             .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
             .andReturn()
 
         val searchResponse = verifyThatSearchMessageWasPersisted(result)
-        val protocolSearchRequest = SearchRequestFactory.create(searchResponse.context!!, "tulsidev", "12.9259,77.583")
+        val protocolSearchRequest = SearchRequestFactory.create(
+          context = searchResponse.context!!,
+          searchString = "Fictional mystery books",
+          providerId = "tulsidev",
+          location = "12.9259,77.583"
+        )
         retailBengaluruBg.verify(
           postRequestedFor(urlEqualTo("/search"))
             .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))
@@ -142,10 +146,16 @@ class SearchControllerSpec @Autowired constructor(
 
   private fun verifyThatBppSearchWasInvoked(
     searchResponse: ProtocolAckResponse,
-    providerId: String,
-    providerLocation: String
+    providerId: String?,
+    providerLocation: String?,
+    searchString: String?
   ) {
-    val protocolSearchRequest = SearchRequestFactory.create(searchResponse.context!!, providerId, providerLocation)
+    val protocolSearchRequest = SearchRequestFactory.create(
+      context = searchResponse.context!!,
+      providerId = providerId,
+      location = providerLocation,
+      searchString = searchString
+    )
     retailBengaluruBpp.verify(
       postRequestedFor(urlEqualTo("/search"))
         .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolSearchRequest)))

@@ -5,9 +5,10 @@ import org.beckn.protocol.schemas.*
 class SearchRequestFactory {
   companion object {
     fun create(
-        context: ProtocolContext,
-        providerId: String?,
-        location: String?
+      context: ProtocolContext,
+      searchString: String? = null,
+      providerId: String? = null,
+      location: String? = null,
     ): ProtocolSearchRequest {
       return ProtocolSearchRequest(
         context = context,
@@ -20,7 +21,8 @@ class SearchRequestFactory {
                   gps = location
                 )
               )
-            )
+            ),
+            item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = searchString))
           )
         )
       )

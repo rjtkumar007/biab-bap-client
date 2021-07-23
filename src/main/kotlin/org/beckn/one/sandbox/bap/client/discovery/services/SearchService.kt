@@ -27,7 +27,7 @@ class SearchService(
   fun search(context: ProtocolContext, criteria: SearchCriteria): Either<HttpError, MessageDao> {
     log.info("Got search request with criteria: {} ", criteria)
     if (isBppFilterSpecified(criteria)) {
-      val criteriaForExploringProviderCatalog = criteria.copy(searchString = null)
+      val criteriaForExploringProviderCatalog = criteria //criteria.copy(searchString = null)
       return registryService
         .lookupBppById(criteriaForExploringProviderCatalog.bppId!!)
         .flatMap { bppService.search(it.first().subscriber_url, context, criteriaForExploringProviderCatalog) }
