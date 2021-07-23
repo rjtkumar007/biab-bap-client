@@ -6,7 +6,7 @@ import org.beckn.one.sandbox.bap.client.order.confirm.mapers.ConfirmClientRespon
 import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitializeResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollMapper
@@ -34,7 +34,7 @@ class ClientServicesConfiguration @Autowired constructor(
     QuoteClientResponseMapper()
 
   @Bean
-  fun forInitResults(): GenericOnPollMapper<ProtocolOnInit, ClientInitializeResponse> =
+  fun forInitResults(): GenericOnPollMapper<ProtocolOnInit, ClientInitResponse> =
     InitClientResponseMapper()
 
   @Bean
@@ -59,7 +59,7 @@ class ClientServicesConfiguration @Autowired constructor(
   fun initResultReplyService(
     @Autowired messageService: MessageService,
     @Autowired responseStorageService: ResponseStorageService<ProtocolOnInit>,
-    @Autowired transformer: GenericOnPollMapper<ProtocolOnInit, ClientInitializeResponse>
+    @Autowired transformer: GenericOnPollMapper<ProtocolOnInit, ClientInitResponse>
   ) = GenericOnPollService(messageService, responseStorageService, transformer)
 
   @Bean

@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.beckn.one.sandbox.bap.client.order.init.controllers.OnInitializeOrderController
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitializeResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.MessageDao
@@ -36,8 +35,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class OnInitializeOrderControllerSpec @Autowired constructor(
-  private val initializeResponseRepo: BecknResponseRepository<OnInitDao>,
+internal class OnInitOrderControllerSpec @Autowired constructor(
+  private val initResponseRepo: BecknResponseRepository<OnInitDao>,
   private val messageRepository: GenericRepository<MessageDao>,
   private val onInitResponseMapper: OnInitResponseMapper,
   private val contextMapper: ContextMapper,
@@ -55,9 +54,9 @@ internal class OnInitializeOrderControllerSpec @Autowired constructor(
 
   init {
     describe("OnInitialize callback") {
-      initializeResponseRepo.clear()
+      initResponseRepo.clear()
       messageRepository.insertOne(MessageDao(id = contextDao.messageId, type = MessageDao.Type.Init))
-      initializeResponseRepo.insertMany(entityOnInitResults())
+      initResponseRepo.insertMany(entityOnInitResults())
 
       context("when called for given message id") {
         val onInitCallBack = mockMvc
@@ -74,18 +73,18 @@ internal class OnInitializeOrderControllerSpec @Autowired constructor(
         it("should respond with all on init responses in body") {
           val results = onInitCallBack.andReturn()
           val body = results.response.contentAsString
-          val clientResponse = mapper.readValue(body, ClientInitializeResponse::class.java)
+          val clientResponse = mapper.readValue(body, ClientInitResponse::class.java)
           clientResponse.message shouldNotBe null
         }
       }
 
       context("when failure occurs during request processing") {
-        val mockOnPollService = mock<GenericOnPollService<ProtocolOnInit, ClientInitializeResponse>> {
+        val mockOnPollService = mock<GenericOnPollService<ProtocolOnInit, ClientInitResponse>> {
           onGeneric { onPoll(any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
         }
-        val onInitPollController = OnInitializeOrderController(mockOnPollService, contextFactory)
+        val onInitPollController = OnInitOrderController(mockOnPollService, contextFactory)
         it("should respond with failure") {
-          val response = onInitPollController.onInitializeOrderV1(contextDao.messageId)
+          val response = onInitPollController.onInitOrderV1(contextDao.messageId)
           response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }

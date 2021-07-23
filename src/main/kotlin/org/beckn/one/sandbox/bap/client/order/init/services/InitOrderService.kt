@@ -17,13 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class InitializeOrderService @Autowired constructor(
+class InitOrderService @Autowired constructor(
   private val messageService: MessageService,
   private val bppService: BppService,//todo: might require a mapper
   private val registryService: RegistryService,
-  private val log: Logger = LoggerFactory.getLogger(InitializeOrderService::class.java)
+  private val log: Logger = LoggerFactory.getLogger(InitOrderService::class.java)
 ) {
-  fun initializeOrder(
+  fun initOrder(
       context: ProtocolContext,
       order: OrderDto
   ): Either<HttpError, MessageDao?> {
@@ -45,7 +45,7 @@ class InitializeOrderService @Autowired constructor(
 
     return registryService.lookupBppById(order.items.first().bppId)
       .flatMap {
-        bppService.initialize(
+        bppService.init(
           context,
           bppUri = it.first().subscriber_url,
           order = order

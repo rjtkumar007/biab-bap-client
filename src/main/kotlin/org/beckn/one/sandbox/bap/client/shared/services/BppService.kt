@@ -77,7 +77,7 @@ class BppService @Autowired constructor(
   private fun isAckNegative(httpResponse: Response<ProtocolAckResponse>) =
     httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
 
-  fun initialize(
+  fun init(
     context: ProtocolContext,
     bppUri: String,
     order: OrderDto
@@ -109,7 +109,7 @@ class BppService @Autowired constructor(
     context: ProtocolContext,
     order: OrderDto
   ): Response<ProtocolAckResponse> {
-    val initializeRequest = ProtocolInitRequest(
+    val initRequest = ProtocolInitRequest(
       context = context,
       ProtocolInitRequestMessage(
         order = ProtocolOrder(
@@ -134,8 +134,8 @@ class BppService @Autowired constructor(
         )
       )
     )
-    log.info("Init API request body: {}", initializeRequest)
-    return bppServiceClient.init(initializeRequest).execute()
+    log.info("Init API request body: {}", initRequest)
+    return bppServiceClient.init(initRequest).execute()
   }
 
   fun search(bppUri: String, context: ProtocolContext, criteria: SearchCriteria)

@@ -76,7 +76,7 @@ internal class BppServiceInitSpec : DescribeSpec() {
   }
 
   private fun invokeBppInit(): Either<BppError, ProtocolAckResponse> {
-    return bppService.initialize(
+    return bppService.init(
       context = contextFactory.create(),
       bppUri = bppUri,
       order = OrderDtoFactory.create(

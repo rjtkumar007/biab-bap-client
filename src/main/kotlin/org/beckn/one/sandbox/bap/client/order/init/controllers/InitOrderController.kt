@@ -1,6 +1,6 @@
 package org.beckn.one.sandbox.bap.client.order.init.controllers
 
-import org.beckn.one.sandbox.bap.client.order.init.services.InitializeOrderService
+import org.beckn.one.sandbox.bap.client.order.init.services.InitOrderService
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderRequestDto
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
@@ -17,19 +17,19 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class InitializeOrderController @Autowired constructor(
+class InitOrderController @Autowired constructor(
   private val contextFactory: ContextFactory,
-  private val initializeOrderService: InitializeOrderService
+  private val initOrderService: InitOrderService
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   @PostMapping("/client/v1/initialize_order")
   @ResponseBody
-  fun initializeOrderV1(
+  fun initiOrderV1(
     @RequestBody orderRequest: OrderRequestDto
   ): ResponseEntity<ProtocolAckResponse> {
     val context = getContext(orderRequest.context.transactionId)
-    return initializeOrderService.initializeOrder(
+    return initOrderService.initOrder(
       context = context,
       order = orderRequest.message
     )
