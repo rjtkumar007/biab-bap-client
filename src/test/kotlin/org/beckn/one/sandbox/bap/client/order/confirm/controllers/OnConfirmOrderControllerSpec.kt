@@ -11,10 +11,7 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.OnConfirmDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOrderFactory
-import org.beckn.one.sandbox.bap.message.mappers.ContextMapper
-import org.beckn.one.sandbox.bap.message.mappers.OnConfirmResponseMapper
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnConfirm
 import org.beckn.protocol.schemas.ProtocolOnConfirmMessage
@@ -36,15 +33,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class OnConfirmOrderControllerSpec @Autowired constructor(
-  private val onConfirmResponseMapper: OnConfirmResponseMapper,
-  private val contextMapper: ContextMapper,
   private val contextFactory: ContextFactory,
   private val mapper: ObjectMapper,
   private val protocolClient: ProtocolClient,
   private val mockMvc: MockMvc
 ) : DescribeSpec() {
   val context = contextFactory.create()
-  private val contextDao = contextMapper.fromSchema(context)
   private val protocolOnConfirm = ProtocolOnConfirm(
     context,
     message = ProtocolOnConfirmMessage(
@@ -58,14 +52,14 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
 
       context("when called for given message id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/v1/on_confirm?messageId=${context.messageId}")
+          WireMock.get("/protocol/v1/on_confirm?messageId=${context.messageId}")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(entityOnConfirmResults())))
         )
         val onInitCallBack = mockMvc
           .perform(
             MockMvcRequestBuilders.get("/client/v1/on_confirm_order")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageId", contextDao.messageId)
+              .param("messageId", context.messageId)
           )
 
         it("should respond with status ok") {
@@ -86,18 +80,17 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
         }
         val onConfirmPollController = OnConfirmOrderController(mockOnPollService, contextFactory, protocolClient)
         it("should respond with failure") {
-          val response = onConfirmPollController.onConfirmOrderV1(contextDao.messageId)
+          val response = onConfirmPollController.onConfirmOrderV1(context.messageId)
           response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }
     }
   }
 
-  fun entityOnConfirmResults(): List<OnConfirmDao> {
-    val onInitDao = onConfirmResponseMapper.protocolToEntity(protocolOnConfirm)
+  fun entityOnConfirmResults(): List<ProtocolOnConfirm> {
     return listOf(
-      onInitDao,
-      onInitDao
+      protocolOnConfirm,
+      protocolOnConfirm
     )
   }
 }

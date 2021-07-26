@@ -10,12 +10,11 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.CatalogDao
-import org.beckn.one.sandbox.bap.message.entities.ContextDao
-import org.beckn.one.sandbox.bap.message.entities.OnSearchDao
-import org.beckn.one.sandbox.bap.message.entities.OnSearchMessageDao
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.protocol.schemas.ProtocolCatalog
+import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolOnSearch
+import org.beckn.protocol.schemas.ProtocolOnSearchMessage
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,10 +47,10 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
     Instant.parse("2018-11-30T18:35:24.00Z"),
     ZoneId.of("UTC")
   )
-  private val entityContext = ContextDao(
+  private val context = ProtocolContext(
     domain = "LocalRetail",
     country = "IN",
-    action = ContextDao.Action.SEARCH,
+    action =  ProtocolContext.Action.SEARCH,
     city = "Pune",
     coreVersion = "0.9.1-draft03",
     bapId = "http://host.bap.com",
@@ -70,14 +69,14 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
 
       context("when called for given message id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/v1/on_search?messageId=${entityContext.messageId}")
+          WireMock.get("/protocol/v1/on_search?messageId=${context.messageId}")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(entitySearchResults())))
         )
         val onSearchCall = mockMvc
           .perform(
             MockMvcRequestBuilders.get("/client/v1/on_search")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageId", entityContext.messageId)
+              .param("messageId", context.messageId)
           )
 
         it("should respond with status ok") {
@@ -89,7 +88,7 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
           val body = results.response.contentAsString
           val clientResponse = mapper.readValue(body, ClientSearchResponse::class.java)
           clientResponse.message?.catalogs?.size shouldBe 2
-          clientResponse.message?.catalogs?.forEach { it.bppId shouldBe entityContext.bppId }
+          clientResponse.message?.catalogs?.forEach { it.bppId shouldBe context.bppId }
         }
       }
 
@@ -99,17 +98,17 @@ internal class OnSearchPollControllerSpec @Autowired constructor(
         }
         val onSearchPollController = OnSearchPollController(mockOnPollService, contextFactory, protocolClient)
         it("should respond with failure") {
-          val response = onSearchPollController.onSearchV1(entityContext.messageId)
+          val response = onSearchPollController.onSearchV1(context.messageId)
           response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }
     }
   }
 
-  fun entitySearchResults(): List<OnSearchDao> {
-    val entitySearchResponse = OnSearchDao(
-      context = entityContext,
-      message = OnSearchMessageDao(CatalogDao())
+  fun entitySearchResults(): List<ProtocolOnSearch> {
+    val entitySearchResponse = ProtocolOnSearch(
+      context = context,
+      message = ProtocolOnSearchMessage(ProtocolCatalog())
     )
     return listOf(
       entitySearchResponse,

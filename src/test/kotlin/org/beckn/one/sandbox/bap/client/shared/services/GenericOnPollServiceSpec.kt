@@ -9,12 +9,10 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.ClientCatalog
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientSearchResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientSearchResponseMessage
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
-import org.beckn.one.sandbox.bap.message.entities.CatalogDao
-import org.beckn.one.sandbox.bap.message.entities.ContextDao
-import org.beckn.one.sandbox.bap.message.entities.OnSearchDao
-import org.beckn.one.sandbox.bap.message.entities.OnSearchMessageDao
+import org.beckn.protocol.schemas.ProtocolCatalog
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolOnSearch
+import org.beckn.protocol.schemas.ProtocolOnSearchMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -35,18 +33,6 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),
     ZoneId.of("UTC")
-  )
-  private val entityContext = ContextDao(
-    domain = "LocalRetail",
-    country = "IN",
-    action = ContextDao.Action.SEARCH,
-    city = "Pune",
-    coreVersion = "0.9.1-draft03",
-    bapId = "http://host.bap.com",
-    bapUri = "http://host.bap.com",
-    transactionId = "222",
-    messageId = "222",
-    timestamp = OffsetDateTime.now(fixedClock)
   )
 
   private val context = ProtocolContext(
@@ -69,7 +55,7 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
 
       it("should return search results for given message id in context") {
         mockProtocolBap.stubFor(
-          WireMock.get("/v1/on_search?messageId=${context.messageId}").willReturn(WireMock.okJson(mapper.writeValueAsString(entitySearchResults())))
+          WireMock.get("/protocol/v1/on_search?messageId=${context.messageId}").willReturn(WireMock.okJson(mapper.writeValueAsString(entitySearchResults())))
         )
         val response = onSearchPollService.onPoll(context, protocolClient.getSearchResponsesCall(context.messageId))
         response.shouldBeRight(
@@ -84,10 +70,10 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
     }
   }
 
-  fun entitySearchResults(): List<OnSearchDao> {
-    val entitySearchResponse = OnSearchDao(
-      context = entityContext,
-      message = OnSearchMessageDao(CatalogDao())
+  fun entitySearchResults(): List<ProtocolOnSearch> {
+    val entitySearchResponse = ProtocolOnSearch(
+      context = context,
+      message = ProtocolOnSearchMessage(ProtocolCatalog())
     )
     return listOf(
       entitySearchResponse,
