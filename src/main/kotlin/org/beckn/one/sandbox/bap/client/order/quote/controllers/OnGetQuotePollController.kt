@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.client.order.quote.controllers
 
+import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
 import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollController
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
@@ -16,10 +17,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class OnGetQuotePollController @Autowired constructor(
   onPollService: GenericOnPollService<ProtocolOnSelect, ClientQuoteResponse>,
-  contextFactory: ContextFactory
+  contextFactory: ContextFactory,
+  val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnSelect, ClientQuoteResponse>(onPollService, contextFactory) {
 
   @RequestMapping("/client/v1/on_get_quote")
   @ResponseBody
-  fun onSelect(@RequestParam messageId: String): ResponseEntity<out ClientResponse> = onPoll(messageId)
+  fun onSelect(@RequestParam messageId: String): ResponseEntity<out ClientResponse> = onPoll(messageId, protocolClient.getSelectResponsesCall(messageId))
 }

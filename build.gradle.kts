@@ -21,12 +21,7 @@ allOpen {
 
 repositories {
   mavenCentral()
-  maven {
-    url = uri("s3://beckn-maven-artifacts/releases")
-    authentication {
-      val awsIm by registering(AwsImAuthentication::class)
-    }
-  }
+
   mavenLocal()
 }
 

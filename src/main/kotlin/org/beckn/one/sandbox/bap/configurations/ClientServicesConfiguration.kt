@@ -9,8 +9,8 @@ import org.beckn.one.sandbox.bap.client.fulfillment.track.mappers.TrackClientRes
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollMapper
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
+import org.beckn.one.sandbox.bap.client.shared.services.GenericProtocolClientService
 import org.beckn.one.sandbox.bap.message.services.MessageService
-import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.protocol.schemas.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -41,38 +41,54 @@ class ClientServicesConfiguration @Autowired constructor(
     TrackClientResponseMapper()
 
   @Bean
+  fun searchProtocolClientService() = GenericProtocolClientService<ProtocolOnSearch>()
+
+  @Bean
+  fun selectProtocolClientService() = GenericProtocolClientService<ProtocolOnSelect>()
+
+  @Bean
+  fun initProtocolClientService() = GenericProtocolClientService<ProtocolOnInit>()
+
+  @Bean
+  fun confirmProtocolClientService() = GenericProtocolClientService<ProtocolOnConfirm>()
+
+  @Bean
+  fun trackProtocolClientService() = GenericProtocolClientService<ProtocolOnTrack>()
+
+  @Bean
   fun searchResultReplyService(
-    @Autowired messageService: MessageService,
-    @Autowired responseStorageService: ResponseStorageService<ProtocolOnSearch>,
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnSearch>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnSearch, ClientSearchResponse>
-  ) = GenericOnPollService(messageService, responseStorageService, transformer)
+  ) = GenericOnPollService(protocolService, transformer)
 
   @Bean
   fun quoteReplyService(
     @Autowired messageService: MessageService,
-    @Autowired responseStorageService: ResponseStorageService<ProtocolOnSelect>,
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnSelect>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnSelect, ClientQuoteResponse>
-  ) = GenericOnPollService(messageService, responseStorageService, transformer)
+  ) = GenericOnPollService(protocolService, transformer)
 
   @Bean
   fun initResultReplyService(
     @Autowired messageService: MessageService,
-    @Autowired responseStorageService: ResponseStorageService<ProtocolOnInit>,
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnInit>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnInit, ClientInitResponse>
-  ) = GenericOnPollService(messageService, responseStorageService, transformer)
+  ) = GenericOnPollService(protocolService, transformer)
 
   @Bean
   fun confirmResultReplyService(
     @Autowired messageService: MessageService,
-    @Autowired responseStorageService: ResponseStorageService<ProtocolOnConfirm>,
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnConfirm>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnConfirm, ClientConfirmResponse>
-  ) = GenericOnPollService(messageService, responseStorageService, transformer)
+  ) = GenericOnPollService(protocolService, transformer)
 
   @Bean
   fun trackReplyService(
     @Autowired messageService: MessageService,
-    @Autowired responseStorageService: ResponseStorageService<ProtocolOnTrack>,
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnTrack>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnTrack, ClientTrackResponse>
-  ) = GenericOnPollService(messageService, responseStorageService, transformer)
+  ) = GenericOnPollService(protocolService, transformer)
+
+
 
 }

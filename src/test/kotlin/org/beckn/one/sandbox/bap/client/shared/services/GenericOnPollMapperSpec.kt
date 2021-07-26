@@ -16,7 +16,7 @@ import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
 
-internal class GenericOnReplyTransformerSpec : DescribeSpec() {
+internal class GenericOnPollMapperSpec : DescribeSpec() {
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),
     ZoneId.of("UTC")

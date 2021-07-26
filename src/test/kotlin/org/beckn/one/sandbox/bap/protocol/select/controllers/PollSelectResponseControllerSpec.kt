@@ -34,7 +34,7 @@ import java.time.ZoneId
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class PollOnSelectResponseControllerSpec @Autowired constructor(
+internal class PollSelectResponseControllerSpec @Autowired constructor(
   private val selectResponseRepo: BecknResponseRepository<OnSelectDao>,
   private val messageRepository: GenericRepository<MessageDao>,
   private val contextFactory: ContextFactory,

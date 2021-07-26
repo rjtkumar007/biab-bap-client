@@ -12,7 +12,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 
 
 @Configuration
-class RegistryServiceConfiguration(
+class RegistryClientConfiguration(
   @Autowired @Value("\${registry_service.url}")
   private val registryServiceUrl: String,
   @Autowired @Value("\${bpp_registry_service.url}")
