@@ -12,10 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class GetQuoteController @Autowired constructor(
@@ -24,7 +21,7 @@ class GetQuoteController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @PutMapping("/client/v1/get_quote")
+  @PostMapping("/client/v1/get_quote")
   @ResponseBody
   fun getQuote(@RequestBody request: GetQuoteRequestDto): ResponseEntity<ProtocolAckResponse> {
     val context = getContext(request.context.transactionId)

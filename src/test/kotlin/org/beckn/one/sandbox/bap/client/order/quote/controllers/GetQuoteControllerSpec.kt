@@ -33,6 +33,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -187,7 +188,7 @@ class GetQuoteControllerSpec @Autowired constructor(
 
   private fun invokeGetQuoteApi(context: ClientContext, cart: CartDto) = mockMvc
     .perform(
-      put("/client/v1/get_quote")
+      MockMvcRequestBuilders.post("/client/v1/get_quote")
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .content(
           objectMapper.writeValueAsString(
