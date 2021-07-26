@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.client.order.confirm.services
 
 import arrow.core.Either
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
@@ -27,7 +28,7 @@ internal class BppServiceConfirmSpec : DescribeSpec() {
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
-  private val bppService = BppService(bppServiceClientFactory)
+  private val bppService = BppService(bppServiceClientFactory, mock(ObjectMapper::class.java))
   private val bppServiceClient: BppClient = mock(BppClient::class.java)
   private val bppUri = "https://bpp1.com"
 

@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.client.shared.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderDto
@@ -21,6 +22,7 @@ import retrofit2.Response
 @Service
 class BppService @Autowired constructor(
   private val bppServiceClientFactory: BppClientFactory,
+  private val objectMapper: ObjectMapper,
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppService::class.java)
 
@@ -169,7 +171,7 @@ class BppService @Autowired constructor(
         )
       )
     )
-    log.info("Init API request body: {}", initRequest)
+    log.info("Init API request body: {}", objectMapper.writeValueAsString(initRequest))
     return bppServiceClient.init(initRequest).execute()
   }
 
