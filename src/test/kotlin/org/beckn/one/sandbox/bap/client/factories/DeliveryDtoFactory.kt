@@ -11,6 +11,7 @@ class DeliveryDtoFactory {
         name = "Test",
         phone = "9999999999",
         email = "test@gmail.com",
+        type = "home-delivery",
         location = ProtocolLocation(
           address = ProtocolAddress(
             door = "A",

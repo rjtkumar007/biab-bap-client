@@ -319,7 +319,7 @@ class InitOrderControllerSpec @Autowired constructor(
                 email = orderRequest.message.deliveryInfo.email
               ), location = orderRequest.message.deliveryInfo.location
             ),
-            type = "home_delivery",
+            type = "home-delivery",
             customer = ProtocolCustomer(person = ProtocolPerson(name = orderRequest.message.deliveryInfo.name))
           ),
           addOns = emptyList(),

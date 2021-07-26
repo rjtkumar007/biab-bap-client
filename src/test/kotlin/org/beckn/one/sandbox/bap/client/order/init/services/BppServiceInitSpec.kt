@@ -127,7 +127,7 @@ internal class BppServiceInitSpec : DescribeSpec() {
               gps = "12,77"
             )
           ),
-          type = "home_delivery",
+          type = "home-delivery",
           customer = ProtocolCustomer(person = ProtocolPerson(name = "Test"))
         ),
         addOns = emptyList(),

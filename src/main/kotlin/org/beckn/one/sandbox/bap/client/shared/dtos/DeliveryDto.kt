@@ -7,5 +7,6 @@ data class DeliveryDto @Default constructor(
   val name: String,
   val phone: String,
   val email: String,
-  val location: ProtocolLocation
+  val location: ProtocolLocation,
+  val type: String,
 )

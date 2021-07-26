@@ -23,7 +23,7 @@ class OrderItemDtoFactory {
         provider = CartItemProviderDto(
           id = providerId,
           locations = listOf("13.001581,77.5703686")
-        )
+        ),
       )
 
     private fun getUuid() = UUID.randomUUID().toString()

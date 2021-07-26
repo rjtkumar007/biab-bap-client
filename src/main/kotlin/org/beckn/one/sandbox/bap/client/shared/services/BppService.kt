@@ -161,7 +161,7 @@ class BppService @Autowired constructor(
                 email = order.deliveryInfo.email
               ), location = order.deliveryInfo.location
             ),
-            type = "home_delivery",
+            type = order.deliveryInfo.type,
             customer = ProtocolCustomer(ProtocolPerson(name = order.deliveryInfo.name))
           ),
           addOns = emptyList(),
