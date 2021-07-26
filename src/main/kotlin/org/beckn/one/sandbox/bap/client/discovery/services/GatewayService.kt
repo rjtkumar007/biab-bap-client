@@ -22,9 +22,8 @@ class GatewayService @Autowired constructor(
   fun search(gateway: SubscriberDto, context: ProtocolContext, criteria: SearchCriteria)
       : Either<GatewaySearchError, ProtocolAckResponse> {
     return Either.catch {
-      log.info("Initiating Search using gateway: {}", gateway)
+      log.info("Initiating Search using gateway: {}. Context: {}", gateway, context)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway)
-      log.info("Initiated Search for context: {}", context)
       val httpResponse = gatewayServiceClient.search(buildProtocolSearchRequest(context, criteria)).execute()
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       return when {

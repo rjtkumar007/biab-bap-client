@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.protocol.controllers
+package org.beckn.one.sandbox.bap.protocol.fulfillment.track.controllers
 
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -10,7 +10,6 @@ import org.beckn.one.sandbox.bap.message.entities.OnTrackDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolContextFactory
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.one.sandbox.bap.protocol.track.controllers.OnTrackController
 import org.beckn.protocol.schemas.ProtocolOnTrack
 import org.beckn.protocol.schemas.ProtocolOnTrackMessage
 import org.beckn.protocol.schemas.ProtocolOnTrackMessageTracking
@@ -30,7 +29,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class ProtocolOnTrackControllerSpec @Autowired constructor(
+internal class OnTrackControllerSpec @Autowired constructor(
   @Autowired
   private val mockMvc: MockMvc,
   @Autowired
