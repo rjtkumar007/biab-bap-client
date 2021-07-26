@@ -3,5 +3,5 @@ registry_service:
   url: http://localhost:4000/
 bpp_registry_service:
   url: http://localhost:4010/
-bap_service:
+protocol_service:
   url: http://localhost:4011/

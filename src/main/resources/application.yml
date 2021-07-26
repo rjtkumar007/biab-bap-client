@@ -15,8 +15,8 @@ registry_service:
   url: https://demo4460370.mockable.io/registry/
 bpp_registry_service:
   url: https://demo4460370.mockable.io/bpp_registry/
-bap_service:
-  url: https://demo4460370.mockable.io/bpp_registry/
+protocol_service:
+  url: http://localhost:9002/
 context:
   domain: nic2004:52110
   city: std:080

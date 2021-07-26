@@ -1,6 +1,6 @@
 ---
 server:
-  port: 9001
+  port: service_port
 logging:
   level:
     org:
@@ -15,8 +15,8 @@ registry_service:
   url: {{ registry_url }}
 bpp_registry_service:
   url: https://demo4460370.mockable.io/bpp_registry/
-bap_service:
-  url: {{ bap_url }}
+protocol_service:
+  url: {{ protocol_url }}
 context:
   domain: nic2004:52110
   city: std:080

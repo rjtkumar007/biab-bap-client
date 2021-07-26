@@ -11,7 +11,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 
 @Configuration
 class BapClientConfiguration(
-  @Autowired @Value("\${bap_service.url}")
+  @Autowired @Value("\${protocol_service.url}")
   private val bapServiceUrl: String,
   @Autowired
   private val objectMapper: ObjectMapper
