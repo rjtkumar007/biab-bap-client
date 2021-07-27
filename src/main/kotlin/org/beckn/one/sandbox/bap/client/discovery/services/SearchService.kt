@@ -26,11 +26,10 @@ class SearchService(
 
   fun search(context: ProtocolContext, criteria: SearchCriteria): Either<HttpError, MessageDao> {
     log.info("Got search request with criteria: {} ", criteria)
-    if (isBppFilterSpecified(criteria)) {
-      val criteriaForExploringProviderCatalog = criteria //criteria.copy(searchString = null)
+    if (isBppFilterSpecified(context)) {
       return registryService
-        .lookupBppById(criteriaForExploringProviderCatalog.bppId!!)
-        .flatMap { bppService.search(it.first().subscriber_url, context, criteriaForExploringProviderCatalog) }
+        .lookupBppById(context.bppId!!)
+        .flatMap { bppService.search(it.first().subscriber_url, context, criteria) }
         .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
     }
     return registryService
@@ -39,7 +38,7 @@ class SearchService(
       .flatMap { messageService.save(MessageDao(id = context.messageId, type = MessageDao.Type.Search)) }
   }
 
-  private fun isBppFilterSpecified(criteria: SearchCriteria) =
-    hasText(criteria.bppId)
+  private fun isBppFilterSpecified(context: ProtocolContext) =
+    hasText(context.bppId)
 
 }
