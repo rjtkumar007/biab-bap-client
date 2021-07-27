@@ -21,4 +21,7 @@ interface ProtocolClient {
 
   @GET("protocol/v1/on_track")
   fun getTrackResponsesCall(@Query("messageId") messageId: String): Call<List<ProtocolOnTrack>>
+
+  @GET("protocol/v1/on_support")
+  fun getSupportResponseCall(@Query("messageId") messageId: String): Call<List<ProtocolOnSupport>>
 }

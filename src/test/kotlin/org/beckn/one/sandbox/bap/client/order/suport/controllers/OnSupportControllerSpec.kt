@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.client.order.confirm.controllers
+package org.beckn.one.sandbox.bap.client.order.suport.controllers
 
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -7,14 +7,14 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
+import org.beckn.one.sandbox.bap.client.order.support.controllers.OnSupportController
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientSupportResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.factories.ProtocolOrderFactory
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
-import org.beckn.protocol.schemas.ProtocolOnConfirm
-import org.beckn.protocol.schemas.ProtocolOnConfirmMessage
+import org.beckn.protocol.schemas.ProtocolOnSupport
+import org.beckn.protocol.schemas.ProtocolOnSupportMessage
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,65 +32,65 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-internal class OnConfirmOrderControllerSpec @Autowired constructor(
+class OnSupportControllerSpec @Autowired constructor(
   private val contextFactory: ContextFactory,
   private val mapper: ObjectMapper,
   private val protocolClient: ProtocolClient,
   private val mockMvc: MockMvc
 ) : DescribeSpec() {
   val context = contextFactory.create()
-  private val protocolOnConfirm = ProtocolOnConfirm(
+  private val protocolOnSupport = ProtocolOnSupport(
     context,
-    message = ProtocolOnConfirmMessage(
-      order = ProtocolOrderFactory.create(1, 2)
-    )
+    message = ProtocolOnSupportMessage(phone = "1234567890")
   )
+
   val mockProtocolBap = MockProtocolBap.withResetInstance()
 
   init {
-    describe("OnConfirm callback") {
+    describe("OnInitialize callback") {
 
       context("when called for given message id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/protocol/v1/on_confirm?messageId=${context.messageId}")
-            .willReturn(WireMock.okJson(mapper.writeValueAsString(entityOnConfirmResults())))
+          WireMock.get("/protocol/v1/on_support?messageId=${context.messageId}")
+            .willReturn(WireMock.okJson(mapper.writeValueAsString(entityOnSupportResults())))
         )
-        val onConfirmCallBack = mockMvc
+        val onSupportCallBack = mockMvc
           .perform(
-            MockMvcRequestBuilders.get("/client/v1/on_confirm_order")
+            MockMvcRequestBuilders.get("/client/v1/on_support")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
               .param("messageId", context.messageId)
           )
 
         it("should respond with status ok") {
-          onConfirmCallBack.andExpect(MockMvcResultMatchers.status().isOk)
+          onSupportCallBack.andExpect(MockMvcResultMatchers.status().isOk)
         }
 
-        it("should respond with all on confirm responses in body") {
-          val results = onConfirmCallBack.andReturn()
+        it("should respond with all on support responses in body") {
+          val results = onSupportCallBack.andReturn()
           val body = results.response.contentAsString
-          val clientResponse = mapper.readValue(body, ClientConfirmResponse::class.java)
+          val clientResponse = mapper.readValue(body, ClientSupportResponse::class.java)
           clientResponse.message shouldNotBe null
         }
       }
 
       context("when failure occurs during request processing") {
-        val mockOnPollService = mock<GenericOnPollService<ProtocolOnConfirm, ClientConfirmResponse>> {
+        val mockOnPollService = mock<GenericOnPollService<ProtocolOnSupport, ClientSupportResponse>> {
           onGeneric { onPoll(any(), any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
         }
-        val onConfirmPollController = OnConfirmOrderController(mockOnPollService, contextFactory, protocolClient)
+        val onSupportPollController = OnSupportController(mockOnPollService, contextFactory, protocolClient)
         it("should respond with failure") {
-          val response = onConfirmPollController.onConfirmOrderV1(context.messageId)
+          val response = onSupportPollController.onSupportOrderV1(context.messageId)
           response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }
     }
   }
 
-  fun entityOnConfirmResults(): List<ProtocolOnConfirm> {
+  fun entityOnSupportResults(): List<ProtocolOnSupport> {
     return listOf(
-      protocolOnConfirm,
-      protocolOnConfirm
+      protocolOnSupport,
+      protocolOnSupport
     )
   }
+
 }

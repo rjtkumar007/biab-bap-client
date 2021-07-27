@@ -2,10 +2,11 @@ package org.beckn.one.sandbox.bap.configurations
 
 import org.beckn.one.sandbox.bap.client.discovery.mappers.ClientCatalogMapper
 import org.beckn.one.sandbox.bap.client.discovery.mappers.SearchClientResponseMapper
-import org.beckn.one.sandbox.bap.client.fulfillment.track.mappers.TrackClientResponseMapper
-import org.beckn.one.sandbox.bap.client.order.confirm.mapers.ConfirmClientResponseMapper
+import org.beckn.one.sandbox.bap.client.order.confirm.mappers.ConfirmClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
+import org.beckn.one.sandbox.bap.client.fulfillment.track.mappers.TrackClientResponseMapper
+import org.beckn.one.sandbox.bap.client.order.support.mappers.SupportClientResponseMapper
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollMapper
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
@@ -40,6 +41,9 @@ class ClientServicesConfiguration @Autowired constructor(
     TrackClientResponseMapper()
 
   @Bean
+  fun forSupportResults(): GenericOnPollMapper<ProtocolOnSupport, ClientSupportResponse> =
+    SupportClientResponseMapper()
+
   fun searchProtocolClientService() = GenericProtocolClientService<ProtocolOnSearch>()
 
   @Bean
@@ -53,6 +57,9 @@ class ClientServicesConfiguration @Autowired constructor(
 
   @Bean
   fun trackProtocolClientService() = GenericProtocolClientService<ProtocolOnTrack>()
+
+  @Bean
+  fun supportProtocolClientService() = GenericProtocolClientService<ProtocolOnSupport>()
 
   @Bean
   fun searchResultReplyService(
@@ -84,6 +91,10 @@ class ClientServicesConfiguration @Autowired constructor(
     @Autowired transformer: GenericOnPollMapper<ProtocolOnTrack, ClientTrackResponse>
   ) = GenericOnPollService(protocolService, transformer)
 
-
+  @Bean
+  fun supportResultReplyService(
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnSupport>,
+    @Autowired transformer: GenericOnPollMapper<ProtocolOnSupport, ClientSupportResponse>
+  ) = GenericOnPollService(protocolService, transformer)
 
 }
