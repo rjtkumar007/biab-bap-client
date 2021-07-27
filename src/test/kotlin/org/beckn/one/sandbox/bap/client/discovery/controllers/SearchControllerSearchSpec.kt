@@ -237,7 +237,7 @@ class SearchControllerSpec @Autowired constructor(
       message = SearchRequestMessageDto(
         criteria = SearchCriteria(
           searchString = "Fictional mystery books",
-          location = location,
+          deliveryLocation = location,
           providerId = providerId,
         )
       )
