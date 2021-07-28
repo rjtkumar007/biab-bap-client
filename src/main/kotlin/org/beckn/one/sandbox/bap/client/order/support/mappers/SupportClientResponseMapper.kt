@@ -16,7 +16,8 @@ class SupportClientResponseMapper : GenericOnPollMapper<ProtocolOnSupport, Clien
     Either.Right(
       ClientSupportResponse(
         context = context,
-        message = ProtocolOnSupportMessage(phone = input.first().message?.phone, email = input.first().message?.email, uri = input.first().message?.uri)
+        message = ProtocolOnSupportMessage(phone = input.firstOrNull()?.message?.phone, email = input.firstOrNull()?.message?.email, uri = input.firstOrNull()?.message?.uri),
+        error = input.firstOrNull()?.error
       )
     )
 }

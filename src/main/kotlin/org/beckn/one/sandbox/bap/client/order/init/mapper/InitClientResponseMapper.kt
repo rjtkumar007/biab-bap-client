@@ -15,7 +15,8 @@ class InitClientResponseMapper : GenericOnPollMapper<ProtocolOnInit, ClientInitR
     Either.Right(
       ClientInitResponse(
         context = context,
-        message = input.first().message
+        message = input.firstOrNull()?.message,
+        error = input.firstOrNull()?.error
       )
     )
 }

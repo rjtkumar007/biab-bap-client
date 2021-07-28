@@ -16,7 +16,8 @@ class QuoteClientResponseMapper : GenericOnPollMapper<ProtocolOnSelect, ClientQu
     Either.Right(
       ClientQuoteResponse(
         context = context,
-        message = ClientQuoteResponseMessage(quote = input.first().message?.selected)
+        message = ClientQuoteResponseMessage(quote = input.firstOrNull()?.message?.selected),
+        error = input.firstOrNull()?.error
       )
     )
 }

@@ -15,7 +15,8 @@ class ConfirmClientResponseMapper : GenericOnPollMapper<ProtocolOnConfirm, Clien
     Either.Right(
       ClientConfirmResponse(
         context = context,
-        message = input.first().message
+        message = input.firstOrNull()?.message,
+        error = input.firstOrNull()?.error
       )
     )
 }
