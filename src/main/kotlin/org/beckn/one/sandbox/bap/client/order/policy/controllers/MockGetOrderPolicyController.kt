@@ -1,5 +1,7 @@
 package org.beckn.one.sandbox.bap.client.order.policy.controllers
 
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientOrderPolicyResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientOrderPolicyResponseMessage
 import org.beckn.one.sandbox.bap.client.shared.dtos.GetOrderPolicyDto
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolDescriptor
@@ -21,12 +23,21 @@ class MockGetOrderPolicyController @Autowired constructor(
 
   @PostMapping("/client/v0/get_order_policy")
   @ResponseBody
-  fun getQuote(@RequestBody request: GetOrderPolicyDto): ResponseEntity<List<ProtocolOption>> {
+  fun getOrderPolicy(@RequestBody request: GetOrderPolicyDto): ResponseEntity<ClientOrderPolicyResponse> {
     log.info("Got request for mock get order policy")
     return ResponseEntity.ok(
-      listOf(
-        ProtocolOption("1", cancellationPolicy()),
-        ProtocolOption("2", returnPolicy()),
+      ClientOrderPolicyResponse(
+        context = contextFactory.create(
+          messageId = "c6036d04-55e6-4e2e-8d31-24183a9f3ee8",
+          transactionId = request.context.transactionId,
+          bppId = request.context.bppId,
+        ),
+        message = ClientOrderPolicyResponseMessage(
+          policies = listOf(
+            ProtocolOption("1", cancellationPolicy()),
+            ProtocolOption("2", returnPolicy()),
+          )
+        )
       )
     )
   }

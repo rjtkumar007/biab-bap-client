@@ -3,9 +3,11 @@ package org.beckn.one.sandbox.bap.client.order.policy.controllers
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientContext
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientOrderPolicyResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientOrderPolicyResponseMessage
 import org.beckn.one.sandbox.bap.client.shared.dtos.GetOrderPolicyDto
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
-import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolDescriptor
 import org.beckn.protocol.schemas.ProtocolOption
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,21 +34,27 @@ class MockGetOrderPolicyControllerSpec @Autowired constructor(
   init {
     describe("Get Order Policy") {
       it("should return order policy") {
-        val context = contextFactory.create()
-        val expectedPolicies = listOf(
-          ProtocolOption("1", cancellationPolicy()),
-          ProtocolOption("2", returnPolicy()),
-        )
+        val context = ClientContext()
 
-        val getOrderPolicyResponse = invokeGetOrderPolicyApi(context)
+        val getOrderPolicyResponseBody = invokeGetOrderPolicyApi(context)
           .andExpect(status().isOk)
           .andReturn()
-        getOrderPolicyResponse.response.contentAsString shouldBe objectMapper.writeValueAsString(expectedPolicies)
+
+        val getOrderPolicyResponse = objectMapper.readValue(
+          getOrderPolicyResponseBody.response.contentAsString,
+          ClientOrderPolicyResponse::class.java
+        )
+        getOrderPolicyResponse.message shouldBe ClientOrderPolicyResponseMessage(
+          policies = listOf(
+            ProtocolOption("1", cancellationPolicy()),
+            ProtocolOption("2", returnPolicy()),
+          )
+        )
       }
     }
   }
 
-  private fun invokeGetOrderPolicyApi(context: ProtocolContext) = mockMvc
+  private fun invokeGetOrderPolicyApi(context: ClientContext) = mockMvc
     .perform(
       post("/client/v0/get_order_policy")
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
