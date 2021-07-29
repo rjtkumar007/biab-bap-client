@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.client.order.suport.controllers
+package org.beckn.one.sandbox.bap.client.order.support.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer

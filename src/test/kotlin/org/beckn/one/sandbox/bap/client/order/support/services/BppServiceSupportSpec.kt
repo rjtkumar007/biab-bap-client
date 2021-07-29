@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.client.order.suport.services
+package org.beckn.one.sandbox.bap.client.order.support.services
 
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper

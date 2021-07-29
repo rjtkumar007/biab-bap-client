@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.client.order.suport.controllers
+package org.beckn.one.sandbox.bap.client.order.support.controllers
 
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -7,7 +7,6 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
-import org.beckn.one.sandbox.bap.client.order.support.controllers.OnSupportController
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientSupportResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
