@@ -1,8 +1,8 @@
-package org.beckn.one.sandbox.bap.client.order.support.services
+package org.beckn.one.sandbox.bap.client.rating.services
 
 import arrow.core.Either
 import arrow.core.flatMap
-import org.beckn.one.sandbox.bap.client.shared.dtos.SupportRequestMessage
+import org.beckn.one.sandbox.bap.client.shared.dtos.RatingRequestDto
 import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.errors.HttpError
@@ -14,23 +14,25 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class SupportService @Autowired constructor(
+class RatingService @Autowired constructor(
   private val bppService: BppService,
   private val registryService: RegistryService,
-  private val log: Logger = LoggerFactory.getLogger(SupportService::class.java)
+  private val log: Logger = LoggerFactory.getLogger(RatingService::class.java)
 ) {
-  fun getSupport(
-    context: ProtocolContext,
-    supportRequestMessage: SupportRequestMessage
-  ): Either<HttpError, ProtocolAckResponse?> {
-    log.info("Got support request for reference Id: {}", supportRequestMessage.refId)
 
-    return registryService.lookupBppById(supportRequestMessage.bppId)
+  fun provideRating(
+    context: ProtocolContext,
+    request: RatingRequestDto
+  ): Either<HttpError, ProtocolAckResponse?> {
+    log.info("Got rating request for Id: {}", request.message.refId)
+    return request.validate()
+      .flatMap { registryService.lookupBppById(it.context.bppId!!) }
       .flatMap {
-        bppService.support(
+        bppService.provideRating(
           bppUri = it.first().subscriber_url,
           context = context,
-          refId = supportRequestMessage.refId
+          refId = request.message.refId,
+          value = request.message.value
         )
       }
   }

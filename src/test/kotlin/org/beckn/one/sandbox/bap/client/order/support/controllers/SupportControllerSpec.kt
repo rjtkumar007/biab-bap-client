@@ -74,7 +74,7 @@ class SupportControllerSpec @Autowired constructor(
         verifyThatSubscriberLookupApiWasInvoked(MockNetwork.registryBppLookupApi, MockNetwork.retailBengaluruBpp)
       }
 
-      it("should invoke provide init api and save message") {
+      it("should invoke provide support api and save message") {
         MockNetwork.retailBengaluruBpp
           .stubFor(
             WireMock.post("/support").willReturn(

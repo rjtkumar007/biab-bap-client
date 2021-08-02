@@ -1,6 +1,8 @@
 package org.beckn.one.sandbox.bap.common.factories
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
@@ -99,4 +101,25 @@ object MockNetwork {
     country = country,
     status = status,
   )
+
+  fun stubBppLookupApi(bppApi: WireMockServer, objectMapper: ObjectMapper) {
+    registryBppLookupApi
+      .stubFor(
+        WireMock.post("/lookup")
+          .withRequestBody(WireMock.matchingJsonPath("$.subscriber_id", WireMock.equalTo(bppApi.baseUrl())))
+          .willReturn(WireMock.okJson(getSubscriberForBpp(objectMapper, bppApi)))
+      )
+  }
+
+  private fun getSubscriberForBpp(objectMapper: ObjectMapper, bppApi: WireMockServer) =
+    objectMapper.writeValueAsString(
+      listOf(
+        SubscriberDtoFactory.getDefault(
+          subscriber_id = bppApi.baseUrl(),
+          baseUrl = bppApi.baseUrl(),
+          type = SubscriberDto.Type.BPP,
+        )
+      )
+    )
+
 }

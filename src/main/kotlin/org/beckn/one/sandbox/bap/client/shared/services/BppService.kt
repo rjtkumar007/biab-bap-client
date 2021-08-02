@@ -287,8 +287,37 @@ class BppService @Autowired constructor(
       else -> Right(httpResponse.body()!!)
     }
   }.mapLeft {
-    log.error("Error when invoking BPP Track API", it)
+    log.error("Error when invoking BPP Support API", it)
     BppError.Internal
   }
+
+  fun provideRating(
+    bppUri: String,
+    context: ProtocolContext,
+    refId: String,
+    value: Int
+  ): Either<BppError, ProtocolAckResponse> =
+    Either.catch {
+      log.info("Invoking provide rating API on BPP: {}", bppUri)
+      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
+      val httpResponse =
+        bppServiceClient.provideRating(
+          ProtocolRatingRequest(
+            context = context,
+            message = ProtocolRatingRequestMessage(id = refId, value = value),
+          )
+        ).execute()
+      log.info("BPP provide rating API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+      return when {
+        isInternalServerError(httpResponse) -> Left(BppError.Internal)
+        isBodyNull(httpResponse) -> Left(BppError.NullResponse)
+        isAckNegative(httpResponse) -> Left(BppError.Nack)
+        else -> Right(httpResponse.body()!!)
+      }
+    }.mapLeft {
+      log.error("Error when invoking BPP provide rating API", it)
+      BppError.Internal
+    }
+
 
 }

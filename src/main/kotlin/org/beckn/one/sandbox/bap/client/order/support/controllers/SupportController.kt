@@ -30,7 +30,7 @@ class SupportController @Autowired constructor(
       getContext(supportRequest.context.transactionId) // might not matter as the context might have different transaction id
     return supportService.getSupport(
       context = context,
-      supportRequestRequestMessage = supportRequest.message
+      supportRequestMessage = supportRequest.message
     ).fold(
       {
         log.error("Error when getting support for refId: {}", it)
