@@ -23,8 +23,7 @@ class SupportController @Autowired constructor(
   @PostMapping("/client/v1/get_support")
   @ResponseBody
   fun getSupportV1(
-    @RequestBody supportRequest: SupportRequestDto,
-    @RequestParam(required = true) signature: String,
+    @RequestBody supportRequest: SupportRequestDto
   ): ResponseEntity<ProtocolAckResponse> {
     val context =
       getContext(supportRequest.context.transactionId) // might not matter as the context might have different transaction id
