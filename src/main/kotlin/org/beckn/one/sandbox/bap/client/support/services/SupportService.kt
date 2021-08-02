@@ -1,8 +1,9 @@
-package org.beckn.one.sandbox.bap.client.order.support.services
+package org.beckn.one.sandbox.bap.client.support.services
 
 import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.shared.dtos.SupportRequestMessage
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.errors.HttpError
@@ -21,11 +22,17 @@ class SupportService @Autowired constructor(
 ) {
   fun getSupport(
     context: ProtocolContext,
-    supportRequestMessage: SupportRequestMessage
+    supportRequestMessage: SupportRequestMessage,
+    bppId: String?
   ): Either<HttpError, ProtocolAckResponse?> {
     log.info("Got support request for reference Id: {}", supportRequestMessage.refId)
 
-    return registryService.lookupBppById(supportRequestMessage.bppId)
+    if (bppId == null) {
+      log.info("BPPId not present")
+      return Either.Left(BppError.BppIdNotPresent)
+    }
+
+    return registryService.lookupBppById(bppId)
       .flatMap {
         bppService.support(
           bppUri = it.first().subscriber_url,

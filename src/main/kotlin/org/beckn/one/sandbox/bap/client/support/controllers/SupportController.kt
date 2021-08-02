@@ -1,6 +1,6 @@
-package org.beckn.one.sandbox.bap.client.order.support.controllers
+package org.beckn.one.sandbox.bap.client.support.controllers
 
-import org.beckn.one.sandbox.bap.client.order.support.services.SupportService
+import org.beckn.one.sandbox.bap.client.support.services.SupportService
 import org.beckn.one.sandbox.bap.client.shared.dtos.SupportRequestDto
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
@@ -30,7 +30,8 @@ class SupportController @Autowired constructor(
       getContext(supportRequest.context.transactionId) // might not matter as the context might have different transaction id
     return supportService.getSupport(
       context = context,
-      supportRequestMessage = supportRequest.message
+      supportRequestMessage = supportRequest.message,
+      bppId = supportRequest.context.bppId
     ).fold(
       {
         log.error("Error when getting support for refId: {}", it)

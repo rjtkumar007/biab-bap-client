@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.client.order.support.controllers
+package org.beckn.one.sandbox.bap.client.support.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -38,15 +38,15 @@ class SupportControllerSpec @Autowired constructor(
   val objectMapper: ObjectMapper,
   val contextFactory: ContextFactory,
   val uuidFactory: UuidFactory,
-) : DescribeSpec()  {
+) : DescribeSpec() {
   init {
     describe("Get support details from BPP") {
       MockNetwork.startAllSubscribers()
-      val context = ClientContext(transactionId = uuidFactory.create())
+      val context =
+        ClientContext(transactionId = uuidFactory.create(), bppId = MockNetwork.retailBengaluruBpp.baseUrl())
       val supportRequest = SupportRequestDto(
         context = context,
         message = SupportRequestMessage(
-          bppId = MockNetwork.retailBengaluruBpp.baseUrl(),
           refId = "abc123"
         ),
       )

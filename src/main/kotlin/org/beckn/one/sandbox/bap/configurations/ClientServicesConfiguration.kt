@@ -6,7 +6,7 @@ import org.beckn.one.sandbox.bap.client.fulfillment.track.mappers.TrackClientRes
 import org.beckn.one.sandbox.bap.client.order.confirm.mappers.ConfirmClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
-import org.beckn.one.sandbox.bap.client.order.support.mappers.SupportClientResponseMapper
+import org.beckn.one.sandbox.bap.client.support.mappers.SupportClientResponseMapper
 import org.beckn.one.sandbox.bap.client.rating.mappers.RatingClientResponseMapper
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollMapper

@@ -8,6 +8,5 @@ data class SupportRequestDto @Default constructor(
 )
 
 data class SupportRequestMessage @Default constructor(
-  val refId: String,
-  val bppId: String
+  val refId: String
 )

@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.shared.dtos.RatingRequestDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.RatingRequestMessage
-import org.beckn.one.sandbox.bap.client.shared.errors.TrackError
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
@@ -33,7 +33,7 @@ class RatingServiceSpec : DescribeSpec() {
           )
         )
 
-        trackResponse shouldBeLeft TrackError.BppIdNotPresent
+        trackResponse shouldBeLeft BppError.BppIdNotPresent
         verifyNoMoreInteractions(registryService)
         verifyNoMoreInteractions(bppService)
       }

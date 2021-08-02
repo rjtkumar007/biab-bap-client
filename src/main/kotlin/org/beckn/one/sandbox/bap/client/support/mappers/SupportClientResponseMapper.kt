@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.client.order.support.mappers
+package org.beckn.one.sandbox.bap.client.support.mappers
 
 import arrow.core.Either
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientSupportResponse
