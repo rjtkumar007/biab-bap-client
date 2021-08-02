@@ -38,7 +38,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
       MockNetwork.startAllSubscribers()
       val gateway = MockNetwork.getRetailBengaluruBg()
       `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
-      `when`(gatewayServiceClientFactory.getClient(gateway)).thenReturn(gatewayServiceClient)
+      `when`(gatewayServiceClientFactory.getClient(gateway.subscriber_url)).thenReturn(gatewayServiceClient)
       val context = contextFactory.create()
 
       beforeEach {
