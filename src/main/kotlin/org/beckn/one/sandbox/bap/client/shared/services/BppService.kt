@@ -291,12 +291,8 @@ class BppService @Autowired constructor(
     BppError.Internal
   }
 
-  fun provideRating(
-    bppUri: String,
-    context: ProtocolContext,
-    refId: String,
-    value: Int
-  ): Either<BppError, ProtocolAckResponse> =
+  fun provideRating(bppUri: String, context: ProtocolContext, refId: String, value: Int):
+      Either<BppError, ProtocolAckResponse> =
     Either.catch {
       log.info("Invoking provide rating API on BPP: {}", bppUri)
       val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
@@ -318,6 +314,4 @@ class BppService @Autowired constructor(
       log.error("Error when invoking BPP provide rating API", it)
       BppError.Internal
     }
-
-
 }

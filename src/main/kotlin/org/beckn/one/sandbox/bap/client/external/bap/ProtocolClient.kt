@@ -5,7 +5,6 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-
 interface ProtocolClient {
   @GET("protocol/v1/on_search")
   fun getSearchResponsesCall(@Query("messageId") messageId: String): Call<List<ProtocolOnSearch>>
@@ -24,4 +23,7 @@ interface ProtocolClient {
 
   @GET("protocol/v1/on_support")
   fun getSupportResponseCall(@Query("messageId") messageId: String): Call<List<ProtocolOnSupport>>
+
+  @GET("protocol/v1/on_rating")
+  fun getProvideRatingResponsesCall(@Query("messageId") messageId: String): Call<List<ProtocolOnRating>>
 }

@@ -10,7 +10,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import retrofit2.Call
 
-open class GenericOnPollService<Protocol: ProtocolResponse, Output: ClientResponse> constructor(
+open class GenericOnPollService<Protocol : ProtocolResponse, Output : ClientResponse> constructor(
   private val protocolService: GenericProtocolClientService<Protocol>,
   private val transformer: GenericOnPollMapper<Protocol, Output>
 ) {

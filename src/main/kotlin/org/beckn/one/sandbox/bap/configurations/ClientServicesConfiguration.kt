@@ -2,11 +2,12 @@ package org.beckn.one.sandbox.bap.configurations
 
 import org.beckn.one.sandbox.bap.client.discovery.mappers.ClientCatalogMapper
 import org.beckn.one.sandbox.bap.client.discovery.mappers.SearchClientResponseMapper
+import org.beckn.one.sandbox.bap.client.fulfillment.track.mappers.TrackClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.confirm.mappers.ConfirmClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
-import org.beckn.one.sandbox.bap.client.fulfillment.track.mappers.TrackClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.support.mappers.SupportClientResponseMapper
+import org.beckn.one.sandbox.bap.client.rating.mappers.RatingClientResponseMapper
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollMapper
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
@@ -44,7 +45,9 @@ class ClientServicesConfiguration @Autowired constructor(
   fun forSupportResults(): GenericOnPollMapper<ProtocolOnSupport, ClientSupportResponse> =
     SupportClientResponseMapper()
 
-  fun searchProtocolClientService() = GenericProtocolClientService<ProtocolOnSearch>()
+  @Bean
+  fun forProvideRatingResults(): GenericOnPollMapper<ProtocolOnRating, ClientRatingResponse> =
+    RatingClientResponseMapper()
 
   @Bean
   fun selectProtocolClientService() = GenericProtocolClientService<ProtocolOnSelect>()
@@ -97,4 +100,9 @@ class ClientServicesConfiguration @Autowired constructor(
     @Autowired transformer: GenericOnPollMapper<ProtocolOnSupport, ClientSupportResponse>
   ) = GenericOnPollService(protocolService, transformer)
 
+  @Bean
+  fun provideRatingReplyService(
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnRating>,
+    @Autowired transformer: GenericOnPollMapper<ProtocolOnRating, ClientRatingResponse>
+  ) = GenericOnPollService(protocolService, transformer)
 }
