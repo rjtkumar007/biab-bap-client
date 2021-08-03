@@ -18,7 +18,7 @@ import org.springframework.util.StringUtils.hasText
 class SearchService(
   @Autowired val registryService: RegistryService,
   @Autowired val gatewayService: GatewayService,
-  @Autowired val bppService: BppService,
+  @Autowired val bppSearchService: BppSearchService,
 ) {
   val log: Logger = LoggerFactory.getLogger(SearchService::class.java)
 
@@ -27,7 +27,7 @@ class SearchService(
     if (isBppFilterSpecified(context)) {
       return registryService
         .lookupBppById(context.bppId!!)
-        .flatMap { bppService.search(it.first().subscriber_url, context, criteria) }
+        .flatMap { bppSearchService.search(it.first().subscriber_url, context, criteria) }
     }
     return registryService
       .lookupGateways()

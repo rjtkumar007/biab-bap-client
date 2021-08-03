@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderDto
-import org.beckn.one.sandbox.bap.client.shared.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.shared.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.protocol.schemas.*
@@ -16,50 +15,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.util.StringUtils.hasText
 import retrofit2.Response
 
 @Service
 class BppService @Autowired constructor(
   private val bppServiceClientFactory: BppClientFactory,
-  private val objectMapper: ObjectMapper,
+  private val objectMapper: ObjectMapper
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppService::class.java)
-
-  fun search(bppUri: String, context: ProtocolContext, criteria: SearchCriteria)
-      : Either<BppError, ProtocolAckResponse> {
-    return Either.catch {
-      log.info("Invoking Search API on BPP: {}", bppUri)
-      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
-      log.info("Initiated Search for context: {}", context)
-      val httpResponse = bppServiceClient.search(
-        ProtocolSearchRequest(
-          context,
-          ProtocolSearchRequestMessage(
-            ProtocolIntent(
-              item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = criteria.searchString)),
-              provider = ProtocolProvider(id = criteria.providerId),
-              fulfillment = getFulfillmentFilter(criteria),
-            )
-          )
-        )
-      ).execute()
-
-      log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-      return when {
-        isInternalServerError(httpResponse) -> Left(BppError.Internal)
-        httpResponse.body() == null -> Left(BppError.NullResponse)
-        isAckNegative(httpResponse) -> Left(BppError.Nack)
-        else -> {
-          log.info("Successfully invoked search on Bpp. Response: {}", httpResponse.body())
-          Right(httpResponse.body()!!)
-        }
-      }
-    }.mapLeft {
-      log.error("Error when initiating search", it)
-      BppError.Internal
-    }
-  }
 
   fun select(
     context: ProtocolContext,
@@ -174,13 +137,6 @@ class BppService @Autowired constructor(
     log.info("Init API request body: {}", objectMapper.writeValueAsString(initRequest))
     return bppServiceClient.init(initRequest).execute()
   }
-
-  private fun getFulfillmentFilter(criteria: SearchCriteria) =
-    when {
-      hasText(criteria.deliveryLocation) ->
-        ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.deliveryLocation)))
-      else -> null
-    }
 
   fun confirm(
     context: ProtocolContext,
