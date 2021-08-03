@@ -5,7 +5,6 @@ import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderItemDto
 import org.beckn.one.sandbox.bap.client.shared.errors.CartError
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.protocol.schemas.ProtocolAckResponse
@@ -17,13 +16,13 @@ import org.springframework.stereotype.Service
 
 @Service
 class InitOrderService @Autowired constructor(
-  private val bppService: BppService,//todo: might require a mapper
+  private val bppInitService: BppInitService,
   private val registryService: RegistryService,
   private val log: Logger = LoggerFactory.getLogger(InitOrderService::class.java)
 ) {
   fun initOrder(
-      context: ProtocolContext,
-      order: OrderDto
+    context: ProtocolContext,
+    order: OrderDto
   ): Either<HttpError, ProtocolAckResponse?> {
     log.info("Got initialize order request. Context: {}, Order: {}", context, order)
     if (order.items.isNullOrEmpty()) {
@@ -43,7 +42,7 @@ class InitOrderService @Autowired constructor(
 
     return registryService.lookupBppById(order.items.first().bppId)
       .flatMap {
-        bppService.init(
+        bppInitService.init(
           context,
           bppUri = it.first().subscriber_url,
           order = order

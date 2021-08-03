@@ -32,67 +32,6 @@ class BppService @Autowired constructor(
   private fun isAckNegative(httpResponse: Response<ProtocolAckResponse>) =
     httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
 
-  fun init(
-    context: ProtocolContext,
-    bppUri: String,
-    order: OrderDto
-  ): Either<BppError, ProtocolAckResponse> {
-    return Either.catch {
-      log.info("Invoking Init API on BPP: {}", bppUri)
-      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
-      val httpResponse =
-        invokeBppInitApi(
-          bppServiceClient = bppServiceClient,
-          context = context,
-          order = order
-        )
-      log.info("BPP init API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-      return when {
-        isInternalServerError(httpResponse) -> Left(BppError.Internal)
-        isBodyNull(httpResponse) -> Left(BppError.NullResponse)
-        isAckNegative(httpResponse) -> Left(BppError.Nack)
-        else -> Right(httpResponse.body()!!)
-      }
-    }.mapLeft {
-      log.error("Error when initiating init", it)
-      BppError.Internal
-    }
-  }
-
-  private fun invokeBppInitApi(
-    bppServiceClient: BppClient,
-    context: ProtocolContext,
-    order: OrderDto
-  ): Response<ProtocolAckResponse> {
-    val initRequest = ProtocolInitRequest(
-      context = context,
-      ProtocolInitRequestMessage(
-        order = ProtocolOrder(
-          provider = ProtocolSelectMessageSelectedProvider(
-            id = order.items!!.first().provider.id,
-            locations = listOf(ProtocolSelectMessageSelectedProviderLocations(id = order.items.first().provider.locations!!.first()))
-          ),
-          items = order.items.map { ProtocolSelectMessageSelectedItems(id = it.id, quantity = it.quantity) },
-          billing = order.billingInfo,
-          fulfillment = ProtocolFulfillment(
-            end = ProtocolFulfillmentEnd(
-              contact = ProtocolContact(
-                phone = order.deliveryInfo.phone,
-                email = order.deliveryInfo.email
-              ), location = order.deliveryInfo.location
-            ),
-            type = order.deliveryInfo.type,
-            customer = ProtocolCustomer(ProtocolPerson(name = order.deliveryInfo.name))
-          ),
-          addOns = emptyList(),
-          offers = emptyList(),
-        )
-      )
-    )
-    log.info("Init API request body: {}", objectMapper.writeValueAsString(initRequest))
-    return bppServiceClient.init(initRequest).execute()
-  }
-
   fun confirm(
     context: ProtocolContext,
     bppUri: String,

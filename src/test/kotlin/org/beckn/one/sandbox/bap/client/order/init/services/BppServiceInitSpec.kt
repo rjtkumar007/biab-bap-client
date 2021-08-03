@@ -6,10 +6,9 @@ import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
-import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.factories.OrderDtoFactory
 import org.beckn.one.sandbox.bap.client.factories.OrderItemDtoFactory
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.message.factories.ProtocolBillingFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
@@ -26,7 +25,7 @@ internal class BppServiceInitSpec : DescribeSpec() {
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
-  private val bppService = BppService(bppServiceClientFactory, mock(ObjectMapper::class.java))
+  private val bppInitService = BppInitService(bppServiceClientFactory, mock(ObjectMapper::class.java))
   private val bppServiceClient: BppClient = mock(BppClient::class.java)
   private val bppUri = "https://bpp1.com"
 
@@ -77,7 +76,7 @@ internal class BppServiceInitSpec : DescribeSpec() {
   }
 
   private fun invokeBppInit(): Either<BppError, ProtocolAckResponse> {
-    return bppService.init(
+    return bppInitService.init(
       context = contextFactory.create(),
       bppUri = bppUri,
       order = OrderDtoFactory.create(
