@@ -1,7 +1,6 @@
 package org.beckn.one.sandbox.bap.client.fulfillment.track.services
 
 import arrow.core.Either
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
@@ -9,7 +8,6 @@ import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.shared.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.beckn.protocol.schemas.*
@@ -25,7 +23,7 @@ internal class BppServiceTrackSpec : DescribeSpec() {
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
-  private val bppService = BppService(bppServiceClientFactory, mock(ObjectMapper::class.java))
+  private val bppTrackService = BppTrackService(bppServiceClientFactory)
   private val bppServiceClient: BppClient = mock(BppClient::class.java)
   private val bppUri = "https://bpp1.com"
 
@@ -76,7 +74,7 @@ internal class BppServiceTrackSpec : DescribeSpec() {
   }
 
   private fun invokeBppTrack(): Either<BppError, ProtocolAckResponse> {
-    return bppService.track(
+    return bppTrackService.track(
       bppUri,
       contextFactory.create(action = ProtocolContext.Action.TRACK),
       TrackRequestDto(

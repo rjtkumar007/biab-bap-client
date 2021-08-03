@@ -4,10 +4,7 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.beckn.one.sandbox.bap.client.external.provider.BppClient
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
-import org.beckn.one.sandbox.bap.client.shared.dtos.OrderDto
-import org.beckn.one.sandbox.bap.client.shared.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.protocol.schemas.*
 import org.slf4j.Logger
@@ -31,24 +28,6 @@ class BppService @Autowired constructor(
 
   private fun isAckNegative(httpResponse: Response<ProtocolAckResponse>) =
     httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
-  
-  fun track(bppUri: String, context: ProtocolContext, request: TrackRequestDto): Either<BppError, ProtocolAckResponse> =
-    Either.catch {
-      log.info("Invoking Track API on BPP: {}", bppUri)
-      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
-      val httpResponse = bppServiceClient.track(ProtocolTrackRequest(context = context, message = request.message))
-        .execute()
-      log.info("BPP Track API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-      return when {
-        isInternalServerError(httpResponse) -> Left(BppError.Internal)
-        isBodyNull(httpResponse) -> Left(BppError.NullResponse)
-        isAckNegative(httpResponse) -> Left(BppError.Nack)
-        else -> Right(httpResponse.body()!!)
-      }
-    }.mapLeft {
-      log.error("Error when invoking BPP Track API", it)
-      BppError.Internal
-    }
 
   fun support(
     bppUri: String,

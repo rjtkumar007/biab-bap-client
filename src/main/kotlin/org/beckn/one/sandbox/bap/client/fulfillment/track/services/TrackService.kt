@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.order.quote.services.QuoteService
 import org.beckn.one.sandbox.bap.client.shared.dtos.TrackRequestDto
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.protocol.schemas.ProtocolAckResponse
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 class TrackService @Autowired constructor(
   private val registryService: RegistryService,
-  private val bppService: BppService,
+  private val bppTrackService: BppTrackService,
 ) {
   private val log: Logger = LoggerFactory.getLogger(QuoteService::class.java)
 
@@ -27,6 +26,6 @@ class TrackService @Autowired constructor(
     return TrackRequestDto.validate(request)
       .flatMap { registryService.lookupBppById(it.context.bppId!!) }
       .map { it.first() }
-      .flatMap { bppService.track(it.subscriber_url, context, request) }
+      .flatMap { bppTrackService.track(it.subscriber_url, context, request) }
   }
 }
