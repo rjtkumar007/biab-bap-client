@@ -6,7 +6,6 @@ import org.beckn.one.sandbox.bap.client.order.quote.mapper.SelectedItemMapper
 import org.beckn.one.sandbox.bap.client.shared.dtos.CartDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.CartItemDto
 import org.beckn.one.sandbox.bap.client.shared.errors.CartError
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.protocol.schemas.ProtocolAckResponse
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Service
 @Service
 class QuoteService @Autowired constructor(
   private val registryService: RegistryService,
-  private val bppService: BppService,
+  private val bppSelectService: BppSelectService,
   private val selectedItemMapper: SelectedItemMapper,
 ) {
   private val log: Logger = LoggerFactory.getLogger(QuoteService::class.java)
@@ -44,7 +43,7 @@ class QuoteService @Autowired constructor(
     return registryService.lookupBppById(cart.items.first().bppId)
       .flatMap { Either.Right(it.first()) }
       .flatMap {
-        bppService.select(
+        bppSelectService.select(
           context,
           bppUri = it.subscriber_url,
           providerId = cart.items.first().provider.id,

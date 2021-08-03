@@ -1,13 +1,11 @@
 package org.beckn.one.sandbox.bap.client.order.quote.services
 
 import arrow.core.Either
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.message.factories.IdFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolLocationFactory
@@ -26,7 +24,7 @@ internal class BppServiceSelectSpec : DescribeSpec() {
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
-  private val bppService = BppService(bppServiceClientFactory, mock(ObjectMapper::class.java))
+  private val bppSelectService = BppSelectService(bppServiceClientFactory)
   private val bppServiceClient: BppClient = mock(BppClient::class.java)
   private val bppUri = "https://bpp1.com"
 
@@ -77,7 +75,7 @@ internal class BppServiceSelectSpec : DescribeSpec() {
   }
 
   private fun invokeBppSelect(): Either<BppError, ProtocolAckResponse> {
-    return bppService.select(
+    return bppSelectService.select(
       contextFactory.create(), //todo: a lot of places where the context factory is used but the action is wrong
       bppUri,
       "venugopala stores",

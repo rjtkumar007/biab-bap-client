@@ -7,7 +7,6 @@ import org.beckn.one.sandbox.bap.client.factories.CartFactory
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.SelectedItemMapperImpl
 import org.beckn.one.sandbox.bap.client.shared.dtos.CartDto
 import org.beckn.one.sandbox.bap.client.shared.errors.CartError
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.mockito.Mockito.mock
@@ -15,11 +14,11 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 
 class QuoteServiceSpec : DescribeSpec() {
   private val registryService = mock(RegistryService::class.java)
-  private val bppService = mock(BppService::class.java)
+  private val bppSelectService = mock(BppSelectService::class.java)
   private val context = ContextFactoryInstance.create().create()
   private val quoteService = QuoteService(
     registryService = registryService,
-    bppService = bppService,
+    bppSelectService = bppSelectService,
     selectedItemMapper = SelectedItemMapperImpl()
   )
 
@@ -34,7 +33,7 @@ class QuoteServiceSpec : DescribeSpec() {
 
         quote shouldBeRight null
         verifyNoMoreInteractions(registryService)
-        verifyNoMoreInteractions(bppService)
+        verifyNoMoreInteractions(bppSelectService)
       }
 
       it("should return error when multiple BPP items are part of the cart") {
@@ -47,7 +46,7 @@ class QuoteServiceSpec : DescribeSpec() {
 
         quote shouldBeLeft CartError.MultipleBpps
         verifyNoMoreInteractions(registryService)
-        verifyNoMoreInteractions(bppService)
+        verifyNoMoreInteractions(bppSelectService)
       }
 
       it("should return error when multiple Provider items are part of the cart") {
@@ -65,7 +64,7 @@ class QuoteServiceSpec : DescribeSpec() {
 
         quote shouldBeLeft CartError.MultipleProviders
         verifyNoMoreInteractions(registryService)
-        verifyNoMoreInteractions(bppService)
+        verifyNoMoreInteractions(bppSelectService)
       }
     }
   }

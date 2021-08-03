@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.client.discovery.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import org.beckn.one.sandbox.bap.client.external.hasBody
 import org.beckn.one.sandbox.bap.client.external.isAckNegative
 import org.beckn.one.sandbox.bap.client.external.isInternalServerError
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
@@ -43,7 +44,7 @@ class BppSearchService @Autowired constructor(
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       return when {
         httpResponse.isInternalServerError() -> Left(BppError.Internal)
-        httpResponse.body() == null -> Left(BppError.NullResponse)
+        !httpResponse.hasBody() -> Left(BppError.NullResponse)
         httpResponse.isAckNegative() -> Left(BppError.Nack)
         else -> {
           log.info("Successfully invoked search on Bpp. Response: {}", httpResponse.body())
