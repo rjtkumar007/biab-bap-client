@@ -3,7 +3,8 @@ package org.beckn.one.sandbox.bap.client.discovery.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import com.fasterxml.jackson.databind.ObjectMapper
+import org.beckn.one.sandbox.bap.client.external.isAckNegative
+import org.beckn.one.sandbox.bap.client.external.isInternalServerError
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
@@ -11,10 +12,8 @@ import org.beckn.protocol.schemas.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.util.StringUtils
-import retrofit2.Response
 
 @Service
 class BppSearchService @Autowired constructor(
@@ -43,9 +42,9 @@ class BppSearchService @Autowired constructor(
 
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       return when {
-        isInternalServerError(httpResponse) -> Left(BppError.Internal)
+        httpResponse.isInternalServerError() -> Left(BppError.Internal)
         httpResponse.body() == null -> Left(BppError.NullResponse)
-        isAckNegative(httpResponse) -> Left(BppError.Nack)
+        httpResponse.isAckNegative() -> Left(BppError.Nack)
         else -> {
           log.info("Successfully invoked search on Bpp. Response: {}", httpResponse.body())
           Right(httpResponse.body()!!)
@@ -57,14 +56,6 @@ class BppSearchService @Autowired constructor(
     }
   }
 
-  private fun isInternalServerError(httpResponse: Response<ProtocolAckResponse>) =
-    httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
-
-  private fun isBodyNull(httpResponse: Response<ProtocolAckResponse>) = httpResponse.body() == null
-
-  private fun isAckNegative(httpResponse: Response<ProtocolAckResponse>) =
-    httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
-
   private fun getFulfillmentFilter(criteria: SearchCriteria) =
     when {
       StringUtils.hasText(criteria.deliveryLocation) ->
@@ -72,3 +63,4 @@ class BppSearchService @Autowired constructor(
       else -> null
     }
 }
+
