@@ -15,16 +15,13 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 class RatingServiceSpec : DescribeSpec() {
   private val context = ContextFactoryInstance.create().create()
   private val registryService = mock(RegistryService::class.java)
-  private val bppService = mock(BppRatingService::class.java)
-  private val ratingService = RatingService(
-    registryService = registryService,
-    bppService = bppService,
-  )
+  private val bppRatingService = mock(BppRatingService::class.java)
+  private val ratingService = RatingService(registryService = registryService, bppRatingService = bppRatingService)
 
   init {
-    describe("Track") {
+    describe("Rating") {
       it("should validate that bpp id is not null") {
-        val trackResponse = ratingService.rating(
+        val ratingResponse = ratingService.rating(
           context = context,
           request = RatingRequestDto(
             context = ClientContext(transactionId = UuidFactory().create(), bppId = null),
@@ -32,9 +29,9 @@ class RatingServiceSpec : DescribeSpec() {
           )
         )
 
-        trackResponse shouldBeLeft BppError.BppIdNotPresent
+        ratingResponse shouldBeLeft BppError.BppIdNotPresent
         verifyNoMoreInteractions(registryService)
-        verifyNoMoreInteractions(bppService)
+        verifyNoMoreInteractions(bppRatingService)
       }
     }
   }

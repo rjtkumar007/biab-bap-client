@@ -23,21 +23,21 @@ class BppTrackService @Autowired constructor(
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppTrackService::class.java)
 
-  fun track(bppUri: String, context: ProtocolContext, request: TrackRequestDto): Either<BppError, ProtocolAckResponse> =
-    Either.catch {
-      log.info("Invoking Track API on BPP: {}", bppUri)
-      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
-      val httpResponse = bppServiceClient.track(ProtocolTrackRequest(context = context, message = request.message))
-        .execute()
-      log.info("BPP Track API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-      return when {
-        httpResponse.isInternalServerError() -> Left(BppError.Internal)
-        !httpResponse.hasBody() -> Left(BppError.NullResponse)
-        httpResponse.isAckNegative() -> Left(BppError.Nack)
-        else -> Right(httpResponse.body()!!)
-      }
-    }.mapLeft {
-      log.error("Error when invoking BPP Track API", it)
-      BppError.Internal
+  fun track(bppUri: String, context: ProtocolContext, request: TrackRequestDto):
+      Either<BppError, ProtocolAckResponse> = Either.catch {
+    log.info("Invoking Track API on BPP: {}", bppUri)
+    val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
+    val httpResponse = bppServiceClient.track(ProtocolTrackRequest(context = context, message = request.message))
+      .execute()
+    log.info("BPP Track API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+    return when {
+      httpResponse.isInternalServerError() -> Left(BppError.Internal)
+      !httpResponse.hasBody() -> Left(BppError.NullResponse)
+      httpResponse.isAckNegative() -> Left(BppError.Nack)
+      else -> Right(httpResponse.body()!!)
     }
+  }.mapLeft {
+    log.error("Error when invoking BPP Track API", it)
+    BppError.Internal
+  }
 }

@@ -23,11 +23,7 @@ class BppInitService @Autowired constructor(
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppInitService::class.java)
 
-  fun init(
-    context: ProtocolContext,
-    bppUri: String,
-    order: OrderDto
-  ): Either<BppError, ProtocolAckResponse> {
+  fun init(context: ProtocolContext, bppUri: String, order: OrderDto): Either<BppError, ProtocolAckResponse> {
     return Either.catch {
       log.info("Invoking Init API on BPP: {}", bppUri)
       val bppServiceClient = bppServiceClientFactory.getClient(bppUri)

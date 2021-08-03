@@ -3,14 +3,12 @@ package org.beckn.one.sandbox.bap.client.order.confirm.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.beckn.one.sandbox.bap.client.external.hasBody
 import org.beckn.one.sandbox.bap.client.external.isAckNegative
 import org.beckn.one.sandbox.bap.client.external.isInternalServerError
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderDto
-import org.beckn.one.sandbox.bap.client.shared.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.protocol.schemas.*
 import org.slf4j.Logger
@@ -25,11 +23,7 @@ class BppConfirmService @Autowired constructor(
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppConfirmService::class.java)
 
-  fun confirm(
-    context: ProtocolContext,
-    bppUri: String,
-    order: OrderDto
-  ): Either<BppError, ProtocolAckResponse> {
+  fun confirm(context: ProtocolContext, bppUri: String, order: OrderDto): Either<BppError, ProtocolAckResponse> {
     return Either.catch {
       log.info("Invoking Confirm API on BPP: {}", bppUri)
       val bppServiceClient = bppServiceClientFactory.getClient(bppUri)

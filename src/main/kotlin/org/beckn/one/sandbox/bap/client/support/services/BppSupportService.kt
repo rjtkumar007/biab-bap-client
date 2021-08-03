@@ -23,29 +23,26 @@ class BppSupportService @Autowired constructor(
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppSupportService::class.java)
 
-  fun support(
-    bppUri: String,
-    context: ProtocolContext,
-    refId: String
-  ): Either<BppError, ProtocolAckResponse> = Either.catch {
-    log.info("Invoking support API on BPP: {}", bppUri)
-    val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
-    val httpResponse =
-      bppServiceClient.support(
-        ProtocolSupportRequest(
-          context = context,
-          message = ProtocolSupportRequestMessage(refId = refId)
-        )
-      ).execute()
-    log.info("BPP support API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-    return when {
-      httpResponse.isInternalServerError() -> Left(BppError.Internal)
-      !httpResponse.hasBody() -> Left(BppError.NullResponse)
-      httpResponse.isAckNegative() -> Left(BppError.Nack)
-      else -> Right(httpResponse.body()!!)
+  fun support(bppUri: String, context: ProtocolContext, refId: String): Either<BppError, ProtocolAckResponse> =
+    Either.catch {
+      log.info("Invoking support API on BPP: {}", bppUri)
+      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
+      val httpResponse =
+        bppServiceClient.support(
+          ProtocolSupportRequest(
+            context = context,
+            message = ProtocolSupportRequestMessage(refId = refId)
+          )
+        ).execute()
+      log.info("BPP support API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+      return when {
+        httpResponse.isInternalServerError() -> Left(BppError.Internal)
+        !httpResponse.hasBody() -> Left(BppError.NullResponse)
+        httpResponse.isAckNegative() -> Left(BppError.Nack)
+        else -> Right(httpResponse.body()!!)
+      }
+    }.mapLeft {
+      log.error("Error when invoking BPP Support API", it)
+      BppError.Internal
     }
-  }.mapLeft {
-    log.error("Error when invoking BPP Support API", it)
-    BppError.Internal
-  }
 }
