@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ConfirmOrderService @Autowired constructor(
-  private val bppService: BppService,
+  private val bppConfirmService: BppConfirmService,
   private val registryService: RegistryService,
   private val log: Logger = LoggerFactory.getLogger(ConfirmOrderService::class.java)
 ) {
@@ -51,7 +51,7 @@ class ConfirmOrderService @Autowired constructor(
 
     return registryService.lookupBppById(order.items.first().bppId)
       .flatMap {
-        bppService.confirm(
+        bppConfirmService.confirm(
           context,
           bppUri = it.first().subscriber_url,
           order = order

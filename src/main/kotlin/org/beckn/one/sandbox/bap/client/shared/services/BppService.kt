@@ -31,72 +31,7 @@ class BppService @Autowired constructor(
 
   private fun isAckNegative(httpResponse: Response<ProtocolAckResponse>) =
     httpResponse.body()!!.message.ack.status == ResponseStatus.NACK
-
-  fun confirm(
-    context: ProtocolContext,
-    bppUri: String,
-    order: OrderDto
-  ): Either<BppError, ProtocolAckResponse> {
-    return Either.catch {
-      log.info("Invoking Confirm API on BPP: {}", bppUri)
-      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
-      val httpResponse =
-        invokeBppConfirmApi(
-          bppServiceClient = bppServiceClient,
-          context = context,
-          order = order
-        )
-      log.info("BPP confirm API response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
-      return when {
-        isInternalServerError(httpResponse) -> Left(BppError.Internal)
-        isBodyNull(httpResponse) -> Left(BppError.NullResponse)
-        isAckNegative(httpResponse) -> Left(BppError.Nack)
-        else -> Right(httpResponse.body()!!)
-      }
-    }.mapLeft {
-      log.error("Error when initiating confirm", it)
-      BppError.Internal
-    }
-  }
-
-  private fun invokeBppConfirmApi(
-    bppServiceClient: BppClient,
-    context: ProtocolContext,
-    order: OrderDto
-  ): Response<ProtocolAckResponse> {
-    val confirmRequest = ProtocolConfirmRequest(
-      context = context,
-      ProtocolConfirmRequestMessage(
-        order = ProtocolOrder(
-          provider = ProtocolSelectMessageSelectedProvider(
-            id = order.items!!.first().provider.id,
-            locations = listOf(ProtocolSelectMessageSelectedProviderLocations(id = order.items.first().provider.locations!!.first()))
-          ),
-          items = order.items.map { ProtocolSelectMessageSelectedItems(id = it.id, quantity = it.quantity) },
-          billing = order.billingInfo,
-          fulfillment = ProtocolFulfillment(
-            end = ProtocolFulfillmentEnd(
-              contact = ProtocolContact(
-                phone = order.deliveryInfo.phone,
-                email = order.deliveryInfo.email
-              ), location = order.deliveryInfo.location
-            ),
-            type = "home_delivery",
-            customer = ProtocolCustomer(person = ProtocolPerson(name = order.deliveryInfo.name))
-          ),
-          addOns = emptyList(),
-          offers = emptyList(),
-          payment = ProtocolPayment(
-            params = mapOf("amount" to order.payment!!.paidAmount.toString()),
-            status = ProtocolPayment.Status.PAID
-          )
-        )
-      )
-    )
-    log.info("Confirm API request body: {}", confirmRequest)
-    return bppServiceClient.confirm(confirmRequest).execute()
-  }
-
+  
   fun track(bppUri: String, context: ProtocolContext, request: TrackRequestDto): Either<BppError, ProtocolAckResponse> =
     Either.catch {
       log.info("Invoking Track API on BPP: {}", bppUri)

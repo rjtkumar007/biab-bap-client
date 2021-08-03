@@ -6,14 +6,13 @@ import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
-import org.beckn.one.sandbox.bap.client.shared.dtos.OrderDto
-import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.factories.DeliveryDtoFactory
 import org.beckn.one.sandbox.bap.client.factories.OrderItemDtoFactory
 import org.beckn.one.sandbox.bap.client.factories.OrderPaymentFactory
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
+import org.beckn.one.sandbox.bap.client.shared.dtos.OrderDto
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
-import org.beckn.one.sandbox.bap.message.factories.*
+import org.beckn.one.sandbox.bap.message.factories.ProtocolBillingFactory
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.beckn.protocol.schemas.*
 import org.mockito.Mockito.*
@@ -28,7 +27,7 @@ internal class BppServiceConfirmSpec : DescribeSpec() {
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
-  private val bppService = BppService(bppServiceClientFactory, mock(ObjectMapper::class.java))
+  private val bppConfirmService = BppConfirmService(bppServiceClientFactory, mock(ObjectMapper::class.java))
   private val bppServiceClient: BppClient = mock(BppClient::class.java)
   private val bppUri = "https://bpp1.com"
 
@@ -79,7 +78,7 @@ internal class BppServiceConfirmSpec : DescribeSpec() {
   }
 
   private fun invokeBppConfirm(): Either<BppError, ProtocolAckResponse> {
-    return bppService.confirm(
+    return bppConfirmService.confirm(
       context = contextFactory.create(),
       bppUri = bppUri,
       order = OrderDto(
