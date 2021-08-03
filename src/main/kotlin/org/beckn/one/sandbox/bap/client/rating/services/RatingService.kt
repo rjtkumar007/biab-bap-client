@@ -3,7 +3,6 @@ package org.beckn.one.sandbox.bap.client.rating.services
 import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.shared.dtos.RatingRequestDto
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.protocol.schemas.ProtocolAckResponse
@@ -15,12 +14,12 @@ import org.springframework.stereotype.Service
 
 @Service
 class RatingService @Autowired constructor(
-  private val bppService: BppService,
+  private val bppRatingService: BppRatingService,
   private val registryService: RegistryService,
   private val log: Logger = LoggerFactory.getLogger(RatingService::class.java)
 ) {
 
-  fun provideRating(
+  fun rating(
     context: ProtocolContext,
     request: RatingRequestDto
   ): Either<HttpError, ProtocolAckResponse?> {
@@ -28,7 +27,7 @@ class RatingService @Autowired constructor(
     return request.validate()
       .flatMap { registryService.lookupBppById(it.context.bppId!!) }
       .flatMap {
-        bppService.provideRating(
+        bppRatingService.rating(
           bppUri = it.first().subscriber_url,
           context = context,
           refId = request.message.refId,

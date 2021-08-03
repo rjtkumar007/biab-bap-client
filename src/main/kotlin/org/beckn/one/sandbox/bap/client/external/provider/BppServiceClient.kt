@@ -25,5 +25,5 @@ interface BppClient {
   fun support(@Body request: ProtocolSupportRequest): Call<ProtocolAckResponse>
 
   @POST("rating")
-  fun provideRating(@Body request: ProtocolRatingRequest): Call<ProtocolAckResponse>
+  fun rating(@Body request: ProtocolRatingRequest): Call<ProtocolAckResponse>
 }

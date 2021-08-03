@@ -21,8 +21,7 @@ import retrofit2.Response
 
 @Service
 class BppConfirmService @Autowired constructor(
-  private val bppServiceClientFactory: BppClientFactory,
-  private val objectMapper: ObjectMapper
+  private val bppServiceClientFactory: BppClientFactory
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppConfirmService::class.java)
 

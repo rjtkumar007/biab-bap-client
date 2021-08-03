@@ -80,7 +80,7 @@ internal class OnRatingPollControllerSpec @Autowired constructor(
         }
         val onRatingPollController = OnRatingPollController(mockOnPollService, contextFactory, protocolClient)
         it("should respond with failure") {
-          val response = onRatingPollController.onProvideRating(context.messageId)
+          val response = onRatingPollController.onRating(context.messageId)
           response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }

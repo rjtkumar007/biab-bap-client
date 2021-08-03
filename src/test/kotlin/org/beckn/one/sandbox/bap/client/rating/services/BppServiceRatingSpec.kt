@@ -1,13 +1,11 @@
 package org.beckn.one.sandbox.bap.client.rating.services
 
 import arrow.core.Either
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
 import org.beckn.protocol.schemas.*
@@ -23,7 +21,7 @@ internal class BppServiceRatingSpec : DescribeSpec() {
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
-  private val bppService = BppService(bppServiceClientFactory, mock(ObjectMapper::class.java))
+  private val bppService = BppRatingService(bppServiceClientFactory)
   private val bppServiceClient: BppClient = mock(BppClient::class.java)
   private val bppUri = "https://bpp1.com"
 
@@ -38,43 +36,43 @@ internal class BppServiceRatingSpec : DescribeSpec() {
       }
 
       it("should return bpp internal server error when bpp provide rating call fails with an exception") {
-        `when`(bppServiceClient.provideRating(getProtocolRatingRequest())).thenReturn(
+        `when`(bppServiceClient.rating(getProtocolRatingRequest())).thenReturn(
           Calls.failure(IOException("Timeout"))
         )
 
-        val response = invokeBppProvideRatingApi()
+        val response = invokeBppRatingApi()
 
         response shouldBeLeft BppError.Internal
-        verify(bppServiceClient).provideRating(getProtocolRatingRequest())
+        verify(bppServiceClient).rating(getProtocolRatingRequest())
       }
 
       it("should return bpp internal server error when bpp track call returns null body") {
-        `when`(bppServiceClient.provideRating(trackRequest)).thenReturn(
+        `when`(bppServiceClient.rating(trackRequest)).thenReturn(
           Calls.response(null)
         )
 
-        val response = invokeBppProvideRatingApi()
+        val response = invokeBppRatingApi()
 
         response shouldBeLeft BppError.NullResponse
-        verify(bppServiceClient).provideRating(getProtocolRatingRequest())
+        verify(bppServiceClient).rating(getProtocolRatingRequest())
       }
 
       it("should return bpp internal server error when bpp track call returns nack response body") {
         val context = contextFactory.create(action = ProtocolContext.Action.TRACK)
-        `when`(bppServiceClient.provideRating(trackRequest)).thenReturn(
+        `when`(bppServiceClient.rating(trackRequest)).thenReturn(
           Calls.response(ProtocolAckResponse(context, ResponseMessage.nack()))
         )
 
-        val response = invokeBppProvideRatingApi()
+        val response = invokeBppRatingApi()
 
         response shouldBeLeft BppError.Nack
-        verify(bppServiceClient).provideRating(getProtocolRatingRequest())
+        verify(bppServiceClient).rating(getProtocolRatingRequest())
       }
     }
   }
 
-  private fun invokeBppProvideRatingApi(): Either<BppError, ProtocolAckResponse> {
-    return bppService.provideRating(
+  private fun invokeBppRatingApi(): Either<BppError, ProtocolAckResponse> {
+    return bppService.rating(
       bppUri = bppUri,
       context = contextFactory.create(action = ProtocolContext.Action.FEEDBACK),
       refId = "item id 1",

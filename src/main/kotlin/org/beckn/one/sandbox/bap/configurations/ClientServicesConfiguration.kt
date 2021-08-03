@@ -6,12 +6,12 @@ import org.beckn.one.sandbox.bap.client.fulfillment.track.mappers.TrackClientRes
 import org.beckn.one.sandbox.bap.client.order.confirm.mappers.ConfirmClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
-import org.beckn.one.sandbox.bap.client.support.mappers.SupportClientResponseMapper
 import org.beckn.one.sandbox.bap.client.rating.mappers.RatingClientResponseMapper
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollMapper
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.client.shared.services.GenericProtocolClientService
+import org.beckn.one.sandbox.bap.client.support.mappers.SupportClientResponseMapper
 import org.beckn.protocol.schemas.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -46,7 +46,7 @@ class ClientServicesConfiguration @Autowired constructor(
     SupportClientResponseMapper()
 
   @Bean
-  fun forProvideRatingResults(): GenericOnPollMapper<ProtocolOnRating, ClientRatingResponse> =
+  fun forRatingResults(): GenericOnPollMapper<ProtocolOnRating, ClientRatingResponse> =
     RatingClientResponseMapper()
 
   @Bean
@@ -101,7 +101,7 @@ class ClientServicesConfiguration @Autowired constructor(
   ) = GenericOnPollService(protocolService, transformer)
 
   @Bean
-  fun provideRatingReplyService(
+  fun ratingReplyService(
     @Autowired protocolService: GenericProtocolClientService<ProtocolOnRating>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnRating, ClientRatingResponse>
   ) = GenericOnPollService(protocolService, transformer)

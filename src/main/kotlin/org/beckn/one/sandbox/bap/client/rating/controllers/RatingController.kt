@@ -29,7 +29,7 @@ class RatingController @Autowired constructor(
     @RequestBody ratingRequest: RatingRequestDto,
   ): ResponseEntity<ProtocolAckResponse> {
     val context = getContext(ratingRequest.context.transactionId)
-    return ratingService.provideRating(context = context, request = ratingRequest)
+    return ratingService.rating(context = context, request = ratingRequest)
       .fold(
         {
           log.error("Error when rating refId: {}", it)

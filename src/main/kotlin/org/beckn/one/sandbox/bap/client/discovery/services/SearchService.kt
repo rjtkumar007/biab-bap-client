@@ -3,7 +3,6 @@ package org.beckn.one.sandbox.bap.client.discovery.services
 import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.shared.dtos.SearchCriteria
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.protocol.schemas.ProtocolAckResponse

@@ -25,5 +25,5 @@ interface ProtocolClient {
   fun getSupportResponseCall(@Query("messageId") messageId: String): Call<List<ProtocolOnSupport>>
 
   @GET("protocol/v1/on_rating")
-  fun getProvideRatingResponsesCall(@Query("messageId") messageId: String): Call<List<ProtocolOnRating>>
+  fun getRatingResponsesCall(@Query("messageId") messageId: String): Call<List<ProtocolOnRating>>
 }

@@ -3,7 +3,6 @@ package org.beckn.one.sandbox.bap.client.support.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.beckn.one.sandbox.bap.client.external.hasBody
 import org.beckn.one.sandbox.bap.client.external.isAckNegative
 import org.beckn.one.sandbox.bap.client.external.isInternalServerError
@@ -20,8 +19,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class BppSupportService @Autowired constructor(
-  private val bppServiceClientFactory: BppClientFactory,
-  private val objectMapper: ObjectMapper
+  private val bppServiceClientFactory: BppClientFactory
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppSupportService::class.java)
 

@@ -3,7 +3,6 @@ package org.beckn.one.sandbox.bap.client.order.init.services
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.beckn.one.sandbox.bap.client.external.hasBody
 import org.beckn.one.sandbox.bap.client.external.isAckNegative
 import org.beckn.one.sandbox.bap.client.external.isInternalServerError
@@ -20,8 +19,7 @@ import retrofit2.Response
 
 @Service
 class BppInitService @Autowired constructor(
-  private val bppServiceClientFactory: BppClientFactory,
-  private val objectMapper: ObjectMapper
+  private val bppServiceClientFactory: BppClientFactory
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppInitService::class.java)
 
@@ -82,7 +80,6 @@ class BppInitService @Autowired constructor(
         )
       )
     )
-    log.info("Init API request body: {}", objectMapper.writeValueAsString(initRequest))
     return bppServiceClient.init(initRequest).execute()
   }
 }

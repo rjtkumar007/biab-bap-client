@@ -6,7 +6,6 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.shared.dtos.RatingRequestDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.RatingRequestMessage
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
@@ -16,7 +15,7 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 class RatingServiceSpec : DescribeSpec() {
   private val context = ContextFactoryInstance.create().create()
   private val registryService = mock(RegistryService::class.java)
-  private val bppService = mock(BppService::class.java)
+  private val bppService = mock(BppRatingService::class.java)
   private val ratingService = RatingService(
     registryService = registryService,
     bppService = bppService,
@@ -25,7 +24,7 @@ class RatingServiceSpec : DescribeSpec() {
   init {
     describe("Track") {
       it("should validate that bpp id is not null") {
-        val trackResponse = ratingService.provideRating(
+        val trackResponse = ratingService.rating(
           context = context,
           request = RatingRequestDto(
             context = ClientContext(transactionId = UuidFactory().create(), bppId = null),
