@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.shared.dtos.SupportRequestMessage
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.protocol.schemas.ProtocolAckResponse
@@ -16,15 +15,12 @@ import org.springframework.stereotype.Service
 
 @Service
 class SupportService @Autowired constructor(
-  private val bppService: BppService,
+  private val bppSupportService: BppSupportService,
   private val registryService: RegistryService,
   private val log: Logger = LoggerFactory.getLogger(SupportService::class.java)
 ) {
-  fun getSupport(
-    context: ProtocolContext,
-    supportRequestMessage: SupportRequestMessage,
-    bppId: String?
-  ): Either<HttpError, ProtocolAckResponse?> {
+  fun getSupport(context: ProtocolContext, supportRequestMessage: SupportRequestMessage, bppId: String?):
+      Either<HttpError, ProtocolAckResponse?> {
     log.info("Got support request for reference Id: {}", supportRequestMessage.refId)
 
     if (bppId == null) {
@@ -34,7 +30,7 @@ class SupportService @Autowired constructor(
 
     return registryService.lookupBppById(bppId)
       .flatMap {
-        bppService.support(
+        bppSupportService.support(
           bppUri = it.first().subscriber_url,
           context = context,
           refId = supportRequestMessage.refId

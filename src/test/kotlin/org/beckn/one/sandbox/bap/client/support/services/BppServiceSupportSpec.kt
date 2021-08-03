@@ -7,10 +7,12 @@ import io.kotest.core.spec.style.DescribeSpec
 import org.beckn.one.sandbox.bap.client.external.provider.BppClient
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
-import org.beckn.one.sandbox.bap.client.shared.services.BppService
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
-import org.beckn.protocol.schemas.*
+import org.beckn.protocol.schemas.ProtocolAckResponse
+import org.beckn.protocol.schemas.ProtocolSupportRequest
+import org.beckn.protocol.schemas.ProtocolSupportRequestMessage
+import org.beckn.protocol.schemas.ResponseMessage
 import org.mockito.Mockito
 import retrofit2.mock.Calls
 import java.io.IOException
@@ -23,7 +25,7 @@ internal class BppServiceSupportSpec : DescribeSpec() {
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = Mockito.mock(UuidFactory::class.java)
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
-  private val bppService = BppService(bppServiceClientFactory, Mockito.mock(ObjectMapper::class.java))
+  private val bppSupportService = BppSupportService(bppServiceClientFactory, Mockito.mock(ObjectMapper::class.java))
   private val bppServiceClient: BppClient = Mockito.mock(BppClient::class.java)
   private val bppUri = "https://bpp1.com"
 
@@ -74,7 +76,7 @@ internal class BppServiceSupportSpec : DescribeSpec() {
   }
 
   private fun invokeBppSupport(): Either<BppError, ProtocolAckResponse> {
-    return bppService.support(
+    return bppSupportService.support(
       context = contextFactory.create(),
       bppUri = bppUri,
       refId = "abc123"
