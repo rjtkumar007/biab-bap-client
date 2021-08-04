@@ -36,7 +36,7 @@ sealed class BppError : HttpError {
     override fun error(): ProtocolError = nullError
   }
 
-  object PendingPayment: BppError(){
+  object PendingPayment : BppError() {
     override fun status(): HttpStatus = HttpStatus.BAD_REQUEST
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
@@ -46,7 +46,9 @@ sealed class BppError : HttpError {
 
   object BppIdNotPresent : BppError() {
     override fun status(): HttpStatus = HttpStatus.BAD_REQUEST
+
     override fun message(): ResponseMessage = ResponseMessage.nack()
+
     override fun error(): ProtocolError = bppIdNotPresent
   }
 }

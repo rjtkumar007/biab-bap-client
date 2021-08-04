@@ -33,7 +33,7 @@ class MockGetOrderPolicyController @Autowired constructor(
           bppId = request.context.bppId,
         ),
         message = ClientOrderPolicyResponseMessage(
-          policies = listOf(
+          cancellationPolicies = listOf(
             ProtocolOption("1", cancellationPolicy()),
             ProtocolOption("2", returnPolicy()),
           )
