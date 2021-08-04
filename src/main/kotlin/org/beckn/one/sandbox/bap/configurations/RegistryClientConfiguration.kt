@@ -1,23 +1,17 @@
 package org.beckn.one.sandbox.bap.configurations
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.github.resilience4j.core.IntervalFunction
 import io.github.resilience4j.retrofit.RetryCallAdapter
 import io.github.resilience4j.retry.Retry
-import io.github.resilience4j.retry.RetryConfig
 import org.beckn.one.sandbox.bap.client.external.registry.RegistryClient
+import org.beckn.one.sandbox.bap.factories.RetryFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.web.server.WebServerException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import org.springframework.http.HttpStatus
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
-import java.io.IOException
-import java.util.concurrent.TimeoutException
 
 
 @Configuration
@@ -35,16 +29,12 @@ class RegistryClientConfiguration(
   @Autowired
   private val objectMapper: ObjectMapper
 ) {
-  private val retry: Retry = Retry.of("RegistryClient", RetryConfig.custom<Response<String>>()
-    .maxAttempts(maxAttempts)
-    .intervalFunction(
-      IntervalFunction
-        .ofExponentialBackoff(initialIntervalInMillis, intervalMultiplier)
-    )
-    .retryOnResult { response -> response.code() == HttpStatus.INTERNAL_SERVER_ERROR.value() }
-    .retryExceptions(IOException::class.java, TimeoutException::class.java, WebServerException::class.java)
-    .failAfterMaxAttempts(true)
-    .build())
+  private val retry: Retry = RetryFactory.create(
+    "RegistryClient",
+    maxAttempts,
+    initialIntervalInMillis,
+    intervalMultiplier
+  )
 
   @Bean
   @Primary
