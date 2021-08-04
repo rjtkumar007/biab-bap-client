@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.server.WebServerException
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -30,7 +31,7 @@ class GatewayClientFactory @Autowired constructor(
       IntervalFunction
         .ofExponentialBackoff(initialIntervalInMillis, intervalMultiplier)
     )
-    .retryOnResult { response -> response.code() == 500 }
+    .retryOnResult { response -> response.code() == HttpStatus.INTERNAL_SERVER_ERROR.value() }
     .retryExceptions(IOException::class.java, TimeoutException::class.java, WebServerException::class.java)
     .failAfterMaxAttempts(true)
     .build())

@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
+import org.beckn.one.sandbox.bap.client.external.isInternalServerError
 import org.beckn.one.sandbox.bap.client.external.registry.RegistryClient
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import retrofit2.Response
 
@@ -47,7 +47,7 @@ class RegistryService(
       val httpResponse = client.lookup(request).execute()
       log.info("Lookup subscriber response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       return when {
-        internalServerError(httpResponse) -> Left(Internal)
+        httpResponse.isInternalServerError() -> Left(Internal)
         noSubscribersFound(httpResponse) -> Left(NoSubscriberFound)
         else -> Right(httpResponse.body()!!)
       }
@@ -67,7 +67,4 @@ class RegistryService(
 
   private fun noSubscribersFound(httpResponse: Response<List<SubscriberDto>>) =
     httpResponse.body() == null || httpResponse.body()?.isEmpty() == true
-
-  private fun internalServerError(httpResponse: Response<List<SubscriberDto>>) =
-    httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
 }

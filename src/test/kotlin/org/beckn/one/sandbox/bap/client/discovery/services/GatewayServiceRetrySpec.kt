@@ -1,13 +1,15 @@
 package org.beckn.one.sandbox.bap.client.discovery.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
+import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.external.gateway.GatewayClient
-import org.beckn.one.sandbox.bap.client.external.gateway.GatewayClientFactory
 import org.beckn.one.sandbox.bap.client.shared.dtos.SearchCriteria
+import org.beckn.one.sandbox.bap.client.shared.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
@@ -32,20 +34,16 @@ class GatewayServiceRetrySpec @Autowired constructor(
   val gatewayService: GatewayService,
   val objectMapper: ObjectMapper,
 ) : DescribeSpec() {
-  private val queryString = "Fictional mystery books"
-  private val locationString = "40.741895,-73.989308"
-  private val gatewayServiceClientFactory = mock(GatewayClientFactory::class.java)
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
-  private val gatewayServiceClient: GatewayClient = mock(GatewayClient::class.java)
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
+  private val gatewayServiceClient: GatewayClient = mock(GatewayClient::class.java)
 
   init {
     describe("Search") {
       MockNetwork.startAllSubscribers()
       val gateway = MockNetwork.getRetailBengaluruBg()
       `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
-      `when`(gatewayServiceClientFactory.getClient(gateway.subscriber_url)).thenReturn(gatewayServiceClient)
       val context = contextFactory.create()
 
       beforeEach {
@@ -55,12 +53,10 @@ class GatewayServiceRetrySpec @Autowired constructor(
 
       it("should retry search call if api returns error") {
         val ackResponse = ProtocolAckResponse(context = context, message = ResponseMessage.ack())
-        stubGatewaySearchApiToReturnInternalServerError()
-        stubGatewaySearchApiToReturnAckResponse(ackResponse)
+        stubGatewaySearchApi(response = WireMock.serverError(), forState = STARTED, nextState = "Success")
+        stubGatewaySearchApi(response = WireMock.okJson(toJson(ackResponse)), forState = "Success")
 
-        val response = gatewayService.search(
-          gateway, context, SearchCriteria(searchString = queryString, deliveryLocation = locationString)
-        )
+        val response = gatewayService.search(gateway, context, SearchCriteria())
 
         response
           .fold(
@@ -69,6 +65,16 @@ class GatewayServiceRetrySpec @Autowired constructor(
           )
         verifyGatewaySearchApiIsInvoked(2)
       }
+
+      it("should fail after max retry attempts") {
+        stubGatewaySearchApi(response = WireMock.serverError(), forState = STARTED, nextState = "Failure")
+        stubGatewaySearchApi(response = WireMock.serverError(), forState = "Failure", nextState = "Failure")
+
+        val response = gatewayService.search(gateway, context, SearchCriteria())
+
+        response shouldBeLeft GatewaySearchError.Internal
+        verifyGatewaySearchApiIsInvoked(3)
+      }
     }
   }
 
@@ -76,25 +82,19 @@ class GatewayServiceRetrySpec @Autowired constructor(
     MockNetwork.retailBengaluruBg.verify(numberOfTimes, WireMock.postRequestedFor(WireMock.urlEqualTo("/search")))
   }
 
-  private fun stubGatewaySearchApiToReturnAckResponse(ackResponse: ProtocolAckResponse) {
-    MockNetwork.retailBengaluruBg
-      .stubFor(
-        WireMock.post("/search")
-          .inScenario("Retry Scenario")
-          .whenScenarioStateIs("Cause Success")
-          .willReturn(WireMock.okJson(toJson(ackResponse)))
-      )
-  }
-
-  private fun stubGatewaySearchApiToReturnInternalServerError() {
+  private fun stubGatewaySearchApi(
+    nextState: String = "Success",
+    forState: String = STARTED,
+    response: ResponseDefinitionBuilder?
+  ) {
     MockNetwork.retailBengaluruBg
       .stubFor(
         WireMock
           .post("/search")
           .inScenario("Retry Scenario")
-          .whenScenarioStateIs(STARTED)
-          .willReturn(WireMock.serverError())
-          .willSetStateTo("Cause Success")
+          .whenScenarioStateIs(forState)
+          .willReturn(response)
+          .willSetStateTo(nextState)
       )
   }
 
