@@ -54,23 +54,9 @@ class GatewayServiceRetrySpec @Autowired constructor(
       }
 
       it("should retry search call if api returns error") {
-        MockNetwork.retailBengaluruBg
-          .stubFor(
-            WireMock
-              .post("/search")
-              .inScenario("Retry Scenario")
-              .whenScenarioStateIs(STARTED)
-              .willReturn(WireMock.serverError())
-              .willSetStateTo("Cause Success")
-          )
         val ackResponse = ProtocolAckResponse(context = context, message = ResponseMessage.ack())
-        MockNetwork.retailBengaluruBg
-          .stubFor(
-            WireMock.post("/search")
-              .inScenario("Retry Scenario")
-              .whenScenarioStateIs("Cause Success")
-              .willReturn(WireMock.okJson(toJson(ackResponse)))
-          )
+        stubGatewaySearchApiToReturnInternalServerError()
+        stubGatewaySearchApiToReturnAckResponse(ackResponse)
 
         val response = gatewayService.search(
           gateway, context, SearchCriteria(searchString = queryString, deliveryLocation = locationString)
@@ -81,9 +67,35 @@ class GatewayServiceRetrySpec @Autowired constructor(
             { Assertions.fail("Search should have been retried but it wasn't. Response: $it") },
             { it.message shouldBe ResponseMessage.ack() }
           )
-        MockNetwork.retailBengaluruBg.verify(2, WireMock.postRequestedFor(WireMock.urlEqualTo("/search")))
+        verifyGatewaySearchApiIsInvoked(2)
       }
     }
+  }
+
+  private fun verifyGatewaySearchApiIsInvoked(numberOfTimes: Int = 1) {
+    MockNetwork.retailBengaluruBg.verify(numberOfTimes, WireMock.postRequestedFor(WireMock.urlEqualTo("/search")))
+  }
+
+  private fun stubGatewaySearchApiToReturnAckResponse(ackResponse: ProtocolAckResponse) {
+    MockNetwork.retailBengaluruBg
+      .stubFor(
+        WireMock.post("/search")
+          .inScenario("Retry Scenario")
+          .whenScenarioStateIs("Cause Success")
+          .willReturn(WireMock.okJson(toJson(ackResponse)))
+      )
+  }
+
+  private fun stubGatewaySearchApiToReturnInternalServerError() {
+    MockNetwork.retailBengaluruBg
+      .stubFor(
+        WireMock
+          .post("/search")
+          .inScenario("Retry Scenario")
+          .whenScenarioStateIs(STARTED)
+          .willReturn(WireMock.serverError())
+          .willSetStateTo("Cause Success")
+      )
   }
 
   private fun toJson(protocolAckResponse: ProtocolAckResponse) =
