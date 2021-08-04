@@ -12,5 +12,5 @@ data class ClientOrderPolicyResponse @Default constructor(
 ) : ClientResponse
 
 data class ClientOrderPolicyResponseMessage @Default constructor(
-  val policies: List<ProtocolOption>
+  val cancellationPolicies: List<ProtocolOption>
 )
