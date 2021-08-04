@@ -2,6 +2,9 @@ package org.beckn.one.sandbox.bap.client.discovery.services
 
 import arrow.core.Either
 import arrow.core.Either.Left
+import io.github.resilience4j.core.IntervalFunction
+import io.github.resilience4j.retry.Retry
+import io.github.resilience4j.retry.RetryConfig
 import org.beckn.one.sandbox.bap.client.external.gateway.GatewayClientFactory
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.SearchCriteria
@@ -10,14 +13,30 @@ import org.beckn.protocol.schemas.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.web.server.WebServerException
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import retrofit2.Response
+import java.io.IOException
+import java.util.concurrent.TimeoutException
 
 @Service
 class GatewayService @Autowired constructor(
   val gatewayServiceClientFactory: GatewayClientFactory,
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
+
+  private val retry: Retry = Retry.of("id", RetryConfig.custom<Response<String>>()
+    .maxAttempts(3)
+    .intervalFunction(
+      IntervalFunction
+        .ofExponentialBackoff(1000, 1.0)
+    )
+    .retryOnResult { response -> response.code() == 500 }
+    .retryOnException { e -> e is WebServerException }
+    .retryExceptions(IOException::class.java, TimeoutException::class.java)
+    .failAfterMaxAttempts(true)
+    .build())
 
   fun search(gateway: SubscriberDto, context: ProtocolContext, criteria: SearchCriteria)
       : Either<GatewaySearchError, ProtocolAckResponse> {
