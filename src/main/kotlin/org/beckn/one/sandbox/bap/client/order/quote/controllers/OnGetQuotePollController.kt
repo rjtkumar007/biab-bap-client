@@ -5,7 +5,7 @@ import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollControl
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnSelect
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OnGetQuotePollController @Autowired constructor(
-  onPollService: GenericOnPollService<ProtocolOnSelect, ClientQuoteResponse>,
-  contextFactory: ContextFactory,
-  val protocolClient: ProtocolClient
+    onPollService: GenericOnPollService<ProtocolOnSelect, ClientQuoteResponse>,
+    contextFactory: ContextFactory,
+    val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnSelect, ClientQuoteResponse>(onPollService, contextFactory) {
 
   @RequestMapping("/client/v1/on_get_quote")

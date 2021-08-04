@@ -3,8 +3,8 @@ package org.beckn.one.sandbox.bap.common.factories
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
-import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.UuidFactory
 import java.time.Clock
 
 class ContextFactoryInstance {

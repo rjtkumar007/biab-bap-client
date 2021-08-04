@@ -1,6 +1,5 @@
-package org.beckn.one.sandbox.bap.schemas.factories
+package org.beckn.one.sandbox.bap.factories
 
-import org.beckn.one.sandbox.bap.protocol.ProtocolVersion
 import org.beckn.protocol.schemas.ProtocolContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value

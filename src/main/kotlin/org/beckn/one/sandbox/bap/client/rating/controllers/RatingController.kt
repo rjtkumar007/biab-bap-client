@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.rating.controllers
 import org.beckn.one.sandbox.bap.client.rating.services.RatingService
 import org.beckn.one.sandbox.bap.client.shared.dtos.RatingRequestDto
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ResponseMessage
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class RatingController @Autowired constructor(
-  private val contextFactory: ContextFactory,
-  private val ratingService: RatingService
+    private val contextFactory: ContextFactory,
+    private val ratingService: RatingService
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 

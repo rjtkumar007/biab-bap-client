@@ -10,7 +10,7 @@ import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.message.factories.IdFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolLocationFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolSelectedItemFactory
-import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.beckn.protocol.schemas.*
 import org.mockito.Mockito.*
 import retrofit2.mock.Calls

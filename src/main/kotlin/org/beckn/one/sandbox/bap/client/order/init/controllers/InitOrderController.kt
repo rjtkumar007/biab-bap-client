@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.order.init.controllers
 import org.beckn.one.sandbox.bap.client.order.init.services.InitOrderService
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderRequestDto
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ResponseMessage

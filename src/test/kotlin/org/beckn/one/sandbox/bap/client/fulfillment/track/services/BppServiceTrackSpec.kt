@@ -9,7 +9,7 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.shared.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
-import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.beckn.protocol.schemas.*
 import org.mockito.Mockito.*
 import retrofit2.mock.Calls

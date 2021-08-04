@@ -8,7 +8,7 @@ import org.beckn.one.sandbox.bap.client.factories.SearchRequestFactory
 import org.beckn.one.sandbox.bap.client.shared.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
-import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ResponseMessage

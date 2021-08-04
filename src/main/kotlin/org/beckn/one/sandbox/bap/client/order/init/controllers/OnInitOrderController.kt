@@ -5,7 +5,7 @@ import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollControl
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnInit
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity

@@ -12,7 +12,7 @@ import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOrderFactory
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnConfirm
 import org.beckn.protocol.schemas.ProtocolOnConfirmMessage
 import org.mockito.kotlin.any
@@ -33,10 +33,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class OnConfirmOrderControllerSpec @Autowired constructor(
-  private val contextFactory: ContextFactory,
-  private val mapper: ObjectMapper,
-  private val protocolClient: ProtocolClient,
-  private val mockMvc: MockMvc
+    private val contextFactory: ContextFactory,
+    private val mapper: ObjectMapper,
+    private val protocolClient: ProtocolClient,
+    private val mockMvc: MockMvc
 ) : DescribeSpec() {
   val context = contextFactory.create()
   private val protocolOnConfirm = ProtocolOnConfirm(

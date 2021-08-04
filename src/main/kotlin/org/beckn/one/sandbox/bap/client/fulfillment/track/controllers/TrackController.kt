@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.fulfillment.track.controllers
 import org.beckn.one.sandbox.bap.client.fulfillment.track.services.TrackService
 import org.beckn.one.sandbox.bap.client.shared.dtos.TrackRequestDto
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ResponseMessage
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class TrackController @Autowired constructor(
-  val contextFactory: ContextFactory,
-  val trackService: TrackService,
+    val contextFactory: ContextFactory,
+    val trackService: TrackService,
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 

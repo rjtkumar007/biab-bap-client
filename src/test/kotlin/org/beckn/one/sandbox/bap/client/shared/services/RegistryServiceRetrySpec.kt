@@ -11,7 +11,7 @@ import org.beckn.one.sandbox.bap.client.external.gateway.GatewayClient
 import org.beckn.one.sandbox.bap.client.shared.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.shared.errors.registry.RegistryLookupError
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
-import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.junit.jupiter.api.Assertions
 import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,13 +31,13 @@ class RegistryServiceRetrySpec @Autowired constructor(
   val registryService: RegistryService,
   val objectMapper: ObjectMapper,
 ) : DescribeSpec() {
-  private val uuidFactory = mock(UuidFactory::class.java)
+//  private val uuidFactory = mock(UuidFactory::class.java)
   private val gatewayServiceClient: GatewayClient = mock(GatewayClient::class.java)
 
   init {
     describe("Search") {
       MockNetwork.startAllSubscribers()
-      `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
+//      `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
       val allGateways = MockNetwork.getAllGateways()
 
       beforeEach {

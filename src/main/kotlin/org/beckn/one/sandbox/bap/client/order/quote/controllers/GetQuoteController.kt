@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.order.quote.controllers
 import org.beckn.one.sandbox.bap.client.order.quote.services.QuoteService
 import org.beckn.one.sandbox.bap.client.shared.dtos.GetQuoteRequestDto
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolContext.Action.SELECT
@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class GetQuoteController @Autowired constructor(
-  private val contextFactory: ContextFactory,
-  private val quoteService: QuoteService
+    private val contextFactory: ContextFactory,
+    private val quoteService: QuoteService
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 

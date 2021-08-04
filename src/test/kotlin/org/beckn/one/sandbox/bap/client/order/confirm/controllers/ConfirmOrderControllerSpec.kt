@@ -22,8 +22,8 @@ import org.beckn.one.sandbox.bap.common.factories.MockNetwork.registryBppLookupA
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork.retailBengaluruBpp
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
-import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.beckn.protocol.schemas.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -40,10 +40,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 class ConfirmOrderControllerSpec @Autowired constructor(
-  val mockMvc: MockMvc,
-  val objectMapper: ObjectMapper,
-  val contextFactory: ContextFactory,
-  val uuidFactory: UuidFactory
+    val mockMvc: MockMvc,
+    val objectMapper: ObjectMapper,
+    val contextFactory: ContextFactory,
+    val uuidFactory: UuidFactory
 ) : DescribeSpec() {
   init {
     describe("Confirm order with BPP") {

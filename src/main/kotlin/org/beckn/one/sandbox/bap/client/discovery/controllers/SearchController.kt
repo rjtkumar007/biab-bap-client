@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.client.discovery.controllers
 
 import org.beckn.one.sandbox.bap.client.discovery.services.SearchService
 import org.beckn.one.sandbox.bap.client.shared.dtos.SearchRequestDto
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ResponseMessage
 import org.slf4j.Logger

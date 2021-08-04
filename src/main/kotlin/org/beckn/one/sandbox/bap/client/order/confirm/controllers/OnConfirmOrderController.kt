@@ -5,7 +5,7 @@ import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollControl
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnConfirm
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OnConfirmOrderController @Autowired constructor(
-  onPollService: GenericOnPollService<ProtocolOnConfirm, ClientConfirmResponse>,
-  contextFactory: ContextFactory,
-  val protocolClient: ProtocolClient
+    onPollService: GenericOnPollService<ProtocolOnConfirm, ClientConfirmResponse>,
+    contextFactory: ContextFactory,
+    val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnConfirm, ClientConfirmResponse>(onPollService, contextFactory) {
 
   @RequestMapping("/client/v1/on_confirm_order")

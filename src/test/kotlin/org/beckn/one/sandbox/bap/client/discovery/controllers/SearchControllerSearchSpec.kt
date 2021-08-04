@@ -18,8 +18,8 @@ import org.beckn.one.sandbox.bap.common.factories.MockNetwork.retailBengaluruBg
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork.retailBengaluruBpp
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
-import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ResponseStatus.ACK
 import org.hamcrest.CoreMatchers.`is`

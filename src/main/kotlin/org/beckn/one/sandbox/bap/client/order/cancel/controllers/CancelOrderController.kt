@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.order.cancel.controllers
 import org.beckn.one.sandbox.bap.client.order.cancel.services.CancelOrderService
 import org.beckn.one.sandbox.bap.client.shared.dtos.CancelOrderDto
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ResponseMessage
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class CancelOrderController @Autowired constructor(
-  private val contextFactory: ContextFactory,
-  private val cancelOrderService: CancelOrderService
+    private val contextFactory: ContextFactory,
+    private val cancelOrderService: CancelOrderService
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 

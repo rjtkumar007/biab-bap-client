@@ -8,7 +8,7 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.shared.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
-import org.beckn.one.sandbox.bap.schemas.factories.UuidFactory
+import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.beckn.protocol.schemas.*
 import org.beckn.protocol.schemas.ResponseMessage.Companion.nack
 import org.junit.jupiter.api.Assertions

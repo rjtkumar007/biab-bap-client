@@ -3,7 +3,7 @@ package org.beckn.one.sandbox.bap.client.order.policy.controllers
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientOrderPolicyResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientOrderPolicyResponseMessage
 import org.beckn.one.sandbox.bap.client.shared.dtos.GetOrderPolicyDto
-import org.beckn.one.sandbox.bap.schemas.factories.ContextFactory
+import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolDescriptor
 import org.beckn.protocol.schemas.ProtocolOption
 import org.slf4j.Logger

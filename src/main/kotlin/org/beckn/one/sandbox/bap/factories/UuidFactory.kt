@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.schemas.factories
+package org.beckn.one.sandbox.bap.factories
 
 import org.springframework.stereotype.Component
 import java.util.*
