@@ -42,9 +42,9 @@ class CancelOrderControllerSpec @Autowired constructor(
     val uuidFactory: UuidFactory
 ) : DescribeSpec() {
   init {
-    MockNetwork.startAllSubscribers()
-
     describe("Cancel order") {
+      MockNetwork.startAllSubscribers()
+
       val context =
         ClientContext(transactionId = uuidFactory.create(), bppId = MockNetwork.retailBengaluruBpp.baseUrl())
       val cancelOrderDto = CancelOrderDto(
@@ -177,7 +177,7 @@ class CancelOrderControllerSpec @Autowired constructor(
     bppApi: WireMockServer
   ) {
     registryBppLookupApi.verify(
-      WireMock.postRequestedFor(urlEqualTo("/lookup"))
+      postRequestedFor(urlEqualTo("/lookup"))
         .withRequestBody(
           WireMock.equalToJson(
             objectMapper.writeValueAsString(
