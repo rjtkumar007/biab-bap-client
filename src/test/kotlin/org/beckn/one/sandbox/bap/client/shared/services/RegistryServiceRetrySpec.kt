@@ -8,6 +8,7 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import org.beckn.one.sandbox.bap.client.external.toJson
 import org.beckn.one.sandbox.bap.client.shared.errors.registry.RegistryLookupError
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.junit.jupiter.api.Assertions
@@ -37,7 +38,7 @@ class RegistryServiceRetrySpec @Autowired constructor(
 
       it("should retry lookup gateway call if api returns error") {
         stubRegistryLookupApi(response = serverError())
-        stubRegistryLookupApi(forState = "Success", response = okJson(toJson(allGateways)))
+        stubRegistryLookupApi(forState = "Success", response = okJson(objectMapper.toJson<Any>(allGateways)))
 
         val response = registryService.lookupGateways()
 
@@ -73,7 +74,7 @@ class RegistryServiceRetrySpec @Autowired constructor(
         stubRegistryLookupApi(response = serverError(), registry = MockNetwork.registryBppLookupApi)
         stubRegistryLookupApi(
           forState = "Success",
-          response = okJson(toJson(bppLookupResponse)),
+          response = okJson(objectMapper.toJson<Any>(bppLookupResponse)),
           registry = MockNetwork.registryBppLookupApi
         )
 
@@ -131,8 +132,4 @@ class RegistryServiceRetrySpec @Autowired constructor(
           .willSetStateTo(nextState)
       )
   }
-
-  private fun toJson(instance: Any) =
-    objectMapper.writeValueAsString(instance)
-
 }

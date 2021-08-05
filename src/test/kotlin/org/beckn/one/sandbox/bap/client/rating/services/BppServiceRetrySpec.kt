@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.client.discovery.services
+package org.beckn.one.sandbox.bap.client.rating.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
@@ -8,7 +8,7 @@ import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.beckn.one.sandbox.bap.client.external.toJson
-import org.beckn.one.sandbox.bap.client.shared.dtos.SearchCriteria
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.common.factories.ContextFactoryInstance
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
@@ -31,8 +31,8 @@ import java.time.ZoneId
 @AutoConfigureMockMvc
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
-class GatewayServiceRetrySpec @Autowired constructor(
-  val gatewayService: GatewayService,
+internal class BppServiceRetrySpec @Autowired constructor(
+  private val bppService: BppRatingService,
   val objectMapper: ObjectMapper,
 ) : DescribeSpec() {
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
@@ -40,9 +40,9 @@ class GatewayServiceRetrySpec @Autowired constructor(
   private val contextFactory = ContextFactoryInstance.create(uuidFactory, clock)
 
   init {
-    describe("Search") {
+    describe("Provide Rating") {
       MockNetwork.startAllSubscribers()
-      val gateway = MockNetwork.getRetailBengaluruBg()
+      val bpp = MockNetwork.retailBengaluruBpp
       `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
       val context = contextFactory.create()
 
@@ -50,50 +50,49 @@ class GatewayServiceRetrySpec @Autowired constructor(
         MockNetwork.resetAllSubscribers()
       }
 
-      it("should retry search call if api returns error") {
+      it("should retry bpp rating api call if api returns error") {
         val ackResponse = ProtocolAckResponse(context = context, message = ResponseMessage.ack())
-        stubGatewaySearchApi(response = WireMock.serverError(), forState = STARTED, nextState = "Success")
-        stubGatewaySearchApi(response = WireMock.okJson(objectMapper.toJson(ackResponse)), forState = "Success")
+        stubBppRatingApi(response = WireMock.serverError(), forState = STARTED, nextState = "Success")
+        stubBppRatingApi(response = WireMock.okJson(objectMapper.toJson(ackResponse)), forState = "Success")
 
-        val response = gatewayService.search(gateway, context, SearchCriteria())
+        val response = bppService.rating(bpp.baseUrl(), context, "item id 1", 2)
 
         response
           .fold(
-            { Assertions.fail("Search should have been retried but it wasn't. Response: $it") },
-            { it.message shouldBe ResponseMessage.ack() }
+            { Assertions.fail("Lookup should have been retried but it wasn't. Response: $it") },
+            { it.message shouldBe ackResponse.message }
           )
-        verifyGatewaySearchApiIsInvoked(2)
+        verifyBppRatingApiIsInvoked(2)
       }
 
       it("should fail after max retry attempts") {
-        stubGatewaySearchApi(response = WireMock.serverError(), forState = STARTED, nextState = "Failure")
-        stubGatewaySearchApi(response = WireMock.serverError(), forState = "Failure", nextState = "Failure")
+        stubBppRatingApi(response = WireMock.serverError(), forState = STARTED, nextState = "Failure")
+        stubBppRatingApi(response = WireMock.serverError(), forState = "Failure", nextState = "Failure")
 
-        val response = gatewayService.search(gateway, context, SearchCriteria())
+        val response = bppService.rating(bpp.baseUrl(), context, "item id 1", 2)
 
-        response shouldBeLeft GatewaySearchError.Internal
-        verifyGatewaySearchApiIsInvoked(3)
+        response shouldBeLeft BppError.Internal
+        verifyBppRatingApiIsInvoked(3)
       }
     }
   }
 
-  private fun verifyGatewaySearchApiIsInvoked(numberOfTimes: Int = 1) {
-    MockNetwork.retailBengaluruBg.verify(numberOfTimes, WireMock.postRequestedFor(WireMock.urlEqualTo("/search")))
-  }
-
-  private fun stubGatewaySearchApi(
+  private fun stubBppRatingApi(
     nextState: String = "Success",
     forState: String = STARTED,
     response: ResponseDefinitionBuilder?
   ) {
-    MockNetwork.retailBengaluruBg
+    MockNetwork.retailBengaluruBpp
       .stubFor(
-        WireMock
-          .post("/search")
+        WireMock.post("/rating")
           .inScenario("Retry Scenario")
           .whenScenarioStateIs(forState)
           .willReturn(response)
           .willSetStateTo(nextState)
       )
+  }
+
+  private fun verifyBppRatingApiIsInvoked(numberOfTimes: Int = 1) {
+    MockNetwork.retailBengaluruBpp.verify(numberOfTimes, WireMock.postRequestedFor(WireMock.urlEqualTo("/rating")))
   }
 }
