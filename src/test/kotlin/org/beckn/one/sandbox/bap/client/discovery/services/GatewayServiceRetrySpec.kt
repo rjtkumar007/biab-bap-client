@@ -55,6 +55,7 @@ class GatewayServiceRetrySpec @Autowired constructor(
         stubGatewaySearchApi(response = WireMock.serverError(), forState = STARTED, nextState = "Success")
         stubGatewaySearchApi(response = WireMock.okJson(objectMapper.toJson(ackResponse)), forState = "Success")
 
+
         val response = gatewayService.search(gateway, context, SearchCriteria())
 
         response

@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OnGetQuotePollController @Autowired constructor(
-    onPollService: GenericOnPollService<ProtocolOnSelect, ClientQuoteResponse>,
-    contextFactory: ContextFactory,
-    val protocolClient: ProtocolClient
+  onPollService: GenericOnPollService<ProtocolOnSelect, ClientQuoteResponse>,
+  contextFactory: ContextFactory,
+  private val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnSelect, ClientQuoteResponse>(onPollService, contextFactory) {
 
   @RequestMapping("/client/v1/on_get_quote")
   @ResponseBody
-  fun onSelect(@RequestParam messageId: String): ResponseEntity<out ClientResponse> = onPoll(messageId, protocolClient.getSelectResponsesCall(messageId))
+  fun onGetQuote(@RequestParam messageId: String): ResponseEntity<out ClientResponse> =
+    onPoll(messageId, protocolClient.getSelectResponsesCall(messageId))
 }

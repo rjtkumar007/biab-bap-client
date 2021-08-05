@@ -20,7 +20,6 @@ class BppClientFactory @Autowired constructor(
   private val initialIntervalInMillis: Long,
   @Value("\${bpp_service.retry.interval_multiplier}")
   private val intervalMultiplier: Double,
-
   ) {
   private val retry: Retry = RetryFactory.create(
     "BppClient",
