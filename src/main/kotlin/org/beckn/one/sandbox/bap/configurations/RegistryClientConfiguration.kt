@@ -53,6 +53,7 @@ class RegistryClientConfiguration(
     val retrofit = Retrofit.Builder()
       .baseUrl(bppRegistryServiceUrl)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+      .addCallAdapterFactory(RetryCallAdapter.of(retry))
       .build()
 
     return retrofit.create(RegistryClient::class.java)

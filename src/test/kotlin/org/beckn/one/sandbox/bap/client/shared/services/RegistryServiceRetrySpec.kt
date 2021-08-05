@@ -1,27 +1,21 @@
 package org.beckn.one.sandbox.bap.client.shared.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.beckn.one.sandbox.bap.client.external.gateway.GatewayClient
-import org.beckn.one.sandbox.bap.client.shared.errors.gateway.GatewaySearchError
 import org.beckn.one.sandbox.bap.client.shared.errors.registry.RegistryLookupError
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
-import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.junit.jupiter.api.Assertions
-import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,21 +25,17 @@ class RegistryServiceRetrySpec @Autowired constructor(
   val registryService: RegistryService,
   val objectMapper: ObjectMapper,
 ) : DescribeSpec() {
-//  private val uuidFactory = mock(UuidFactory::class.java)
-  private val gatewayServiceClient: GatewayClient = mock(GatewayClient::class.java)
 
   init {
-    describe("Search") {
+    describe("Lookup Gateways") {
       MockNetwork.startAllSubscribers()
-//      `when`(uuidFactory.create()).thenReturn("9056ea1b-275d-4799-b0c8-25ae74b6bf51")
       val allGateways = MockNetwork.getAllGateways()
 
       beforeEach {
         MockNetwork.resetAllSubscribers()
-        reset(gatewayServiceClient)
       }
 
-      it("should retry search call if api returns error") {
+      it("should retry lookup gateway call if api returns error") {
         stubRegistryLookupApi(response = serverError())
         stubRegistryLookupApi(forState = "Success", response = okJson(toJson(allGateways)))
 
@@ -66,21 +56,73 @@ class RegistryServiceRetrySpec @Autowired constructor(
         val response = registryService.lookupGateways()
 
         response shouldBeLeft RegistryLookupError.Internal
-        verifyGatewaySearchApiIsInvoked(3)
+        verifyRegistryLookupApiIsInvoked(3)
+      }
+    }
+
+    describe("Lookup BPP by ID") {
+      MockNetwork.startAllSubscribers()
+      val bpp = MockNetwork.getRetailBengaluruBpp()
+      val bppLookupResponse = listOf(bpp)
+
+      beforeEach {
+        MockNetwork.resetAllSubscribers()
+      }
+
+      it("should retry lookup bpp by id call if api returns error") {
+        stubRegistryLookupApi(response = serverError(), registry = MockNetwork.registryBppLookupApi)
+        stubRegistryLookupApi(
+          forState = "Success",
+          response = okJson(toJson(bppLookupResponse)),
+          registry = MockNetwork.registryBppLookupApi
+        )
+
+        val response = registryService.lookupBppById(bpp.subscriber_id)
+
+        response
+          .fold(
+            { Assertions.fail("Lookup should have been retried but it wasn't. Response: $it") },
+            { it shouldBe bppLookupResponse }
+          )
+        verifyRegistryLookupApiIsInvoked(2, registry = MockNetwork.registryBppLookupApi)
+      }
+
+      it("should fail after max retry attempts") {
+        stubRegistryLookupApi(
+          response = serverError(),
+          forState = STARTED,
+          nextState = "Failure",
+          registry = MockNetwork.registryBppLookupApi
+        )
+        stubRegistryLookupApi(
+          response = serverError(),
+          forState = "Failure",
+          nextState = "Failure",
+          registry = MockNetwork.registryBppLookupApi
+        )
+
+        val response = registryService.lookupBppById(bpp.subscriber_id)
+
+        response shouldBeLeft RegistryLookupError.Internal
+        verifyRegistryLookupApiIsInvoked(3, registry = MockNetwork.registryBppLookupApi)
       }
     }
   }
 
-  private fun verifyGatewaySearchApiIsInvoked(numberOfTimes: Int = 1) {
-    MockNetwork.registry.verify(numberOfTimes, postRequestedFor(urlEqualTo("/lookup")))
+  private fun verifyRegistryLookupApiIsInvoked(
+    numberOfTimes: Int = 1,
+    registry: WireMockServer = MockNetwork.registry,
+  ) {
+    registry.verify(numberOfTimes, postRequestedFor(urlEqualTo("/lookup")))
   }
 
   private fun stubRegistryLookupApi(
     forState: String = STARTED,
     nextState: String = "Success",
-    response: ResponseDefinitionBuilder?
+    response: ResponseDefinitionBuilder?,
+    registry: WireMockServer = MockNetwork.registry,
   ) {
-    MockNetwork.registry
+    registry
       .stubFor(
         post("/lookup")
           .inScenario("Retry Scenario")
