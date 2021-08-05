@@ -12,8 +12,10 @@ class BppClientFactory @Autowired constructor(val objectMapper: ObjectMapper) {
   @Cacheable("bppClients")
   fun getClient(bppUri: String): BppClient {
     val url = if (bppUri.endsWith("/")) bppUri else "$bppUri/"
-    val retrofit = Retrofit.Builder().baseUrl(url)
-      .addConverterFactory(JacksonConverterFactory.create(objectMapper)).build()
+    val retrofit = Retrofit.Builder()
+      .baseUrl(url)
+      .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+      .build()
     return retrofit.create(BppClient::class.java)
   }
 }

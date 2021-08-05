@@ -19,7 +19,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
-internal class BppServiceSearchSpec : DescribeSpec() {
+internal class BppSearchServiceSpec : DescribeSpec() {
   private val bppServiceClientFactory = mock(BppClientFactory::class.java)
   private val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
   private val uuidFactory = mock(UuidFactory::class.java)
