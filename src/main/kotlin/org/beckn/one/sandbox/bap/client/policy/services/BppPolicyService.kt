@@ -1,6 +1,8 @@
 package org.beckn.one.sandbox.bap.client.policy.services
 
 import arrow.core.Either
+import org.beckn.one.sandbox.bap.client.external.hasBody
+import org.beckn.one.sandbox.bap.client.external.isInternalServerError
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.protocol.schemas.ProtocolContext
@@ -30,8 +32,8 @@ class BppPolicyService @Autowired constructor(
       ).execute()
       log.info("BPP get cancellation reasons response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       return when {
-        isInternalServerErrorWhenOptionsList(httpResponse) -> Either.Left(BppError.Internal)
-        isBodyNullWhenOptionsList(httpResponse) -> Either.Left(BppError.NullResponse)
+        httpResponse.isInternalServerError() -> Either.Left(BppError.Internal)
+        !httpResponse.hasBody() || hasEmptyBody(httpResponse) -> Either.Left(BppError.NullResponse)
         else -> Either.Right(httpResponse.body()!!)
       }
     }.mapLeft {
@@ -39,11 +41,7 @@ class BppPolicyService @Autowired constructor(
       BppError.Internal
     }
 
-  private fun isInternalServerErrorWhenOptionsList(httpResponse: Response<List<ProtocolOption>>) =
-    httpResponse.code() == HttpStatus.INTERNAL_SERVER_ERROR.value()
-
-  private fun isBodyNullWhenOptionsList(httpResponse: Response<List<ProtocolOption>>) =
-    httpResponse.body() == null || httpResponse.body()!!
-      .isEmpty()
+  private fun hasEmptyBody(httpResponse: Response<List<ProtocolOption>>) =
+    httpResponse.body()!!.isEmpty()
 
 }
