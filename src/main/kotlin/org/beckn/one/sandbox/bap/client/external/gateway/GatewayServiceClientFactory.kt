@@ -1,8 +1,11 @@
 package org.beckn.one.sandbox.bap.client.external.gateway
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.resilience4j.circuitbreaker.CircuitBreaker
+import io.github.resilience4j.retrofit.CircuitBreakerCallAdapter
 import io.github.resilience4j.retrofit.RetryCallAdapter
 import io.github.resilience4j.retry.Retry
+import org.beckn.one.sandbox.bap.factories.CircuitBreakerFactory
 import org.beckn.one.sandbox.bap.factories.RetryFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -19,19 +22,20 @@ class GatewayClientFactory @Autowired constructor(
   @Value("\${gateway_service.retry.initial_interval_in_millis}") val initialIntervalInMillis: Long,
   @Value("\${gateway_service.retry.interval_multiplier}") val intervalMultiplier: Double,
 ) {
-  private val retry: Retry = RetryFactory.create(
-    "GatewayClient",
-    maxAttempts,
-    initialIntervalInMillis,
-    intervalMultiplier
-  )
-
   @Cacheable("gatewayClients")
   fun getClient(gatewayUri: String): GatewayClient {
+    val retry: Retry = RetryFactory.create(
+      gatewayUri,
+      maxAttempts,
+      initialIntervalInMillis,
+      intervalMultiplier
+    )
+    val circuitBreaker: CircuitBreaker = CircuitBreakerFactory.create(gatewayUri)
     val retrofit = Retrofit.Builder()
       .baseUrl(gatewayUri)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(retry))
+      .addCallAdapterFactory(CircuitBreakerCallAdapter.of(circuitBreaker))
       .build()
     return retrofit.create(GatewayClient::class.java)
   }

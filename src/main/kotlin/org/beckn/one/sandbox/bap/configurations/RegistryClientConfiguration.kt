@@ -1,9 +1,12 @@
 package org.beckn.one.sandbox.bap.configurations
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.resilience4j.circuitbreaker.CircuitBreaker
+import io.github.resilience4j.retrofit.CircuitBreakerCallAdapter
 import io.github.resilience4j.retrofit.RetryCallAdapter
 import io.github.resilience4j.retry.Retry
 import org.beckn.one.sandbox.bap.client.external.registry.RegistryClient
+import org.beckn.one.sandbox.bap.factories.CircuitBreakerFactory
 import org.beckn.one.sandbox.bap.factories.RetryFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -29,20 +32,22 @@ class RegistryClientConfiguration(
   @Autowired
   private val objectMapper: ObjectMapper
 ) {
-  private val retry: Retry = RetryFactory.create(
-    "RegistryClient",
-    maxAttempts,
-    initialIntervalInMillis,
-    intervalMultiplier
-  )
 
   @Bean
   @Primary
   fun registryServiceClient(): RegistryClient {
+    val retry: Retry = RetryFactory.create(
+      "RegistryClient",
+      maxAttempts,
+      initialIntervalInMillis,
+      intervalMultiplier
+    )
+    val registryCircuitBreaker: CircuitBreaker = CircuitBreakerFactory.create("RegistryClient")
     val retrofit = Retrofit.Builder()
       .baseUrl(registryServiceUrl)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(retry))
+      .addCallAdapterFactory(CircuitBreakerCallAdapter.of(registryCircuitBreaker))
       .build()
 
     return retrofit.create(RegistryClient::class.java)
@@ -50,10 +55,18 @@ class RegistryClientConfiguration(
 
   @Bean(BPP_REGISTRY_SERVICE_CLIENT)
   fun bppRegistryServiceClient(): RegistryClient {
+    val retry: Retry = RetryFactory.create(
+      "BppRegistryClient",
+      maxAttempts,
+      initialIntervalInMillis,
+      intervalMultiplier
+    )
+    val bppRegistryCircuitBreaker: CircuitBreaker = CircuitBreakerFactory.create("BppRegistryClient")
     val retrofit = Retrofit.Builder()
       .baseUrl(bppRegistryServiceUrl)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(retry))
+      .addCallAdapterFactory(CircuitBreakerCallAdapter.of(bppRegistryCircuitBreaker))
       .build()
 
     return retrofit.create(RegistryClient::class.java)

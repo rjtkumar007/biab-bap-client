@@ -42,7 +42,7 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
   private val protocolOnConfirm = ProtocolOnConfirm(
     context,
     message = ProtocolOnConfirmMessage(
-      order = ProtocolOrderFactory.create(1, 2)
+      order = ProtocolOrderFactory.create(1)
     )
   )
   val mockProtocolBap = MockProtocolBap.withResetInstance()

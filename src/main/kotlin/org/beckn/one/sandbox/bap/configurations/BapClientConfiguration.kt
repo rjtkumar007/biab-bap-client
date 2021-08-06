@@ -25,16 +25,14 @@ class BapClientConfiguration(
   @Autowired
   private val objectMapper: ObjectMapper
 ) {
-
-  private val retry: Retry = RetryFactory.create(
-    "BapClient",
-    maxAttempts,
-    initialIntervalInMillis,
-    intervalMultiplier
-  )
-
   @Bean
   fun bapClient(): ProtocolClient {
+    val retry: Retry = RetryFactory.create(
+      "BapClient",
+      maxAttempts,
+      initialIntervalInMillis,
+      intervalMultiplier
+    )
     val retrofit = Retrofit.Builder()
       .baseUrl(bapServiceUrl)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))

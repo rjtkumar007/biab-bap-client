@@ -6,9 +6,9 @@ object ProtocolOnRatingMessageFeedbackFactory {
 
   fun create(index: Int = 1): ProtocolOnRatingMessageFeedback {
     return ProtocolOnRatingMessageFeedback(
-      id = "item id 1",
+      id = "item id $index",
       descriptor = "item descriptor",
-      parentId = "item id 1 - parent id 1",
+      parentId = "item id $index - parent id $index",
     )
   }
 }
