@@ -52,7 +52,7 @@ dependencies {
   implementation("com.squareup.retrofit2:retrofit-mock:$retrofitVersion")
   implementation("org.litote.kmongo:kmongo:4.2.8")
   implementation("org.mapstruct:mapstruct:1.4.2.Final")
-  implementation("org.beckn.jvm:beckn-protocol-dtos:0.9.1.14")
+  implementation("org.beckn.jvm:beckn-protocol-dtos:0.9.1.15")
   implementation("io.github.resilience4j:resilience4j-retrofit:$resilience4jVersion")
   implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
   implementation("io.github.resilience4j:resilience4j-circuitbreaker:$resilience4jVersion")

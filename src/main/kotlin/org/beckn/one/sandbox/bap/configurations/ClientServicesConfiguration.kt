@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.configurations
 import org.beckn.one.sandbox.bap.client.discovery.mappers.ClientCatalogMapper
 import org.beckn.one.sandbox.bap.client.discovery.mappers.SearchClientResponseMapper
 import org.beckn.one.sandbox.bap.client.fulfillment.track.mappers.TrackClientResponseMapper
+import org.beckn.one.sandbox.bap.client.order.cancel.mappers.CancelClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.confirm.mappers.ConfirmClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
@@ -55,6 +56,10 @@ class ClientServicesConfiguration @Autowired constructor(
     OrderStatusClientResponseMapper()
 
   @Bean
+  fun forCancelResults(): GenericOnPollMapper<ProtocolOnCancel, ClientCancelResponse> =
+    CancelClientResponseMapper()
+
+  @Bean
   fun selectProtocolClientService() = GenericProtocolClientService<ProtocolOnSelect>()
 
   @Bean
@@ -71,6 +76,9 @@ class ClientServicesConfiguration @Autowired constructor(
 
   @Bean
   fun onOrderStatusProtocolClientService() = GenericProtocolClientService<ProtocolOnOrderStatus>()
+
+  @Bean
+  fun cancelProtocolClientService() = GenericProtocolClientService<ProtocolOnCancel>()
 
   @Bean
   fun searchResultReplyService(
@@ -118,5 +126,11 @@ class ClientServicesConfiguration @Autowired constructor(
   fun orderStatusReplyService(
     @Autowired protocolService: GenericProtocolClientService<ProtocolOnOrderStatus>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnOrderStatus, ClientOrderStatusResponse>
+  ) = GenericOnPollService(protocolService, transformer)
+
+  @Bean
+  fun cancelReplyService(
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnCancel>,
+    @Autowired transformer: GenericOnPollMapper<ProtocolOnCancel, ClientCancelResponse>
   ) = GenericOnPollService(protocolService, transformer)
 }
