@@ -6,6 +6,7 @@ import org.beckn.one.sandbox.bap.client.fulfillment.track.mappers.TrackClientRes
 import org.beckn.one.sandbox.bap.client.order.confirm.mappers.ConfirmClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
+import org.beckn.one.sandbox.bap.client.order.status.mappers.OrderStatusClientResponseMapper
 import org.beckn.one.sandbox.bap.client.rating.mappers.RatingClientResponseMapper
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollMapper
@@ -50,6 +51,10 @@ class ClientServicesConfiguration @Autowired constructor(
     RatingClientResponseMapper()
 
   @Bean
+  fun forOrderStatusResults(): GenericOnPollMapper<ProtocolOnOrderStatus, ClientOrderStatusResponse> =
+    OrderStatusClientResponseMapper()
+
+  @Bean
   fun selectProtocolClientService() = GenericProtocolClientService<ProtocolOnSelect>()
 
   @Bean
@@ -63,6 +68,9 @@ class ClientServicesConfiguration @Autowired constructor(
 
   @Bean
   fun supportProtocolClientService() = GenericProtocolClientService<ProtocolOnSupport>()
+
+  @Bean
+  fun onOrderStatusProtocolClientService() = GenericProtocolClientService<ProtocolOnOrderStatus>()
 
   @Bean
   fun searchResultReplyService(
@@ -104,5 +112,11 @@ class ClientServicesConfiguration @Autowired constructor(
   fun ratingReplyService(
     @Autowired protocolService: GenericProtocolClientService<ProtocolOnRating>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnRating, ClientRatingResponse>
+  ) = GenericOnPollService(protocolService, transformer)
+
+  @Bean
+  fun orderStatusReplyService(
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnOrderStatus>,
+    @Autowired transformer: GenericOnPollMapper<ProtocolOnOrderStatus, ClientOrderStatusResponse>
   ) = GenericOnPollService(protocolService, transformer)
 }
