@@ -51,7 +51,7 @@ internal class OnRatingPollControllerSpec @Autowired constructor(
 
       context("when called for given message id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/protocol/v1/on_rating?messageId=${context.messageId}")
+          WireMock.get("/protocol/response/v1/on_rating?messageId=${context.messageId}")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(ratingResults())))
         )
         val onRatingCall = mockMvc

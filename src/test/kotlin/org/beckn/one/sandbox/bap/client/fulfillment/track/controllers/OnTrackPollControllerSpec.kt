@@ -11,8 +11,8 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.ClientTrackResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.factories.ProtocolOnTrackMessageTrackingFactory
 import org.beckn.one.sandbox.bap.factories.ContextFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolOnTrackMessageTrackingFactory
 import org.beckn.protocol.schemas.ProtocolOnTrack
 import org.beckn.protocol.schemas.ProtocolOnTrackMessage
 import org.mockito.kotlin.any
@@ -51,7 +51,7 @@ internal class OnTrackPollControllerSpec @Autowired constructor(
 
       context("when called for given message id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/protocol/v1/on_track?messageId=${context.messageId}")
+          WireMock.get("/protocol/response/v1/on_track?messageId=${context.messageId}")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(trackResults())))
         )
         val onTrackCall = mockMvc

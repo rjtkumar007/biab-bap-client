@@ -10,10 +10,8 @@ import org.beckn.one.sandbox.bap.client.external.toJson
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnSelectMessageSelectedFactory
-import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolOnSelect
 import org.beckn.protocol.schemas.ProtocolOnSelectMessage
-import org.beckn.protocol.schemas.ResponseMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -77,7 +75,7 @@ internal class OnGetQuoteRetrySpec @Autowired constructor(
   ) {
     mockProtocolBap
       .stubFor(
-        get("/protocol/v1/on_select?messageId=${context.messageId}")
+        get("/protocol/response/v1/on_select?messageId=${context.messageId}")
           .inScenario("Retry Scenario")
           .whenScenarioStateIs(forState)
           .willReturn(response)
@@ -88,7 +86,7 @@ internal class OnGetQuoteRetrySpec @Autowired constructor(
   private fun verifyBapOnSelectApiIsInvoked(numberOfTimes: Int = 1) {
     mockProtocolBap.verify(
       numberOfTimes,
-      getRequestedFor(urlEqualTo("/protocol/v1/on_select?messageId=${context.messageId}"))
+      getRequestedFor(urlEqualTo("/protocol/response/v1/on_select?messageId=${context.messageId}"))
     )
   }
 

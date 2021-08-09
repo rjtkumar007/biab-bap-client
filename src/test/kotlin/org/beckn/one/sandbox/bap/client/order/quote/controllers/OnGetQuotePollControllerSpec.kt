@@ -59,7 +59,7 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
 
       context("when called for given message id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/protocol/v1/on_select?messageId=${context.messageId}")
+          WireMock.get("/protocol/response/v1/on_select?messageId=${context.messageId}")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(entitySelectResults())))
         )
         val onGetQuoteCall = mockMvc
