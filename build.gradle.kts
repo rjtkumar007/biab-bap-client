@@ -50,7 +50,6 @@ dependencies {
   implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
   implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
   implementation("com.squareup.retrofit2:retrofit-mock:$retrofitVersion")
-  implementation("org.litote.kmongo:kmongo:4.2.8")
   implementation("org.mapstruct:mapstruct:1.4.2.Final")
   implementation("org.beckn.jvm:beckn-protocol-dtos:0.9.1.15")
   implementation("io.github.resilience4j:resilience4j-retrofit:$resilience4jVersion")
@@ -61,7 +60,6 @@ dependencies {
   testImplementation("io.kotest:kotest-runner-junit5:4.4.3")
   testImplementation("io.kotest:kotest-extensions-spring:4.4.3")
   testImplementation("com.github.tomakehurst:wiremock-jre8:2.28.0")
-  testImplementation("org.testcontainers:mongodb:1.15.3")
   testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
   testImplementation("io.kotest.extensions:kotest-assertions-arrow:1.0.2")
 }
