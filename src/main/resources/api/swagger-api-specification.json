@@ -21,7 +21,7 @@
         "summary": "Search",
         "description": "Search using the Beckn Network",
         "tags": [
-          "Discovery"
+          "Trigger APIs"
         ],
         "operationId": "search",
         "requestBody": {
@@ -39,8 +39,37 @@
             }
           }
         },
-        "parameters": [],
-        "externalDocs": {}
+        "parameters": []
+      }
+    },
+    "/v1/on_search": {
+      "get": {
+        "summary": "On Search",
+        "description": "Get results for Search by message Id",
+        "tags": [
+          "Response APIs"
+        ],
+        "operationId": "on_search",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "message_id",
+            "description": "Message Id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully initiated search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientSearchResponse"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -92,6 +121,459 @@
             "type": "string"
           }
         }
+      },
+      "ClientSearchResponse": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "message": {
+            "$ref": "#/components/schemas/ClientSearchResponseMessage"
+          },
+          "error": {
+            "$ref": "#/components/schemas/Error"
+          }
+        }
+      },
+      "ClientSearchResponseMessage": {
+        "type": "object",
+        "properties": {
+          "catalogs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientCatalog"
+            }
+          }
+        }
+      },
+      "ClientCatalog": {
+        "description": "Describes a BPP catalog",
+        "type": "object",
+        "properties": {
+          "bpp_descriptor": {
+            "$ref": "#/components/schemas/Descriptor"
+          },
+          "bpp_providers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Provider"
+            }
+          },
+          "bpp_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Category"
+            }
+          },
+          "exp": {
+            "type": "string",
+            "description": "Time after which catalog has to be refreshed",
+            "format": "date-time"
+          },
+          "bpp_id": {
+            "type": "string",
+            "description": "ID of the BPP"
+          }
+        }
+      },
+      "Category": {
+        "description": "Describes a category",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique id of the category"
+          },
+          "parent_category_id": {
+            "$ref": "#/components/schemas/Category/properties/id"
+          },
+          "descriptor": {
+            "$ref": "#/components/schemas/Descriptor"
+          },
+          "time": {
+            "type": "string",
+            "description": "Time after which catalog has to be refreshed",
+            "format": "date-time"
+          },
+          "tags": {
+            "$ref": "#/components/schemas/Tags"
+          }
+        }
+      },
+      "Descriptor": {
+        "description": "Describes the description of a real-world object",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "short_desc": {
+            "type": "string"
+          },
+          "long_desc": {
+            "type": "string"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Image"
+            }
+          },
+          "audio": {
+            "type": "string",
+            "format": "uri"
+          },
+          "3d_render": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "Provider": {
+        "description": "Describes a service provider. This can be a restaurant, a hospital, a Store etc",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id of the provider"
+          },
+          "descriptor": {
+            "$ref": "#/components/schemas/Descriptor"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Location"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Category"
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
+          },
+          "exp": {
+            "type": "string",
+            "description": "Time after which catalog has to be refreshed",
+            "format": "date-time"
+          },
+          "tags": {
+            "$ref": "#/components/schemas/Tags"
+          },
+          "matched": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Location": {
+        "description": "Describes the location of a runtime object. Extension not allowed",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "descriptor": {
+            "$ref": "#/components/schemas/Descriptor"
+          },
+          "gps": {
+            "$ref": "#/components/schemas/Gps"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "station_code": {
+            "type": "string"
+          },
+          "city": {
+            "$ref": "#/components/schemas/City"
+          },
+          "country": {
+            "$ref": "#/components/schemas/Country"
+          },
+          "circle": {
+            "$ref": "#/components/schemas/Circle"
+          },
+          "polygon": {
+            "type": "string"
+          },
+          "3dspace": {
+            "type": "string"
+          },
+          "time": {
+            "$ref": "#/components/schemas/Time"
+          }
+        }
+      },
+      "Address": {
+        "description": "Describes an address",
+        "type": "object",
+        "properties": {
+          "door": {
+            "type": "string",
+            "description": "Door / Shop number of the address"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of address if applicable. Example, shop name"
+          },
+          "building": {
+            "type": "string",
+            "description": "Name of the building or block"
+          },
+          "street": {
+            "type": "string",
+            "description": "Street name or number"
+          },
+          "locality": {
+            "type": "string",
+            "description": "Name of the locality, apartments"
+          },
+          "ward": {
+            "type": "string",
+            "description": "Name or number of the ward if applicable"
+          },
+          "city": {
+            "type": "string",
+            "description": "City name"
+          },
+          "state": {
+            "type": "string",
+            "description": "State name"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country name"
+          },
+          "area_code": {
+            "type": "string",
+            "description": "Area code. This can be Pincode, ZIP code or any equivalent"
+          }
+        }
+      },
+      "City": {
+        "description": "Describes a city",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the city"
+          },
+          "code": {
+            "type": "string",
+            "description": "City code"
+          }
+        }
+      },
+      "Country": {
+        "description": "Describes a country.",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the country"
+          },
+          "code": {
+            "type": "string",
+            "description": "Country code as per ISO 3166-1 and ISO 3166-2 format"
+          }
+        }
+      },
+      "Circle": {
+        "description": "Describes a circular area on the map",
+        "type": "object",
+        "properties": {
+          "gps": {
+            "$ref": "#/components/schemas/Gps"
+          },
+          "radius": {
+            "$ref": "#/components/schemas/Scalar"
+          }
+        },
+        "required": [
+          "gps",
+          "radius"
+        ]
+      },
+      "Tags": {
+        "description": "Describes a tag. This is a simple key-value store which is used to contain extended metadata",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "Gps": {
+        "description": "Describes a gps coordinate",
+        "type": "string",
+        "pattern": "^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?),\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$"
+      },
+      "Image": {
+        "description": "Image of an object. <br/><br/> A url based image will look like <br/><br/>```uri:http://path/to/image``` <br/><br/> An image can also be sent as a data string. For example : <br/><br/> ```data:js87y34ilhriuho84r3i4```",
+        "type": "string"
+      },
+      "Time": {
+        "description": "Describes time in its various forms. It can be a single point in time; duration; or a structured timetable of operations",
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duration": {
+            "$ref": "#/components/schemas/Duration"
+          },
+          "range": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "end": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "days": {
+            "type": "string",
+            "description": "comma separated values representing days of the week"
+          }
+        }
+      },
+      "Scalar": {
+        "description": "An object representing a scalar quantity. Extension allowed only to the limit of vector",
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "CONSTANT",
+              "VARIABLE"
+            ]
+          },
+          "value": {
+            "type": "number"
+          },
+          "estimated_value": {
+            "type": "number"
+          },
+          "computed_value": {
+            "type": "number"
+          },
+          "range": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              }
+            }
+          },
+          "unit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "unit"
+        ]
+      },
+      "Duration": {
+        "description": "Describes duration as per ISO8601 format",
+        "type": "string"
+      },
+      "Item": {
+        "description": "Describes an item. Allows for domain extension.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "This is the most unique identifier of a service item. An example of an Item ID could be the SKU of a product.",
+            "type": "string",
+            "format": "#/components/schemas/Item/properties/id"
+          },
+          "parent_item_id": {
+            "$ref": "#/components/schemas/Item/properties/id"
+          },
+          "descriptor": {
+            "$ref": "#/components/schemas/Descriptor"
+          },
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "category_id": {
+            "$ref": "#/components/schemas/Category/properties/id"
+          },
+          "location_id": {
+            "$ref": "#/components/schemas/Location/properties/id"
+          },
+          "time": {
+            "$ref": "#/components/schemas/Time"
+          },
+          "matched": {
+            "type": "boolean"
+          },
+          "related": {
+            "type": "boolean"
+          },
+          "recommended": {
+            "type": "boolean"
+          },
+          "tags": {
+            "$ref": "#/components/schemas/Tags"
+          }
+        }
+      },
+      "Price": {
+        "description": "Describes the price of an item. Allows for domain extension.",
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "value": {
+            "$ref": "#/components/schemas/DecimalValue"
+          },
+          "estimated_value": {
+            "$ref": "#/components/schemas/DecimalValue"
+          },
+          "computed_value": {
+            "$ref": "#/components/schemas/DecimalValue"
+          },
+          "listed_value": {
+            "$ref": "#/components/schemas/DecimalValue"
+          },
+          "offered_value": {
+            "$ref": "#/components/schemas/DecimalValue"
+          },
+          "minimum_value": {
+            "$ref": "#/components/schemas/DecimalValue"
+          },
+          "maximum_value": {
+            "$ref": "#/components/schemas/DecimalValue"
+          }
+        }
+      },
+      "DecimalValue": {
+        "description": "Describes a decimal value",
+        "type": "string",
+        "pattern": "[+-]?([0-9]*[.])?[0-9]+"
       },
       "ApiResponse": {
         "type": "object",
