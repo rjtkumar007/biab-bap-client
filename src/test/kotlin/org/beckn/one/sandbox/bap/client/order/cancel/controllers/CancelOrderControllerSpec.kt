@@ -164,8 +164,8 @@ class CancelOrderControllerSpec @Autowired constructor(
 
   private fun getProtocolGetCancellationReasonsRequest(
     orderPolicyDto: GetOrderPolicyDto
-  ): ProtocolGetCancellationReasonsRequest =
-    ProtocolGetCancellationReasonsRequest(
+  ): ProtocolGetPolicyRequest =
+    ProtocolGetPolicyRequest(
       context = getContext(
         orderPolicyDto.context.transactionId,
         orderPolicyDto.context.bppId
@@ -228,7 +228,7 @@ class CancelOrderControllerSpec @Autowired constructor(
   }
 
   private fun invokeGetOrderPolicy(getOrderPolicyDto: GetOrderPolicyDto) = mockMvc.perform(
-    MockMvcRequestBuilders.post("/client/v1/get_order_policy").header(
+    MockMvcRequestBuilders.post("/client/v1/get_cancellation_policy").header(
       org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
     ).content(objectMapper.writeValueAsString(getOrderPolicyDto))
   )

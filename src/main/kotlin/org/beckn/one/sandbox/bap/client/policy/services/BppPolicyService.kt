@@ -6,12 +6,12 @@ import org.beckn.one.sandbox.bap.client.external.isInternalServerError
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.protocol.schemas.ProtocolContext
-import org.beckn.protocol.schemas.ProtocolGetCancellationReasonsRequest
+import org.beckn.protocol.schemas.ProtocolGetPolicyRequest
 import org.beckn.protocol.schemas.ProtocolOption
+import org.beckn.protocol.schemas.ProtocolRatingCategory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import retrofit2.Response
 
@@ -26,7 +26,7 @@ class BppPolicyService @Autowired constructor(
       log.info("Invoking get cancellation reasons API on BPP: {}", bppUri)
       val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
       val httpResponse = bppServiceClient.getCancellationReasons(
-        ProtocolGetCancellationReasonsRequest(
+        ProtocolGetPolicyRequest(
           context = context
         )
       ).execute()
@@ -41,7 +41,27 @@ class BppPolicyService @Autowired constructor(
       BppError.Internal
     }
 
-  private fun hasEmptyBody(httpResponse: Response<List<ProtocolOption>>) =
+  fun getRatingCategories(bppUri: String, context: ProtocolContext): Either<BppError, List<ProtocolRatingCategory>> =
+    Either.catch {
+      log.info("Invoking get rating categories API on BPP: {}", bppUri)
+      val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
+      val httpResponse = bppServiceClient.getRatingCategories(
+        ProtocolGetPolicyRequest(
+          context = context
+        )
+      ).execute()
+      log.info("BPP get rating categories response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+      return when{
+        httpResponse.isInternalServerError() -> Either.Left(BppError.Internal)
+        !httpResponse.hasBody() || hasEmptyBody(httpResponse) -> Either.Left(BppError.NullResponse)
+        else -> Either.Right(httpResponse.body()!!)
+      }
+    }.mapLeft {
+      log.error("Error when invoking BPP get rating categories reasons API", it)
+      BppError.Internal
+    }
+
+  private fun <T> hasEmptyBody(httpResponse: Response<List<T>>) =
     httpResponse.body()!!.isEmpty()
 
 }
