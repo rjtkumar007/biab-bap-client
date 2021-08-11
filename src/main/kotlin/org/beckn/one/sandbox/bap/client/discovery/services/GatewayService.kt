@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class GatewayService @Autowired constructor(
-  val gatewayServiceClientFactory: GatewayClientFactory,
+  private val gatewayServiceClientFactory: GatewayClientFactory,
 ) {
   val log: Logger = LoggerFactory.getLogger(GatewayService::class.java)
 
