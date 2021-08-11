@@ -22,6 +22,7 @@ class GatewayClientFactory @Autowired constructor(
   @Value("\${gateway_service.retry.max_attempts}") val maxAttempts: Int,
   @Value("\${gateway_service.retry.initial_interval_in_millis}") val initialIntervalInMillis: Long,
   @Value("\${gateway_service.retry.interval_multiplier}") val intervalMultiplier: Double,
+  @Value("\${beckn.security.enabled}") val enableSecurity: Boolean,
   private val interceptor: SignRequestInterceptor
 ) {
   @Cacheable("gatewayClients")
@@ -34,13 +35,12 @@ class GatewayClientFactory @Autowired constructor(
     )
     val okHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
     val circuitBreaker = CircuitBreakerFactory.create(gatewayUri)
-    val retrofit = Retrofit.Builder()
-      .client(okHttpClient)
+    val retrofitBuilder = Retrofit.Builder()
       .baseUrl(gatewayUri)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(retry))
       .addCallAdapterFactory(CircuitBreakerCallAdapter.of(circuitBreaker))
-      .build()
+    val retrofit = if(enableSecurity) retrofitBuilder.client(okHttpClient).build() else retrofitBuilder.build()
     return retrofit.create(GatewayClient::class.java)
   }
 }

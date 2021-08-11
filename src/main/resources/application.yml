@@ -42,6 +42,8 @@ context:
   bap_id: box.beckn.org
   bap_uri: http://localhost:9002/protocol/v1
   ttl_seconds: 20
+beckn:
+  security.enabled: false
 security:
   self:
     private_key:

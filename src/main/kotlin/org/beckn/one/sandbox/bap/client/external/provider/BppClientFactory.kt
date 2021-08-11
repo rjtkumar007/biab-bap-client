@@ -24,6 +24,7 @@ class BppClientFactory @Autowired constructor(
   private val initialIntervalInMillis: Long,
   @Value("\${bpp_service.retry.interval_multiplier}")
   private val intervalMultiplier: Double,
+  @Value("\${beckn.security.enabled}") val enableSecurity: Boolean,
   private val interceptor: SignRequestInterceptor
 ) {
   @Cacheable("bppClients")
@@ -37,13 +38,12 @@ class BppClientFactory @Autowired constructor(
     val okHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
     val circuitBreaker = CircuitBreakerFactory.create(bppUri)
     val url = if (bppUri.endsWith("/")) bppUri else "$bppUri/"
-    val retrofit = Retrofit.Builder()
-      .client(okHttpClient)
+    val retrofitBuilder = Retrofit.Builder()
       .baseUrl(url)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(retry))
       .addCallAdapterFactory(CircuitBreakerCallAdapter.of(circuitBreaker))
-      .build()
+    val retrofit = if(enableSecurity) retrofitBuilder.client(okHttpClient).build() else retrofitBuilder.build()
     return retrofit.create(BppClient::class.java)
   }
 }

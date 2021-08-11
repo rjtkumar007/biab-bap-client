@@ -30,6 +30,7 @@ class RegistryClientConfiguration(
   private val intervalMultiplier: Double,
   @Autowired @Value("\${bpp_registry_service.url}")
   private val bppRegistryServiceUrl: String,
+  @Value("\${beckn.security.enabled}") private val enableSecurity: Boolean,
   @Autowired
   private val objectMapper: ObjectMapper,
   @Autowired
@@ -47,14 +48,12 @@ class RegistryClientConfiguration(
     )
     val okHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
     val registryCircuitBreaker = CircuitBreakerFactory.create("RegistryClient")
-    val retrofit = Retrofit.Builder()
-      .client(okHttpClient)
+    val retrofitBuilder = Retrofit.Builder()
       .baseUrl(registryServiceUrl)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(retry))
       .addCallAdapterFactory(CircuitBreakerCallAdapter.of(registryCircuitBreaker))
-      .build()
-
+    val retrofit = if(enableSecurity) retrofitBuilder.client(okHttpClient).build() else retrofitBuilder.build()
     return retrofit.create(RegistryClient::class.java)
   }
 
