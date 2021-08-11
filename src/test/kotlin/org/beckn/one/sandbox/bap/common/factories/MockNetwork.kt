@@ -72,7 +72,7 @@ object MockNetwork {
     number = 4, mockServer = retailBengaluruBpp, type = SubscriberDto.Type.BPP
   )
 
-  private fun getAnotherRetailBengaluruBpp() = createSubscriberDto(
+  fun getAnotherRetailBengaluruBpp() = createSubscriberDto(
     number = 5, mockServer = anotherRetailBengaluruBpp, type = SubscriberDto.Type.BPP
   )
 

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import retrofit2.Response
 
@@ -30,10 +31,12 @@ class RegistryService(
 ) {
   private val log: Logger = LoggerFactory.getLogger(RegistryService::class.java)
 
+  @Cacheable("lookupGateways")
   fun lookupGateways(): Either<RegistryLookupError, List<SubscriberDto>> {
     return lookup(registryServiceClient, lookupRequest(subscriberType = Subscriber.Type.BG))
   }
 
+  @Cacheable("lookupBppById")
   fun lookupBppById(id: String): Either<RegistryLookupError, List<SubscriberDto>> {
     return lookup(bppRegistryServiceClient, lookupRequest(subscriberType = Subscriber.Type.BPP, subscriberId = id))
   }
