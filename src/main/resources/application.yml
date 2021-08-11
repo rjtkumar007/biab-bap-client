@@ -41,6 +41,11 @@ context:
   country: IND
   bap_id: box.beckn.org
   bap_uri: http://localhost:9002/protocol/v1
+  ttl_seconds: 20
+security:
+  self:
+    private_key:
+    unique_key_id: key1
 database:
   mongo:
     url: mongodb://localhost:27017

@@ -5,3 +5,4 @@ mongo_port: 27017
 bap_mongo_name: sandbox_bap
 registry_url: https://demo4460370.mockable.io/registry/
 protocol_url: http://internal-biab-qa-bap-api-1627558606.ap-south-1.elb.amazonaws.com:9002/
+public_key: c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUZwQUZBNE16QmJSR1Rhd25OMXRYWFpLRmFwR3lyWms1REluc0tvZjFmTkogcHVuZWV0c0BQdW5lZXRzLU1hY0Jvb2stUHJvLmxvY2FsCg==

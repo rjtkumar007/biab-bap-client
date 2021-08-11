@@ -48,15 +48,14 @@ internal class GenericOnPollServiceSpec @Autowired constructor(
     timestamp = OffsetDateTime.now(fixedClock)
   )
 
-  val mockProtocolBap = MockProtocolBap.withResetInstance()
-
   init {
     describe("GenericOnReplyService") {
+      val mockProtocolBap = MockProtocolBap.withResetInstance()
+      mockProtocolBap.stubFor(
+        WireMock.get("/protocol/response/v1/on_search?messageId=${context.messageId}").willReturn(WireMock.okJson(mapper.writeValueAsString(entitySearchResults())))
+      )
 
       it("should return search results for given message id in context") {
-        mockProtocolBap.stubFor(
-          WireMock.get("/protocol/response/v1/on_search?messageId=${context.messageId}").willReturn(WireMock.okJson(mapper.writeValueAsString(entitySearchResults())))
-        )
         val response = onSearchPollService.onPoll(context, protocolClient.getSearchResponsesCall(context.messageId))
         response.shouldBeRight(
           ClientSearchResponse(

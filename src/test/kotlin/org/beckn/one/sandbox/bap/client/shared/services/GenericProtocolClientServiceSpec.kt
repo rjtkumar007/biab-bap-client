@@ -46,13 +46,13 @@ internal class GenericProtocolClientServiceSpec @Autowired constructor(
       )
     )
   )
-  val mockProtocolBap = MockProtocolBap.withResetInstance()
   val messageId = "some-message-id"
 
   init {
     describe("Given ProtocolClient calls protocol service") {
 
       context("when it calls BAP protocol service and gets HTTP 200 responses for a message id") {
+        val mockProtocolBap = MockProtocolBap.withResetInstance()
         mockProtocolBap.stubFor(
           get("/protocol/response/v1/on_search?messageId=some-message-id").withId(_onSearchStub).willReturn(okJson(mapper.writeValueAsString(searchResponse)))
         )
@@ -64,7 +64,8 @@ internal class GenericProtocolClientServiceSpec @Autowired constructor(
       }
 
       context("when it calls BAP protocol service and gets HTTP 500 responses for a message id") {
-        mockProtocolBap.editStub(
+        val mockProtocolBap = MockProtocolBap.withResetInstance()
+        mockProtocolBap.stubFor(
           get("/protocol/response/v1/on_search?messageId=some-message-id").withId(_onSearchStub).withId(_onSearchStub).willReturn(WireMock.serverError())
         )
         val results = protocolClientService.getResponse(protocolClientBap.getSearchResponsesCall(messageId))

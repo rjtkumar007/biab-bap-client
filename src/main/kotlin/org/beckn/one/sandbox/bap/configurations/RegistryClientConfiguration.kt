@@ -1,11 +1,12 @@
 package org.beckn.one.sandbox.bap.configurations
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.retrofit.CircuitBreakerCallAdapter
 import io.github.resilience4j.retrofit.RetryCallAdapter
 import io.github.resilience4j.retry.Retry
+import okhttp3.OkHttpClient
 import org.beckn.one.sandbox.bap.client.external.registry.RegistryClient
+import org.beckn.one.sandbox.bap.client.shared.security.SignRequestInterceptor
 import org.beckn.one.sandbox.bap.factories.CircuitBreakerFactory
 import org.beckn.one.sandbox.bap.factories.RetryFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,7 +31,9 @@ class RegistryClientConfiguration(
   @Autowired @Value("\${bpp_registry_service.url}")
   private val bppRegistryServiceUrl: String,
   @Autowired
-  private val objectMapper: ObjectMapper
+  private val objectMapper: ObjectMapper,
+  @Autowired
+  private val interceptor: SignRequestInterceptor
 ) {
 
   @Bean
@@ -42,8 +45,10 @@ class RegistryClientConfiguration(
       initialIntervalInMillis,
       intervalMultiplier
     )
-    val registryCircuitBreaker: CircuitBreaker = CircuitBreakerFactory.create("RegistryClient")
+    val okHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
+    val registryCircuitBreaker = CircuitBreakerFactory.create("RegistryClient")
     val retrofit = Retrofit.Builder()
+      .client(okHttpClient)
       .baseUrl(registryServiceUrl)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(retry))
@@ -61,7 +66,7 @@ class RegistryClientConfiguration(
       initialIntervalInMillis,
       intervalMultiplier
     )
-    val bppRegistryCircuitBreaker: CircuitBreaker = CircuitBreakerFactory.create("BppRegistryClient")
+    val bppRegistryCircuitBreaker = CircuitBreakerFactory.create("BppRegistryClient")
     val retrofit = Retrofit.Builder()
       .baseUrl(bppRegistryServiceUrl)
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))

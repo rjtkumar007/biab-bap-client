@@ -21,12 +21,12 @@ allOpen {
 
 repositories {
   mavenCentral()
-  maven {
+  /*maven {
     url = uri("s3://beckn-maven-artifacts/releases")
     authentication {
       val awsIm by registering(AwsImAuthentication::class)
     }
-  }
+  }*/
   mavenLocal()
 }
 
@@ -51,10 +51,12 @@ dependencies {
   implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
   implementation("com.squareup.retrofit2:retrofit-mock:$retrofitVersion")
   implementation("org.mapstruct:mapstruct:1.4.2.Final")
-  implementation("org.beckn.jvm:beckn-protocol-dtos:0.9.1.15")
+  implementation("org.beckn.jvm:beckn-protocol-dtos:0.9.1.16")
   implementation("io.github.resilience4j:resilience4j-retrofit:$resilience4jVersion")
   implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
   implementation("io.github.resilience4j:resilience4j-circuitbreaker:$resilience4jVersion")
+  implementation("org.bouncycastle:bcprov-jdk15on:1.69")
+  implementation("commons-codec:commons-codec:1.15")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("io.kotest:kotest-runner-junit5:4.4.3")

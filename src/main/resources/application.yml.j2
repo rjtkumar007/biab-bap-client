@@ -41,6 +41,12 @@ context:
   country: IND
   bap_id: box.beckn.org
   bap_uri: https://qa.api.box.beckn.org/bap/protocol/v1
+  ttl_seconds: 20
+security:
+  self:
+    private_key: {{ private_key }}
+    unique_key_id: key1
+    public_key: {{ public_key }}
 database:
   mongo:
     url: mongodb://{{ mongo_host }}:{{ mongo_port }}
