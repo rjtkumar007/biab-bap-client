@@ -45,7 +45,7 @@ class MockGetOrderPolicyControllerSpec @Autowired constructor(
           ClientOrderPolicyResponse::class.java
         )
         getOrderPolicyResponse.message shouldBe ClientOrderPolicyResponseMessage(
-          cancellationPolicies = listOf(
+          cancellationReasons = listOf(
             ProtocolOption("1", cancellationPolicy()),
             ProtocolOption("2", returnPolicy()),
           )

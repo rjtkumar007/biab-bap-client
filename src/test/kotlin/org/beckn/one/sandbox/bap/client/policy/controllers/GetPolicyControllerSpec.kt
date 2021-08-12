@@ -109,7 +109,7 @@ class GetPolicyControllerSpec @Autowired constructor(
           getOrderPolicyResponseString,
           getOrderPolicyDto,
           ClientOrderPolicyResponseMessage(
-            cancellationPolicies = listOf(
+            cancellationReasons = listOf(
               ProtocolOption(
                 descriptor = ProtocolDescriptor(
                   name = "No Longer Required",
@@ -300,7 +300,7 @@ class GetPolicyControllerSpec @Autowired constructor(
             getPoliciesResponseString,
             getOrderPolicyDto,
             ClientOrderPolicyResponseMessage(
-              cancellationPolicies = listOf(
+              cancellationReasons = listOf(
                 ProtocolOption(
                   descriptor = ProtocolDescriptor(
                     name = "No Longer Required",
@@ -445,7 +445,7 @@ class GetPolicyControllerSpec @Autowired constructor(
                 id = ".retail.kiranaind.blr2@mandi.succinct.in.rating_categories"
               )
             ),
-            cancellationPolicies = listOf(
+            cancellationReasons = listOf(
               ProtocolOption(
                 descriptor = ProtocolDescriptor(
                   name = "No Longer Required",

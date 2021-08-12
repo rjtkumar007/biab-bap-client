@@ -40,7 +40,7 @@ class GetPolicyController @Autowired constructor(
         ResponseEntity.ok(
           ClientOrderPolicyResponse(
             context = context,
-            message = ClientOrderPolicyResponseMessage(cancellationPolicies = it)
+            message = ClientOrderPolicyResponseMessage(cancellationReasons = it)
           )
         )
       }
@@ -98,11 +98,11 @@ class GetPolicyController @Autowired constructor(
         log.info("Successfully got order policy from BPP. Message: {}", it)
         if (response.message != null && response.message!!.ratingCategories != null)
           response.message = ClientOrderPolicyResponseMessage(
-            cancellationPolicies = it,
+            cancellationReasons = it,
             ratingCategories = response.message!!.ratingCategories
           )
         else
-          response.message = ClientOrderPolicyResponseMessage(cancellationPolicies = it)
+          response.message = ClientOrderPolicyResponseMessage(cancellationReasons = it)
       }
     )
     if (response.message != null)

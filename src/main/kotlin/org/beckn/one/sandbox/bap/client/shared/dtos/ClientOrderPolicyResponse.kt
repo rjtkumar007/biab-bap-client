@@ -13,7 +13,7 @@ data class ClientOrderPolicyResponse @Default constructor(
 ) : ClientResponse
 
 data class ClientOrderPolicyResponseMessage @Default constructor(
-  val cancellationPolicies: List<ProtocolOption>? = null,
+  val cancellationReasons: List<ProtocolOption>? = null,
   val ratingCategories: List<ProtocolRatingCategory>? = null
 )
 

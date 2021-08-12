@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OnSupportController @Autowired constructor(
-    onPollService: GenericOnPollService<ProtocolOnSupport, ClientSupportResponse>,
-    contextFactory: ContextFactory,
-    val protocolClient: ProtocolClient
+  onPollService: GenericOnPollService<ProtocolOnSupport, ClientSupportResponse>,
+  contextFactory: ContextFactory,
+  val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnSupport, ClientSupportResponse>(onPollService, contextFactory) {
 
   @RequestMapping("/client/v1/on_support")
