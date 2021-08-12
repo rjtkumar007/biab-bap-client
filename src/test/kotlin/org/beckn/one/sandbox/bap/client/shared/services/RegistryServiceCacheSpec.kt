@@ -2,7 +2,7 @@ package org.beckn.one.sandbox.bap.client.shared.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.core.spec.style.DescribeSpec
@@ -13,6 +13,7 @@ import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cache.CacheManager
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 
@@ -20,6 +21,7 @@ import org.springframework.test.context.TestPropertySource
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 class RegistryServiceCacheSpec @Autowired constructor(
+  val cacheManager: CacheManager,
   val registryService: RegistryService,
   val objectMapper: ObjectMapper,
 ) : DescribeSpec() {
@@ -27,37 +29,45 @@ class RegistryServiceCacheSpec @Autowired constructor(
 
     describe("Lookup Gateways") {
       MockNetwork.startAllSubscribers()
+      val allGateways = listOf(
+        SubscriberDtoFactory.getDefault(1),
+        SubscriberDtoFactory.getDefault(2)
+      )
 
       beforeEach {
+        clearAllCaches()
         MockNetwork.resetAllSubscribers()
+        stubRegistryLookupApi(subscribers = allGateways, nextState = STARTED)
       }
 
       it("should cache gateway response") {
-        val allGateways = listOf(
-          SubscriberDtoFactory.getDefault(1),
-          SubscriberDtoFactory.getDefault(2)
-        )
-        stubRegistryLookupApi(subscribers = allGateways)
-
         val firstResponse = registryService.lookupGateways()
         val secondResponse = registryService.lookupGateways()
 
         firstResponse shouldBeRight allGateways
         firstResponse shouldBe secondResponse
-        MockNetwork.registry.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo("/lookup")))
+        MockNetwork.registry.verify(1, postRequestedFor(urlEqualTo("/lookup")))
+      }
+
+      it("should clear cache") {
+        val gatewaysResponseBeforeCacheClearing = registryService.lookupGateways()
+        registryService.clearGatewayCache()
+        val gatewaysResponseAfterCacheClearing = registryService.lookupGateways()
+
+        gatewaysResponseBeforeCacheClearing.isRight() shouldBe true
+        gatewaysResponseAfterCacheClearing.isRight() shouldBe true
+        MockNetwork.registry.verify(2, postRequestedFor(urlEqualTo("/lookup")))
       }
     }
 
     describe("Lookup BPP by Id") {
       MockNetwork.startAllSubscribers()
+      val bpp = MockNetwork.getRetailBengaluruBpp()
+      val anotherBpp = MockNetwork.getAnotherRetailBengaluruBpp()
       beforeEach {
+        clearAllCaches()
         MockNetwork.resetAllSubscribers()
         MockNetwork.registryBppLookupApi.resetAll()
-      }
-
-      it("should cache multiple bpp lookup responses by their id") {
-        val bpp = MockNetwork.getRetailBengaluruBpp()
-        val anotherBpp = MockNetwork.getAnotherRetailBengaluruBpp()
         stubRegistryLookupApi(
           MockNetwork.registryBppLookupApi,
           listOf(bpp),
@@ -70,7 +80,9 @@ class RegistryServiceCacheSpec @Autowired constructor(
           forState = "anotherBpp",
           nextState = "anotherBpp"
         )
+      }
 
+      it("should cache multiple bpp lookup responses by their id") {
         val bppFirstResponse = registryService.lookupBppById(bpp.subscriber_id)
         val bppSecondResponse = registryService.lookupBppById(bpp.subscriber_id)
         val anotherBppFirstResponse = registryService.lookupBppById(anotherBpp.subscriber_id)
@@ -81,9 +93,23 @@ class RegistryServiceCacheSpec @Autowired constructor(
         anotherBppFirstResponse shouldBeRight listOf(anotherBpp)
         anotherBppFirstResponse shouldBe anotherBppSecondResponse
 
-        MockNetwork.registryBppLookupApi.verify(2, WireMock.postRequestedFor(WireMock.urlEqualTo("/lookup")))
+        MockNetwork.registryBppLookupApi.verify(2, postRequestedFor(urlEqualTo("/lookup")))
+      }
+
+      it("should clear cache") {
+        val bppResponseBeforeCacheClearing = registryService.lookupBppById(bpp.subscriber_id)
+        registryService.clearBppsByIdCache()
+        val bppResponseAfterCacheClearing = registryService.lookupBppById(bpp.subscriber_id)
+
+        bppResponseBeforeCacheClearing.isRight() shouldBe true
+        bppResponseAfterCacheClearing.isRight() shouldBe true
+        MockNetwork.registryBppLookupApi.verify(2, postRequestedFor(urlEqualTo("/lookup")))
       }
     }
+  }
+
+  private fun clearAllCaches() {
+    cacheManager.cacheNames.forEach { cacheManager.getCache(it)?.clear() }
   }
 
   private fun stubRegistryLookupApi(
@@ -94,11 +120,11 @@ class RegistryServiceCacheSpec @Autowired constructor(
   ) {
     registry
       .stubFor(
-        WireMock.post("/lookup")
+        post("/lookup")
           .inScenario("Cache Scenario")
           .whenScenarioStateIs(forState)
           .willSetStateTo(nextState)
-          .willReturn(WireMock.okJson(objectMapper.toJson(subscribers)))
+          .willReturn(okJson(objectMapper.toJson(subscribers)))
       )
   }
 }

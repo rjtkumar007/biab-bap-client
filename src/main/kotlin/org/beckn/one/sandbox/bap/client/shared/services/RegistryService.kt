@@ -17,12 +17,19 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import retrofit2.Response
 
+object CacheName {
+  const val gateways = "gateways"
+  const val bppsById = "bppsById"
+}
+
 @Service
 class RegistryService(
+  @Autowired private val cacheManager: CacheManager,
   @Autowired private val registryServiceClient: RegistryClient,
   @Qualifier(BPP_REGISTRY_SERVICE_CLIENT) @Autowired private val bppRegistryServiceClient: RegistryClient,
   @Value("\${context.domain}") private val domain: String,
@@ -31,14 +38,24 @@ class RegistryService(
 ) {
   private val log: Logger = LoggerFactory.getLogger(RegistryService::class.java)
 
-  @Cacheable("lookupGateways")
+  @Cacheable(CacheName.gateways)
   fun lookupGateways(): Either<RegistryLookupError, List<SubscriberDto>> {
     return lookup(registryServiceClient, lookupRequest(subscriberType = Subscriber.Type.BG))
   }
 
-  @Cacheable("lookupBppById")
+  @Cacheable(CacheName.bppsById)
   fun lookupBppById(id: String): Either<RegistryLookupError, List<SubscriberDto>> {
     return lookup(bppRegistryServiceClient, lookupRequest(subscriberType = Subscriber.Type.BPP, subscriberId = id))
+  }
+
+  fun clearGatewayCache() {
+    log.info("Clearing Gateways Cache")
+    cacheManager.getCache(CacheName.gateways)?.clear()
+  }
+
+  fun clearBppsByIdCache() {
+    log.info("Clearing BPPs by ID Cache")
+    cacheManager.getCache(CacheName.bppsById)?.clear()
   }
 
   private fun lookup(

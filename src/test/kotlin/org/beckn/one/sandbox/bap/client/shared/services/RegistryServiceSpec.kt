@@ -14,6 +14,7 @@ import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.junit.jupiter.api.Assertions.fail
 import org.mockito.Mockito.*
+import org.springframework.cache.CacheManager
 import retrofit2.mock.Calls
 import java.io.IOException
 import java.time.Clock
@@ -22,15 +23,17 @@ import java.time.ZoneId
 
 internal class RegistryServiceSpec : DescribeSpec() {
   init {
+    val cacheManager = mock(CacheManager::class.java)
     val registryServiceClient = mock(RegistryClient::class.java)
     val bppRegistryServiceClient = mock(RegistryClient::class.java)
     val registryService =
       RegistryService(
+        cacheManager,
         registryServiceClient,
         bppRegistryServiceClient,
         Domain.LocalRetail.value,
         City.Bengaluru.value,
-        Country.India.value
+        Country.India.value,
       )
     val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
     val request = SubscriberLookupRequest(
