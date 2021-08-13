@@ -129,6 +129,23 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ApiResponse"
       parameters: [ ]
+  "/v1/get_support":
+    post:
+      summary: Get support
+      description: Get support from Beckn Provider
+      tags:
+        - Trigger APIs
+      operationId: get_support
+      requestBody:
+        "$ref": "#/components/requestBodies/SupportRequestDto"
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ApiResponse"
+      parameters: [ ]
   "/v1/on_search":
     get:
       summary: On Search
@@ -276,6 +293,27 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ClientCancelResponse"
+  "/v1/on_support":
+    get:
+      summary: On Support
+      description: Get order suppot response by message Id
+      tags:
+        - Response APIs
+      operationId: on_support
+      parameters:
+        - in: query
+          name: message_id
+          description: Message Id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClientSupportResponse"
 components:
   schemas:
     ClientContext:
@@ -476,6 +514,21 @@ components:
         order_id:
           type: string
         cancellation_reason_id:
+          type: string
+    SupportRequestDto:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/ClientContext"
+        message:
+          "$ref": "#/components/schemas/SupportRequestMessage"
+      required:
+        - context
+        - message
+    SupportRequestMessage:
+      type: object
+      properties:
+        ref_id:
           type: string
     ClientSearchResponse:
       type: object
@@ -698,6 +751,24 @@ components:
         order:
           type: object
           "$ref": "#/components/schemas/Order"
+    ClientSupportResponse:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/Context"
+        message:
+          "$ref": "#/components/schemas/OnSupportMessage"
+        error:
+          "$ref": "#/components/schemas/Error"
+    OnSupportMessage:
+      type: object
+      properties:
+        email:
+          type: string
+        phone:
+          type: string
+        url:
+          type: string
     Category:
       description: Describes a category
       type: object
@@ -1445,6 +1516,13 @@ components:
         application/json:
           schema:
             "$ref": "#/components/schemas/CancelOrderDto"
+      description: CancelOrderDto that specifies the order to be cancelled
+      required: true
+    SupportRequestDto:
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/SupportRequestDto"
       description: CancelOrderDto that specifies the order to be cancelled
       required: true
   securitySchemes: {}
