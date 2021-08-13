@@ -95,6 +95,23 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ApiResponse"
       parameters: [ ]
+  "/v1/order_status":
+    post:
+      summary: Order status
+      description: Get Order status from Beckn Provider
+      tags:
+        - Trigger APIs
+      operationId: order_status
+      requestBody:
+        "$ref": "#/components/requestBodies/OrderStatusDto"
+      responses:
+        '200':
+          description: Successfully submitted request for initializing order
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ApiResponse"
+      parameters: [ ]
   "/v1/on_search":
     get:
       summary: On Search
@@ -200,6 +217,27 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ClientTrackResponse"
+  "/v1/on_order_status":
+    get:
+      summary: On Order Shatus
+      description: Get order status response by message Id
+      tags:
+        - Response APIs
+      operationId: on_order_status
+      parameters:
+        - in: query
+          name: message_id
+          description: Message Id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClientOrderStatusResponse"
 components:
   schemas:
     ClientContext:
@@ -369,6 +407,21 @@ components:
       required:
         - context
         - message
+    OrderStatusDto:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/ClientContext"
+        message:
+          "$ref": "#/components/schemas/OrderStatusRequestMessage"
+      required:
+        - context
+        - message
+    OrderStatusRequestMessage:
+      type: object
+      properties:
+        order_id:
+          type: string
     ClientSearchResponse:
       type: object
       properties:
@@ -560,6 +613,21 @@ components:
             - Inactive
         url:
           type: string
+    ClientOrderStatusResponse:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/Context"
+        message:
+          "$ref": "#/components/schemas/OnOrderStatusMessage"
+        error:
+          "$ref": "#/components/schemas/Error"
+    OnOrderStatusMessage:
+      type: object
+      properties:
+        order:
+          type: object
+          "$ref": "#/components/schemas/Order"
     Category:
       description: Describes a category
       type: object
@@ -1294,6 +1362,13 @@ components:
           schema:
             "$ref": "#/components/schemas/TrackRequestDto"
       description: TrackRequestDto that specifies the order to be tracked
+      required: true
+    OrderStatusDto:
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/OrderStatusDto"
+      description: OrderStatusDto that specifies the order whose status is required
       required: true
   securitySchemes: {}
   links: {}
