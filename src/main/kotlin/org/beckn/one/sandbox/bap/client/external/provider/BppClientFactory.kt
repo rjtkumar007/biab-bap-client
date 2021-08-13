@@ -43,7 +43,7 @@ class BppClientFactory @Autowired constructor(
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(retry))
       .addCallAdapterFactory(CircuitBreakerCallAdapter.of(circuitBreaker))
-    val retrofit = if(enableSecurity) retrofitBuilder.client(okHttpClient).build() else retrofitBuilder.build()
+    val retrofit = if (enableSecurity) retrofitBuilder.client(okHttpClient).build() else retrofitBuilder.build()
     return retrofit.create(BppClient::class.java)
   }
 }
