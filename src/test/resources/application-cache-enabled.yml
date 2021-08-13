@@ -12,4 +12,4 @@ security:
     unique_key_id: key1
 spring:
   cache:
-    type: NONE
+    type: simple

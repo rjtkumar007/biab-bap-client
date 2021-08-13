@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 
 @SpringBootTest
-@ActiveProfiles(value = ["test"])
+@ActiveProfiles(value = ["cached-enabled"])
 @TestPropertySource(locations = ["/application-test.yml"])
 class BppClientFactorySpec @Autowired constructor(
   private val bppClientFactory: BppClientFactory

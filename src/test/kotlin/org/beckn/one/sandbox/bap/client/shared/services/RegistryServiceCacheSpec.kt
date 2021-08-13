@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 
 @SpringBootTest
-@ActiveProfiles(value = ["test"])
+@ActiveProfiles(value = ["cache-enabled"])
 @TestPropertySource(locations = ["/application-test.yml"])
 class RegistryServiceCacheSpec @Autowired constructor(
   val cacheManager: CacheManager,
