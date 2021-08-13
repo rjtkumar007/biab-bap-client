@@ -78,6 +78,23 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ApiResponse"
       parameters: [ ]
+  "/v1/track":
+    post:
+      summary: Track Order
+      description: Track Order with Beckn Provider
+      tags:
+        - Trigger APIs
+      operationId: track
+      requestBody:
+        "$ref": "#/components/requestBodies/TrackRequestDto"
+      responses:
+        '200':
+          description: Successfully submitted request for initializing order
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ApiResponse"
+      parameters: [ ]
   "/v1/on_search":
     get:
       summary: On Search
@@ -162,6 +179,27 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ClientConfirmResponse"
+  "/v1/on_track":
+    get:
+      summary: On Track
+      description: Get Track order response by message Id
+      tags:
+        - Response APIs
+      operationId: on_track
+      parameters:
+        - in: query
+          name: message_id
+          description: Message Id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClientTrackResponse"
 components:
   schemas:
     ClientContext:
@@ -311,6 +349,26 @@ components:
           $ref: '#/components/schemas/Location'
         type:
           type: string
+    TrackRequestDto:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/ClientContext"
+        message:
+          "$ref": "#/components/schemas/TrackRequestMessage"
+      required:
+        - context
+        - message
+    TrackRequestMessage:
+      type: object
+      properties:
+        callback_url:
+          type: string
+        order_id:
+          type: string
+      required:
+        - context
+        - message
     ClientSearchResponse:
       type: object
       properties:
@@ -477,6 +535,31 @@ components:
         order:
           type: object
           "$ref": "#/components/schemas/Order"
+    ClientTrackResponse:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/Context"
+        message:
+          "$ref": "#/components/schemas/OnTrackMessage"
+        error:
+          "$ref": "#/components/schemas/Error"
+    OnTrackMessage:
+      type: object
+      properties:
+        tracking:
+          type: object
+          "$ref": "#/components/schemas/OnTrackMessageTracking"
+    OnTrackMessageTracking:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+        url:
+          type: string
     Category:
       description: Describes a category
       type: object
@@ -1204,6 +1287,13 @@ components:
           schema:
             "$ref": "#/components/schemas/OrderRequestDto"
       description: OrderRequestDto that specifies the order to be initialized
+      required: true
+    TrackRequestDto:
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/TrackRequestDto"
+      description: TrackRequestDto that specifies the order to be tracked
       required: true
   securitySchemes: {}
   links: {}
