@@ -19,6 +19,10 @@ registry_service:
     interval_multiplier: 1.0
   cache:
     expiry_cron_schedule: "0 */5 * * * *"
+  timeouts:
+    connection_in_seconds: 10
+    read_in_seconds: 10
+    write_in_seconds: 10
 bpp_registry_service:
   url: https://demo4460370.mockable.io/bpp_registry/
 gateway_service:

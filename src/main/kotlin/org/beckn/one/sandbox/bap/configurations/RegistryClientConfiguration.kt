@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
+import java.util.concurrent.TimeUnit
 
 
 @Configuration
@@ -31,6 +32,9 @@ class RegistryClientConfiguration(
   @Autowired @Value("\${bpp_registry_service.url}")
   private val bppRegistryServiceUrl: String,
   @Value("\${beckn.security.enabled}") private val enableSecurity: Boolean,
+  @Value("\${registry_service.timeouts.connection_in_seconds}") private val connectionTimeoutInSeconds: Long,
+  @Value("\${registry_service.timeouts.read_in_seconds}") private val readTimeoutInSeconds: Long,
+  @Value("\${registry_service.timeouts.write_in_seconds}") private val writeTimeoutInSeconds: Long,
   @Autowired
   private val objectMapper: ObjectMapper,
   @Autowired
@@ -40,40 +44,47 @@ class RegistryClientConfiguration(
   @Bean
   @Primary
   fun registryServiceClient(): RegistryClient {
-    val retry: Retry = RetryFactory.create(
-      "RegistryClient",
-      maxAttempts,
-      initialIntervalInMillis,
-      intervalMultiplier
-    )
-    val okHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
-    val registryCircuitBreaker = CircuitBreakerFactory.create("RegistryClient")
-    val retrofitBuilder = Retrofit.Builder()
+    val retrofit = Retrofit.Builder()
       .baseUrl(registryServiceUrl)
+      .client(buildHttpClient())
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
-      .addCallAdapterFactory(RetryCallAdapter.of(retry))
-      .addCallAdapterFactory(CircuitBreakerCallAdapter.of(registryCircuitBreaker))
-    val retrofit = if(enableSecurity) retrofitBuilder.client(okHttpClient).build() else retrofitBuilder.build()
+      .addCallAdapterFactory(RetryCallAdapter.of(getRetryConfig("RegistryClient")))
+      .addCallAdapterFactory(CircuitBreakerCallAdapter.of(CircuitBreakerFactory.create("RegistryClient")))
+      .build()
     return retrofit.create(RegistryClient::class.java)
   }
 
   @Bean(BPP_REGISTRY_SERVICE_CLIENT)
   fun bppRegistryServiceClient(): RegistryClient {
-    val retry: Retry = RetryFactory.create(
-      "BppRegistryClient",
+    val retrofit = Retrofit.Builder()
+      .baseUrl(bppRegistryServiceUrl)
+      .client(buildHttpClient())
+      .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+      .addCallAdapterFactory(RetryCallAdapter.of(getRetryConfig("BppRegistryClient")))
+      .addCallAdapterFactory(CircuitBreakerCallAdapter.of(CircuitBreakerFactory.create("BppRegistryClient")))
+      .build()
+
+    return retrofit.create(RegistryClient::class.java)
+  }
+
+  private fun buildHttpClient(): OkHttpClient {
+    val httpClientBuilder = OkHttpClient.Builder()
+      .connectTimeout(connectionTimeoutInSeconds, TimeUnit.SECONDS)
+      .readTimeout(readTimeoutInSeconds, TimeUnit.SECONDS)
+      .writeTimeout(writeTimeoutInSeconds, TimeUnit.SECONDS)
+    if (enableSecurity) {
+      httpClientBuilder.addInterceptor(interceptor)
+    }
+    return httpClientBuilder.build()
+  }
+
+  private fun getRetryConfig(name: String): Retry {
+    return RetryFactory.create(
+      name,
       maxAttempts,
       initialIntervalInMillis,
       intervalMultiplier
     )
-    val bppRegistryCircuitBreaker = CircuitBreakerFactory.create("BppRegistryClient")
-    val retrofit = Retrofit.Builder()
-      .baseUrl(bppRegistryServiceUrl)
-      .addConverterFactory(JacksonConverterFactory.create(objectMapper))
-      .addCallAdapterFactory(RetryCallAdapter.of(retry))
-      .addCallAdapterFactory(CircuitBreakerCallAdapter.of(bppRegistryCircuitBreaker))
-      .build()
-
-    return retrofit.create(RegistryClient::class.java)
   }
 
   companion object {
