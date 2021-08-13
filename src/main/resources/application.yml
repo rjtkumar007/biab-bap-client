@@ -17,13 +17,15 @@ registry_service:
     max_attempts: 3
     initial_interval_in_millis: 1000
     interval_multiplier: 1.0
+  cache:
+    expiry_cron_schedule: "0 */5 * * * *"
+bpp_registry_service:
+  url: https://demo4460370.mockable.io/bpp_registry/
 gateway_service:
   retry:
     max_attempts: 3
     initial_interval_in_millis: 1000
     interval_multiplier: 1.0
-bpp_registry_service:
-  url: https://demo4460370.mockable.io/bpp_registry/
 bpp_service:
   retry:
     max_attempts: 3

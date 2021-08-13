@@ -17,6 +17,8 @@ registry_service:
     max_attempts: 3
     initial_interval_in_millis: 1000
     interval_multiplier: 1.0
+  cache:
+    expiry_cron_schedule: : "0 */5 * * * *"
 gateway_service:
   retry:
     max_attempts: 3

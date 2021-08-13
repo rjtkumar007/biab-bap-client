@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import retrofit2.Response
 
@@ -48,11 +49,13 @@ class RegistryService(
     return lookup(bppRegistryServiceClient, lookupRequest(subscriberType = Subscriber.Type.BPP, subscriberId = id))
   }
 
+  @Scheduled(cron = "\${registry_service.cache.expiry_cron_schedule}")
   fun clearGatewayCache() {
     log.info("Clearing Gateways Cache")
     cacheManager.getCache(CacheName.gateways)?.clear()
   }
 
+  @Scheduled(cron = "\${registry_service.cache.expiry_cron_schedule}")
   fun clearBppsByIdCache() {
     log.info("Clearing BPPs by ID Cache")
     cacheManager.getCache(CacheName.bppsById)?.clear()
