@@ -44,6 +44,23 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ApiResponse"
       parameters: []
+  "/v1/initialize_order":
+    post:
+      summary: Initialize Order
+      description: Initialize Order with Beckn Provider
+      tags:
+        - Trigger APIs
+      operationId: initialize_order
+      requestBody:
+        "$ref": "#/components/requestBodies/OrderRequestDto"
+      responses:
+        '200':
+          description: Successfully submitted request for initializing order
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ApiResponse"
+      parameters: [ ]
   "/v1/on_search":
     get:
       summary: On Search
@@ -81,11 +98,32 @@ paths:
             type: string
       responses:
         '200':
-          description: Successfully initiated search
+          description: Successfully
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ClientQuoteResponse"
+  "/v1/on_initialize_order":
+    get:
+      summary: On Initialize Order
+      description: Get Initialize order response by message Id
+      tags:
+        - Response APIs
+      operationId: on_initialize_order
+      parameters:
+        - in: query
+          name: message_id
+          description: Message Id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClientInitResponse"
 components:
   schemas:
     ClientContext:
@@ -107,6 +145,17 @@ components:
       properties:
         criteria:
           "$ref": "#/components/schemas/SearchCriteria"
+    SearchCriteria:
+      type: object
+      properties:
+        search_string:
+          type: string
+        delivery_location:
+          type: string
+        provider_id:
+          type: string
+        category_id:
+          type: string
     GetQuoteRequestDto:
       type: object
       properties:
@@ -124,17 +173,6 @@ components:
           "$ref": "#/components/schemas/CartDto"
       required:
         - cart
-    SearchCriteria:
-      type: object
-      properties:
-        search_string:
-          type: string
-        delivery_location:
-          type: string
-        provider_id:
-          type: string
-        category_id:
-          type: string
     CartDto:
       type: object
       properties:
@@ -178,6 +216,63 @@ components:
             type: string
       required:
         - id
+    OrderRequestDto:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/ClientContext"
+        message:
+          "$ref": "#/components/schemas/OrderDto"
+      required:
+        - context
+        - message
+    OrderDto:
+      type: object
+      properties:
+        id:
+          type: string
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/OrderItemDto"
+        delivery_info:
+          type: object
+          $ref: '#/components/schemas/DeliveryDto'
+        billing_info:
+          type: object
+          $ref: '#/components/schemas/Billing'
+        payment:
+          type: object
+          $ref: '#/components/schemas/Payment'
+    OrderItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+        quantity:
+          "$ref": "#/components/schemas/CartSelectedItemQuantity"
+        bpp_id:
+          type: string
+        provider:
+          "$ref": "#/components/schemas/CartItemProviderDto"
+      required:
+        - id
+        - quantity
+        - bpp_id
+        - provider
+    DeliveryDto:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        type:
+          type: string
     ClientSearchResponse:
       type: object
       properties:
@@ -272,6 +367,64 @@ components:
           $ref: '#/components/schemas/Tags'
         time:
           $ref: '#/components/schemas/Time'
+    ClientInitResponse:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/Context"
+        message:
+          "$ref": "#/components/schemas/OnInitMessage"
+        error:
+          "$ref": "#/components/schemas/Error"
+    OnInitMessage:
+      type: object
+      properties:
+        initialized:
+          type: object
+          "$ref": "#/components/schemas/OnInitMessageInitialized"
+    OnInitMessageInitialized:
+      type: object
+      properties:
+        add_ons:
+          type: array
+          items:
+            $ref: "#/components/schemas/AddOn"
+        billing:
+          $ref: "#/components/schemas/Billing"
+        fulfillment:
+          $ref: "#/components/schemas/Fulfillment"
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/Item/properties/id'
+              quantity:
+                $ref: '#/components/schemas/ItemQuantity/properties/selected'
+        offers:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/Offer/properties/id'
+        quote:
+          $ref: '#/components/schemas/Quotation'
+        payment:
+          $ref: '#/components/schemas/Payment'
+        provider:
+          $ref: '#/components/schemas/Provider'
+        provider_location:
+          $ref: '#/components/schemas/Location/properties/id'
+    OnInitMessageInitializedItems:
+      type: object
+      properties:
+        id:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/OnInitMessageInitializedItems'
+
     Category:
       description: Describes a category
       type: object
@@ -403,6 +556,156 @@ components:
         area_code:
           type: string
           description: Area code. This can be Pincode, ZIP code or any equivalent
+    Billing:
+      description: Describes a billing event
+      type: object
+      properties:
+        name:
+          description: Personal details of the customer needed for billing.
+          type: string
+        organization:
+          $ref: '#/components/schemas/Organization'
+        address:
+          $ref: '#/components/schemas/Address'
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        time:
+          $ref: '#/components/schemas/Time'
+        tax_number:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - name
+        - phone
+    Organization:
+      description: Describes an organization
+      type: object
+      properties:
+        name:
+          type: string
+        cred:
+          type: string
+    Fulfillment:
+      description: Describes how a single product/service will be rendered/fulfilled to the end customer
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique reference ID to the fulfillment of an order
+        type:
+          type: string
+          description: This describes the type of fulfillment
+        state:
+          $ref: '#/components/schemas/State'
+        tracking:
+          type: boolean
+          description: Indicates whether the fulfillment allows tracking
+          default: false
+        customer:
+          type: object
+          properties:
+            person:
+              $ref: '#/components/schemas/Person'
+            contact:
+              $ref: '#/components/schemas/Contact'
+        agent:
+          $ref: '#/components/schemas/Person'
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+        start:
+          description: Details on the start of fulfillment
+          type: object
+          properties:
+            location:
+              $ref: '#/components/schemas/Location'
+            time:
+              $ref: '#/components/schemas/Time'
+            instructions:
+              $ref: '#/components/schemas/Descriptor'
+            contact:
+              $ref: '#/components/schemas/Contact'
+            person:
+              $ref: '#/components/schemas/Person'
+        end:
+          description: Details on the end of fulfillment
+          type: object
+          properties:
+            location:
+              $ref: '#/components/schemas/Location'
+            time:
+              $ref: '#/components/schemas/Time'
+            instructions:
+              $ref: '#/components/schemas/Descriptor'
+            contact:
+              $ref: '#/components/schemas/Contact'
+            person:
+              $ref: '#/components/schemas/Person'
+        tags:
+          $ref: '#/components/schemas/Tags'
+    Vehicle:
+      description: Describes the properties of a vehicle used in a mobility service
+      type: object
+      properties:
+        category:
+          type: string
+        capacity:
+          type: integer
+        make:
+          type: string
+        model:
+          type: string
+        size:
+          type: string
+        variant:
+          type: string
+        color:
+          type: string
+        energy_type:
+          type: string
+        registration:
+          type: string
+    State:
+      description: Describes a state
+      type: object
+      properties:
+        descriptor:
+          $ref: '#/components/schemas/Descriptor'
+        updated_at:
+          type: string
+          format: date-time
+        updated_by:
+          type: string
+          description: ID of entity which changed the state
+    Person:
+      description: Describes a person. Extension not allowed
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/Name'
+        image:
+          $ref: '#/components/schemas/Image'
+        dob:
+          type: string
+          format: date
+        gender:
+          type: string
+          description: 'Gender of something, typically a Person, but possibly also fictional characters, animals, etc. While Male and Female may be used, text strings are also acceptable for people who do not identify as a binary gender'
+        cred:
+          type: string
+        tags:
+          $ref: '#/components/schemas/Tags'
+    Name:
+      type: string
+      description: 'Describes the name of a person in format: ./{given_name}/{honorific_prefix}/{first_name}/{middle_name}/{last_name}/{honorific_suffix}'
+      pattern: '^\./[^/]+/[^/]*/[^/]*/[^/]*/[^/]*/[^/]*$'
     AddOn:
       type: object
       properties:
@@ -422,6 +725,15 @@ components:
         code:
           type: string
           description: City code
+    Contact:
+      type: object
+      properties:
+        phone:
+          type: string
+        email:
+          type: string
+        tags:
+          $ref: '#/components/schemas/Tags'
     Country:
       description: Describes a country.
       type: object
@@ -457,6 +769,49 @@ components:
         <br/><br/>```uri:http://path/to/image``` <br/><br/> An image can also be sent
         as a data string. For example : <br/><br/> ```data:js87y34ilhriuho84r3i4```'
       type: string
+    Payment:
+      description: Describes a payment
+      type: object
+      properties:
+        uri:
+          type: string
+          description: 'A payment uri to be called by the BAP. If empty, then the payment is to be done offline. The details of payment should be present in the params object. If ```tl_method``` = http/get, then the payment details will be sent as url params. Two url param values, ```$transaction_id``` and ```$amount``` are mandatory. And example url would be : https://www.example.com/pay?txid=$transaction_id&amount=$amount&vpa=upiid&payee=shopez&billno=1234'
+          format: uri
+        tl_method:
+          type: string
+          enum:
+            - http/get
+            - http/post
+        params:
+          type: object
+          properties:
+            transaction_id:
+              type: string
+              description: This value will be placed in the the $transaction_id url param in case of http/get and in the requestBody http/post requests
+            transaction_status:
+              type: string
+            amount:
+              $ref: '#/components/schemas/Price/properties/value'
+            currency:
+              $ref: '#/components/schemas/Price/properties/currency'
+          additionalProperties:
+            type: string
+          required:
+            - currency
+        type:
+          type: string
+          enum:
+            - ON-ORDER
+            - PRE-FULFILLMENT
+            - ON-FULFILLMENT
+            - POST-FULFILLMENT
+        status:
+          type: string
+          enum:
+            - PAID
+            - NOT-PATD
+        time:
+          $ref: '#/components/schemas/Time'
     Time:
       description: Describes time in its various forms. It can be a single point in
         time; duration; or a structured timetable of operations
@@ -728,6 +1083,13 @@ components:
           schema:
             "$ref": "#/components/schemas/GetQuoteRequestDto"
       description: GetQuoteRequestDto that specifies the cart for which quote is required
+      required: true
+    OrderRequestDto:
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/OrderRequestDto"
+      description: OrderRequestDto that specifies the order to be initialized
       required: true
   securitySchemes: {}
   links: {}
