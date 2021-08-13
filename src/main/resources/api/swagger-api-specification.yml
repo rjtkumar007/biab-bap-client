@@ -146,6 +146,23 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ApiResponse"
       parameters: [ ]
+  "/v1/rating":
+    post:
+      summary: Get rating
+      description: Get rating for Beckn Provider
+      tags:
+        - Trigger APIs
+      operationId: rating
+      requestBody:
+        "$ref": "#/components/requestBodies/RatingRequestDto"
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ApiResponse"
+      parameters: [ ]
   "/v1/on_search":
     get:
       summary: On Search
@@ -314,6 +331,27 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ClientSupportResponse"
+  "/v1/on_rating":
+    get:
+      summary: On Rating
+      description: Get order Rating response by message Id
+      tags:
+        - Response APIs
+      operationId: on_rating
+      parameters:
+        - in: query
+          name: message_id
+          description: Message Id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClientRatingResponse"
 components:
   schemas:
     ClientContext:
@@ -530,6 +568,23 @@ components:
       properties:
         ref_id:
           type: string
+    RatingRequestDto:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/ClientContext"
+        message:
+          "$ref": "#/components/schemas/RatingRequestMessage"
+      required:
+        - context
+        - message
+    RatingRequestMessage:
+      type: object
+      properties:
+        ref_id:
+          type: string
+        value:
+          type: integer
     ClientSearchResponse:
       type: object
       properties:
@@ -768,6 +823,29 @@ components:
         phone:
           type: string
         url:
+          type: string
+    ClientRatingResponse:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/Context"
+        message:
+          "$ref": "#/components/schemas/ClientRatingResponseMessage"
+        error:
+          "$ref": "#/components/schemas/Error"
+    ClientRatingResponseMessage:
+      type: object
+      properties:
+        feedback:
+          $ref: '#/components/schemas/OnRatingMessageFeedback'
+    OnRatingMessageFeedback:
+      type: object
+      properties:
+        descriptor:
+          type: string
+        id:
+          type: string
+        parent_id:
           type: string
     Category:
       description: Describes a category
@@ -1524,6 +1602,13 @@ components:
           schema:
             "$ref": "#/components/schemas/SupportRequestDto"
       description: CancelOrderDto that specifies the order to be cancelled
+      required: true
+    RatingRequestDto:
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/RatingRequestDto"
+      description: RatingOrderDto that specifies the rating
       required: true
   securitySchemes: {}
   links: {}
