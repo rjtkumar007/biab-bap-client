@@ -27,6 +27,23 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ApiResponse"
       parameters: []
+  "/v1/get_quote":
+    post:
+      summary: Get Quote
+      description: Get Quote from BEckn Provider
+      tags:
+        - Trigger APIs
+      operationId: get_quote
+      requestBody:
+        "$ref": "#/components/requestBodies/GetQuoteRequestDto"
+      responses:
+        '200':
+          description: Successfully submitted request for quote
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ApiResponse"
+      parameters: []
   "/v1/on_search":
     get:
       summary: On Search
@@ -39,6 +56,8 @@ paths:
           name: message_id
           description: Message Id
           required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Successfully initiated search
@@ -46,6 +65,27 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ClientSearchResponse"
+  "/v1/on_get_quote":
+    get:
+      summary: On Get Quote
+      description: Get quote response by message Id
+      tags:
+        - Response APIs
+      operationId: on_get_quote
+      parameters:
+        - in: query
+          name: message_id
+          description: Message Id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully initiated search
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClientQuoteResponse"
 components:
   schemas:
     ClientContext:
@@ -67,6 +107,23 @@ components:
       properties:
         criteria:
           "$ref": "#/components/schemas/SearchCriteria"
+    GetQuoteRequestDto:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/ClientContext"
+        message:
+          "$ref": "#/components/schemas/GetQuoteRequestMessageDto"
+      required:
+        - context
+        - message
+    GetQuoteRequestMessageDto:
+      type: object
+      properties:
+        cart:
+          "$ref": "#/components/schemas/CartDto"
+      required:
+        - cart
     SearchCriteria:
       type: object
       properties:
@@ -78,6 +135,49 @@ components:
           type: string
         category_id:
           type: string
+    CartDto:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            "$ref": "#/components/schemas/CartItemDto"
+    CartItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+        quantity:
+          "$ref": "#/components/schemas/CartSelectedItemQuantity"
+        bpp_id:
+          type: string
+        provider:
+          "$ref": "#/components/schemas/CartItemProviderDto"
+        quote:
+          "$ref": "#/components/schemas/Quotation"
+      required:
+        - id
+        - quantity
+        - bpp_id
+        - provider
+    CartSelectedItemQuantity:
+      type: object
+      properties:
+        count:
+          type: integer
+        measure:
+          "$ref": "#/components/schemas/Scalar"
+    CartItemProviderDto:
+      type: object
+      properties:
+        id:
+          type: string
+        locations:
+          type: array
+          items:
+            type: string
+      required:
+        - id
     ClientSearchResponse:
       type: object
       properties:
@@ -115,6 +215,63 @@ components:
         bpp_id:
           type: string
           description: ID of the BPP
+    ClientQuoteResponse:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/Context"
+        message:
+          "$ref": "#/components/schemas/ClientQuoteResponseMessage"
+        error:
+          "$ref": "#/components/schemas/Error"
+    ClientQuoteResponseMessage:
+      type: object
+      properties:
+        quote:
+          type: object
+          "$ref": "#/components/schemas/OnSelectMessageSelected"
+    OnSelectMessageSelected:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OnSelectedItem'
+        add_ons:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddOn'
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Offer'
+        quote:
+          $ref: '#/components/schemas/Quotation'
+        provider:
+          $ref: '#/components/schemas/Provider'
+        provider_location:
+          $ref: '#/components/schemas/Location'
+    OnSelectedItem:
+      type: object
+      properties:
+        category_id:
+          type: string
+        descriptor:
+          $ref: '#/components/schemas/Descriptor'
+        id:
+          type: string
+        location_id:
+          type: string
+        parent_item_id:
+          type: string
+        price:
+          $ref: '#/components/schemas/Price'
+        quantity:
+          $ref: '#/components/schemas/ItemQuantity'
+        tags:
+          $ref: '#/components/schemas/Tags'
+        time:
+          $ref: '#/components/schemas/Time'
     Category:
       description: Describes a category
       type: object
@@ -246,6 +403,15 @@ components:
         area_code:
           type: string
           description: Area code. This can be Pincode, ZIP code or any equivalent
+    AddOn:
+      type: object
+      properties:
+        descriptor:
+          $ref: '#/components/schemas/Descriptor'
+        id:
+          type: string
+        price:
+          $ref: '#/components/schemas/Price'
     City:
       description: Describes a city
       type: object
@@ -375,6 +541,50 @@ components:
           type: boolean
         tags:
           "$ref": "#/components/schemas/Tags"
+    ItemQuantity:
+      description: Describes count or amount of an item
+      type: object
+      properties:
+        allocated:
+          type: object
+          properties:
+            count:
+              type: integer
+              minimum: 0
+            measure:
+              $ref: '#/components/schemas/Scalar'
+        available:
+          type: object
+          properties:
+            count:
+              type: integer
+              minimum: 0
+            measure:
+              $ref: '#/components/schemas/Scalar'
+        maximum:
+          type: object
+          properties:
+            count:
+              type: integer
+              minimum: 1
+            measure:
+              $ref: '#/components/schemas/Scalar'
+        minimum:
+          type: object
+          properties:
+            count:
+              type: integer
+              minimum: 0
+            measure:
+              $ref: '#/components/schemas/Scalar'
+        selected:
+          type: object
+          properties:
+            count:
+              type: integer
+              minimum: 0
+            measure:
+              $ref: '#/components/schemas/Scalar'
     Price:
       description: Describes the price of an item. Allows for domain extension.
       type: object
@@ -395,6 +605,28 @@ components:
           "$ref": "#/components/schemas/DecimalValue"
         maximum_value:
           "$ref": "#/components/schemas/DecimalValue"
+    Offer:
+      description: Describes an offer
+      type: object
+      properties:
+        id:
+          type: string
+        descriptor:
+          $ref: '#/components/schemas/Descriptor'
+        location_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Location/properties/id'
+        category_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category/properties/id'
+        item_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item/properties/id'
+        time:
+          $ref: '#/components/schemas/Time'
     DecimalValue:
       description: Describes a decimal value
       type: string
@@ -456,6 +688,32 @@ components:
       enum:
         - ACK
         - NACK
+    Quotation:
+      description: Describes a quote
+      type: object
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        breakup:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              price:
+                $ref: '#/components/schemas/Price'
+              refId:
+                type: string
+              type:
+                type: string
+                enum:
+                  - ITEM
+                  - OFFER
+                  - ADDON
+                  - FULFILLMENT
+        ttl:
+          $ref: '#/components/schemas/Duration'
   requestBodies:
     SearchRequestDto:
       content:
@@ -463,6 +721,13 @@ components:
           schema:
             "$ref": "#/components/schemas/SearchRequestDto"
       description: SearchRequestDto that specifies the search criteria
+      required: true
+    GetQuoteRequestDto:
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/GetQuoteRequestDto"
+      description: GetQuoteRequestDto that specifies the cart for which quote is required
       required: true
   securitySchemes: {}
   links: {}
