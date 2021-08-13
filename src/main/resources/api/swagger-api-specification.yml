@@ -61,6 +61,23 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ApiResponse"
       parameters: [ ]
+  "/v1/confirm_order":
+    post:
+      summary: Initialize Order
+      description: Initialize Order with Beckn Provider
+      tags:
+        - Trigger APIs
+      operationId: initialize_order
+      requestBody:
+        "$ref": "#/components/requestBodies/OrderRequestDto"
+      responses:
+        '200':
+          description: Successfully submitted request for initializing order
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ApiResponse"
+      parameters: [ ]
   "/v1/on_search":
     get:
       summary: On Search
@@ -124,6 +141,27 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ClientInitResponse"
+  "/v1/on_confirm_order":
+    get:
+      summary: On Confirm Order
+      description: Get Confirm order response by message Id
+      tags:
+        - Response APIs
+      operationId: on_confirm_order
+      parameters:
+        - in: query
+          name: message_id
+          description: Message Id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClientConfirmResponse"
 components:
   schemas:
     ClientContext:
@@ -424,7 +462,21 @@ components:
           type: string
         quantity:
           $ref: '#/components/schemas/OnInitMessageInitializedItems'
-
+    ClientConfirmResponse:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/Context"
+        message:
+          "$ref": "#/components/schemas/OnConfirmMessage"
+        error:
+          "$ref": "#/components/schemas/Error"
+    OnConfirmMessage:
+      type: object
+      properties:
+        order:
+          type: object
+          "$ref": "#/components/schemas/Order"
     Category:
       description: Describes a category
       type: object
@@ -442,6 +494,68 @@ components:
           format: date-time
         tags:
           "$ref": "#/components/schemas/Tags"
+    Order:
+      description: Describes the details of an order
+      type: object
+      properties:
+        id:
+          type: string
+          description: Hash of order object without id
+        state:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/Item/properties/id'
+              quantity:
+                $ref: '#/components/schemas/ItemQuantity/properties/selected'
+            required:
+              - id
+              - quantity
+        add_ons:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/AddOn/properties/id'
+            required:
+              - id
+        offers:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/Offer/properties/id'
+            required:
+              - id
+        billing:
+          $ref: '#/components/schemas/Billing'
+        fulfillment:
+          $ref: '#/components/schemas/Fulfillment'
+        quote:
+          $ref: '#/components/schemas/Quotation'
+        payment:
+          $ref: '#/components/schemas/Payment'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - provider
+        - items
+        - add_ons
+        - offers
+        - billing
+        - fulfillment
+        - quote
+        - payment
     Descriptor:
       description: Describes the description of a real-world object
       type: object
