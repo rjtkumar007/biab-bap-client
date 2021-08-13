@@ -112,6 +112,23 @@ paths:
               schema:
                 "$ref": "#/components/schemas/ApiResponse"
       parameters: [ ]
+  "/v1/cancel_order":
+    post:
+      summary: Cancel Order
+      description: Cancel Order with Beckn Provider
+      tags:
+        - Trigger APIs
+      operationId: cancel_order
+      requestBody:
+        "$ref": "#/components/requestBodies/CancelOrderDto"
+      responses:
+        '200':
+          description: Successfully submitted request for cancel order
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ApiResponse"
+      parameters: [ ]
   "/v1/on_search":
     get:
       summary: On Search
@@ -238,6 +255,27 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ClientOrderStatusResponse"
+  "/v1/on_cancel_order":
+    get:
+      summary: On cancel Order
+      description: Get cancel order response by message Id
+      tags:
+        - Response APIs
+      operationId: on_cancel_order
+      parameters:
+        - in: query
+          name: message_id
+          description: Message Id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfull
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ClientCancelResponse"
 components:
   schemas:
     ClientContext:
@@ -421,6 +459,23 @@ components:
       type: object
       properties:
         order_id:
+          type: string
+    CancelOrderDto:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/ClientContext"
+        message:
+          "$ref": "#/components/schemas/CancelOrderRequestMessage"
+      required:
+        - context
+        - message
+    CancelOrderRequestMessage:
+      type: object
+      properties:
+        order_id:
+          type: string
+        cancellation_reason_id:
           type: string
     ClientSearchResponse:
       type: object
@@ -623,6 +678,21 @@ components:
         error:
           "$ref": "#/components/schemas/Error"
     OnOrderStatusMessage:
+      type: object
+      properties:
+        order:
+          type: object
+          "$ref": "#/components/schemas/Order"
+    ClientCancelResponse:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/Context"
+        message:
+          "$ref": "#/components/schemas/OnCancelMessage"
+        error:
+          "$ref": "#/components/schemas/Error"
+    OnCancelMessage:
       type: object
       properties:
         order:
@@ -1369,6 +1439,13 @@ components:
           schema:
             "$ref": "#/components/schemas/OrderStatusDto"
       description: OrderStatusDto that specifies the order whose status is required
+      required: true
+    CancelOrderDto:
+      content:
+        application/json:
+          schema:
+            "$ref": "#/components/schemas/CancelOrderDto"
+      description: CancelOrderDto that specifies the order to be cancelled
       required: true
   securitySchemes: {}
   links: {}
