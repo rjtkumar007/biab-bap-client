@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.user.model
+package org.beckn.one.sandbox.bap.client.user.model
 
 import java.io.Serializable
 

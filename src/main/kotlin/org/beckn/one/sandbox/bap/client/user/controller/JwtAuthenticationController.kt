@@ -1,4 +1,4 @@
-package org.beckn.one.sandbox.bap.user.controller
+package org.beckn.one.sandbox.bap.client.user.controller
 
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -6,9 +6,9 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.beckn.one.sandbox.bap.auth.utils.JwtTokenUtil
 import org.beckn.one.sandbox.bap.auth.JwtUserDetailsService
 import kotlin.Throws
-import org.beckn.one.sandbox.bap.user.model.JwtRequest
+import org.beckn.one.sandbox.bap.client.user.model.JwtRequest
 import org.springframework.http.ResponseEntity
-import org.beckn.one.sandbox.bap.user.model.JwtResponse
+import org.beckn.one.sandbox.bap.client.user.model.JwtResponse
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.authentication.DisabledException
