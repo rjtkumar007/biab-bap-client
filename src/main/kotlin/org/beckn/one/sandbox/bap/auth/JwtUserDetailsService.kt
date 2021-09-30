@@ -22,7 +22,7 @@ class JwtUserDetailsService : UserDetailsService {
 //            throw UsernameNotFoundException("User not found with username: $username")
 //        }
       return User(
-        "javainuse", "$2a$10\$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6",
+        username, "$2a$10\$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6",
         ArrayList()
       )
     }

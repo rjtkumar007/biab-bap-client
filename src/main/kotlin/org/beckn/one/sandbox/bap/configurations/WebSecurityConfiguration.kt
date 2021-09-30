@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.beckn.one.sandbox.bap.auth.JwtAuthenticationEntryPoint
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.beckn.one.sandbox.bap.auth.utils.JwtRequestFilter
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import kotlin.Throws
@@ -67,7 +65,7 @@ class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
       // We don't need CSRF for this example
         httpSecurity.cors().and().csrf().disable() // dont authenticate this particular request
-            .authorizeRequests().antMatchers("/authenticate","/client/v1/search")
+            .authorizeRequests().antMatchers("/client/v1/authenticate","/client/v1/on_search")
             .permitAll().anyRequest() // all other requests need to be authenticated
         .authenticated().and().exceptionHandling() // make sure we use stateless session; session won't be used to
         // store user's state.
