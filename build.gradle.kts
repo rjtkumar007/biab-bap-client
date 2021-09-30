@@ -57,6 +57,11 @@ dependencies {
   implementation("io.github.resilience4j:resilience4j-circuitbreaker:$resilience4jVersion")
   implementation("org.bouncycastle:bcprov-jdk15on:1.69")
   implementation("commons-codec:commons-codec:1.15")
+  implementation("org.springframework.boot:spring-boot-starter-security")
+  implementation("org.springframework.security:spring-security-test")
+  implementation("io.jsonwebtoken:jjwt:0.9.1")
+  implementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
+
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("io.kotest:kotest-runner-junit5:4.4.3")

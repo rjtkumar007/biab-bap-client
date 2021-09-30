@@ -66,6 +66,17 @@ security:
   self:
     private_key:
     unique_key_id: key1
+protected_actions:
+  - search
+  - select
+  - init
+  - confirm
+  - status
+  - rating
+  - update
+  - cancel
+  - track
+  - support
 database:
   mongo:
     url: mongodb://localhost:27017
@@ -75,3 +86,5 @@ management:
     web:
       exposure:
         include: "configprops, env, health, loggers, metrics, mappings, httptrace"
+jwt:
+  secret: "beckn-bap-client"
