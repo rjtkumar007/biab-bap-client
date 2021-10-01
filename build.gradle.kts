@@ -31,6 +31,7 @@ repositories {
 }
 
 dependencies {
+  implementation("org.projectlombok:lombok:1.18.20")
   val retrofitVersion = "2.9.+"
   val resilience4jVersion = "1.7.+"
 
@@ -61,6 +62,7 @@ dependencies {
   implementation("org.springframework.security:spring-security-test")
   implementation("io.jsonwebtoken:jjwt:0.9.1")
   implementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
+  implementation("com.google.firebase:firebase-admin:8.1.0")
 
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")

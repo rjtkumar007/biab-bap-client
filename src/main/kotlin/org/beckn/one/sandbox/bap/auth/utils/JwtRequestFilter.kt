@@ -1,65 +1,91 @@
 package org.beckn.one.sandbox.bap.auth.utils
 
-import org.springframework.web.filter.OncePerRequestFilter
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseToken
+import org.beckn.one.sandbox.bap.auth.model.Credentials
+import org.beckn.one.sandbox.bap.auth.model.SecurityProperties
+import org.beckn.one.sandbox.bap.auth.model.User
+import org.beckn.one.sandbox.bap.auth.service.SecurityService
 import org.springframework.beans.factory.annotation.Autowired
-import org.beckn.one.sandbox.bap.auth.JwtUserDetailsService
-import kotlin.Throws
-import java.io.IOException
-import java.lang.IllegalArgumentException
-import io.jsonwebtoken.ExpiredJwtException
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
+import org.springframework.web.filter.OncePerRequestFilter
 import javax.servlet.FilterChain
-import javax.servlet.ServletException
+import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+
 @Component
 class JwtRequestFilter : OncePerRequestFilter() {
-    @Autowired
-    private val jwtUserDetailsService: JwtUserDetailsService? = null
+  @Autowired
+  var securityService: SecurityService? = null
 
-    @Autowired
-    private val jwtTokenUtil: JwtTokenUtil? = null
-    @Throws(ServletException::class, IOException::class)
-    override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
-        val requestTokenHeader = request.getHeader("Authorization")
-        var username: String? = null
-        var jwtToken: String? = null
-        // JWT Token is in the form "Bearer token". Remove Bearer word and get
-        // only the Token
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7)
-            try {
-                username = jwtTokenUtil?.getUsernameFromToken(jwtToken)
-            } catch (e: IllegalArgumentException) {
-                println("Unable to get JWT Token")
-            } catch (e: ExpiredJwtException) {
-                println("JWT Token has expired")
-            }
-        } else {
-            logger.warn("JWT Token does not begin with Bearer String")
+  @Autowired
+  var cookieUtils: CookieUtils? = null
+
+  @Autowired
+  var securityProps: SecurityProperties? = null
+
+
+
+  override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
+    verifyToken(request)
+    filterChain.doFilter(request, response)
+  }
+
+    fun verifyToken(request: HttpServletRequest) {
+    var session: String? = null
+    var decodedToken: FirebaseToken? = null
+    var type: Credentials.CredentialType? = null
+    val strictServerSessionEnabled: Boolean = securityProps?.firebaseProps!!.enableStrictServerSession
+    val sessionCookie: Cookie? = cookieUtils?.getCookie("session")
+    val token: String? = securityService?.getBearerToken(request)
+    logger.info(token)
+    try {
+      if (sessionCookie != null) {
+        session = sessionCookie.value
+        decodedToken = FirebaseAuth.getInstance().verifySessionCookie(
+          session,
+          securityProps?.firebaseProps!!.enableCheckSessionRevoked
+        )
+        type = Credentials.CredentialType.SESSION
+      } else if (!strictServerSessionEnabled) {
+        if (token != null && !token.equals("undefined", ignoreCase = true)) {
+          decodedToken = FirebaseAuth.getInstance().verifyIdToken(token)
+          type = Credentials.CredentialType.ID_TOKEN
         }
-
-        // Once we get the token validate it.
-        if (username != null && SecurityContextHolder.getContext().authentication == null) {
-            val userDetails = jwtUserDetailsService!!.loadUserByUsername(username)
-
-            // if token is valid configure Spring Security to manually set
-            // authentication
-            if (jwtTokenUtil!!.validateToken(jwtToken, userDetails)) {
-                val usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.authorities
-                )
-                usernamePasswordAuthenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-                // After setting the Authentication in the context, we specify
-                // that the current user is authenticated. So it passes the
-                // Spring Security Configurations successfully.
-                SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
-            }
-        }
-        chain.doFilter(request, response)
+      }
+    } catch (e: FirebaseAuthException) {
+      e.printStackTrace()
+//      log.error("Firebase Exception:: ", e.localizedMessage)
     }
+    val user: User? = firebaseTokenToUserDto(decodedToken)
+    if (user != null) {
+      val authentication = UsernamePasswordAuthenticationToken(
+        user,
+        Credentials(type, decodedToken, token, session), null
+      )
+      authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
+      SecurityContextHolder.getContext().authentication = authentication
+    }
+  }
+
+  fun firebaseTokenToUserDto(decodedToken: FirebaseToken?): User? {
+    var user: User? = null
+    if (decodedToken != null) {
+      user = User()
+      user.uid = decodedToken.uid
+      user.name = decodedToken.name
+      user.email = decodedToken.email
+      user.picture = decodedToken.picture
+      user.issuer= decodedToken.issuer
+      user.isEmailVerified = decodedToken.isEmailVerified
+    }
+    return user
+  }
+
 }
