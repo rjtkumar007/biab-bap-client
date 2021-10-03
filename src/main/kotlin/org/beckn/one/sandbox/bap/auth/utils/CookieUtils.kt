@@ -18,21 +18,12 @@ class CookieUtils {
 
     @Autowired
     var restSecProps: SecurityProperties? = null
+
     fun getCookie(name: String?): Cookie? {
         return WebUtils.getCookie(httpServletRequest!!, name!!)
     }
 
-    fun setCookie(name: String?, value: String?, expiryInMinutes: Int) {
-        val expiresInSeconds = expiryInMinutes * 60 * 60
-        val cookie = Cookie(name, value)
-        cookie.secure = restSecProps!!.cookieProps!!.secure
-        cookie.path = restSecProps!!.cookieProps!!.path
-        cookie.domain = restSecProps!!.cookieProps!!.domain
-        cookie.maxAge = expiresInSeconds
-        httpServletResponse!!.addCookie(cookie)
-    }
-
-    fun setSecureCookie(name: String?, value: String?, expiryInMinutes: Int) {
+   /* fun setSecureCookie(name: String?, value: String?, expiryInMinutes: Int) {
         val expiresInSeconds = expiryInMinutes * 60 * 60
         val cookie = Cookie(name, value)
         cookie.isHttpOnly = restSecProps!!.cookieProps!!.httpOnly
@@ -66,5 +57,5 @@ class CookieUtils {
         cookie.domain = restSecProps!!.cookieProps!!.domain
         cookie.maxAge = expiresInSeconds
         httpServletResponse!!.addCookie(cookie)
-    }
+    }*/
 }
