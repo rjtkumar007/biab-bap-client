@@ -32,7 +32,7 @@ import java.time.Instant
 import java.time.ZoneId
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class OnGetQuotePollControllerSpec @Autowired constructor(
