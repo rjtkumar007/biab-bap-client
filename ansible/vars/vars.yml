@@ -3,6 +3,6 @@ var: this
 mongo_host: 10.0.1.10
 mongo_port: 27017
 bap_mongo_name: sandbox_bap
-registry_url: https://demo4460370.mockable.io/registry/
+registry_url: https://beckn-one.succinct.in/subscribers
 protocol_url: http://internal-biab-qa-bap-api-1627558606.ap-south-1.elb.amazonaws.com:9002/
-public_key: "AAAAC3NzaC1lZDI1NTE5AAAAIMLpt4ysQUXtWZkrsRjtBbctht7xdOKT+kS97TZ7MNrX"
+public_key: X+jgcPXHD4kFzvcbb3eaxWRA5UwB8Mm6IykeTPADofU=
