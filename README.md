@@ -1,6 +1,6 @@
 # Beckn-In-A-Box BAP Client
 
-Provides BAP Client APIs for Beckn-In-A-Box
+Provides BAP Client APIs for Beckn-In-A-Box 
 
 ### Installation
 1. Install JDK 11
