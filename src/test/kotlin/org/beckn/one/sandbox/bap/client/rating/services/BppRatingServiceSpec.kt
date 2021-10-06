@@ -74,14 +74,14 @@ internal class BppRatingServiceSpec : DescribeSpec() {
   private fun invokeBppRatingApi(): Either<BppError, ProtocolAckResponse> {
     return bppService.rating(
       bppUri = bppUri,
-      context = contextFactory.create(action = ProtocolContext.Action.FEEDBACK),
+      context = contextFactory.create(action = ProtocolContext.Action.RATING),
       refId = "item id 1",
       value = 3,
     )
   }
 
   private fun getProtocolRatingRequest() = ProtocolRatingRequest(
-    context = contextFactory.create(action = ProtocolContext.Action.FEEDBACK),
+    context = contextFactory.create(action = ProtocolContext.Action.RATING),
     message = ProtocolRatingRequestMessage(id = "item id 1", value = 3),
   )
 }

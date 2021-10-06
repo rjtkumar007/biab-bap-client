@@ -15,8 +15,8 @@ object ProtocolQuotationFactory {
 object ProtocolQuotationBreakupFactory {
 
   private fun create(id: String, type: ProtocolQuotationBreakup.Type) = ProtocolQuotationBreakup(
-    type = type,
-    refId = id,
+//    type = type,
+//    refId = id,
     price = ProtocolPriceFactory.create()
   )
 

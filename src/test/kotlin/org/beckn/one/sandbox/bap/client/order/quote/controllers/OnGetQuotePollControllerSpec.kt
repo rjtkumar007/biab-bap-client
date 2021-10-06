@@ -50,7 +50,7 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
   val context = contextFactory.create()
   private val protocolOnSelect = ProtocolOnSelect(
     context,
-    message = ProtocolOnSelectMessage(selected = ProtocolOnSelectMessageSelectedFactory.create())
+    message = ProtocolOnSelectMessage(order = ProtocolOnSelectMessageSelectedFactory.create())
   )
   val mockProtocolBap = MockProtocolBap.withResetInstance()
 
@@ -78,7 +78,7 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
           val body = results.response.contentAsString
           val clientResponse = mapper.readValue(body, ClientQuoteResponse::class.java)
           clientResponse.message?.quote shouldNotBe null
-          clientResponse.message?.quote?.quote shouldBe protocolOnSelect.message?.selected?.quote
+          clientResponse.message?.quote?.quote shouldBe protocolOnSelect.message?.order?.quote
         }
       }
 

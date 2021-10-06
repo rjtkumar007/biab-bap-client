@@ -73,7 +73,7 @@ class RatingControllerSpec @Autowired constructor(
             ratingResponseString,
             ResponseMessage.nack(),
             ProtocolError("BAP_011", "BPP returned error"),
-            ProtocolContext.Action.FEEDBACK
+            ProtocolContext.Action.RATING
           )
         ratingResponse.context?.transactionId shouldBe ratingRequest.context.transactionId
         verifyThatBppRatingApiWasInvoked(ratingResponse, ratingRequest, MockNetwork.retailBengaluruBpp)
@@ -101,7 +101,7 @@ class RatingControllerSpec @Autowired constructor(
             ratingResponseString,
             ResponseMessage.ack(),
             null,
-            ProtocolContext.Action.FEEDBACK
+            ProtocolContext.Action.RATING
           )
         verifyThatBppRatingApiWasInvoked(ratingResponse, ratingRequest, MockNetwork.retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasInvoked(MockNetwork.registryBppLookupApi, MockNetwork.retailBengaluruBpp)

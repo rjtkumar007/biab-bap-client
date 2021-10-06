@@ -21,7 +21,7 @@ class SearchClientResponseMapper(
         message = ClientSearchResponseMessage(
           catalogs = input.mapNotNull { response ->
             val catalog = response.message?.catalog?.let(clientCatalogMapper::protocolToClientDto)
-            catalog?.copy(bppId = response.context.bppId)
+            catalog?.copy(bppId = response.context?.bppId)
           })
       )
     )

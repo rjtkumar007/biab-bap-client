@@ -53,5 +53,5 @@ class RatingController @Autowired constructor(
     )
 
   private fun getContext(transactionId: String) =
-    contextFactory.create(action = ProtocolContext.Action.FEEDBACK, transactionId = transactionId)
+    contextFactory.create(action = ProtocolContext.Action.RATING, transactionId = transactionId)
 }
