@@ -110,14 +110,14 @@ class SearchControllerSpec @Autowired constructor(
         stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp, bpp.subscriber_id)
 
         val result: MvcResult =
-          invokeSearchApi(location = "12.9259,77.583", providerId = "tulsidev", bppId = bpp.subscriber_id)
+          invokeSearchApi(location = "12.9259,77.583", providerId = "padma coffee works", bppId = bpp.subscriber_id)
             .andExpect(status().is2xxSuccessful)
             .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
             .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
             .andReturn()
 
         val searchResponse = verifyAckResponse(result)
-        verifyThatBppSearchWasInvoked(searchResponse, "tulsidev", "12.9259,77.583", "Fictional mystery books")
+        verifyThatBppSearchWasInvoked(searchResponse, "padma coffee works", "12.9259,77.583", "Fictional mystery books")
       }
 
       it("should invoke Beckn /search API on specified BPP using gateway and persist message") {
@@ -125,7 +125,7 @@ class SearchControllerSpec @Autowired constructor(
         stubSearchApi()
 
         val result: MvcResult =
-          invokeSearchApi(location = "12.9259,77.583", providerId = "tulsidev")
+          invokeSearchApi(location = "12.9259,77.583", providerId = "padma coffee works")
             .andExpect(status().is2xxSuccessful)
             .andExpect(jsonPath("$.message.ack.status", `is`(ACK.status)))
             .andExpect(jsonPath("$.context.message_id", `is`(notNullValue())))
@@ -135,7 +135,7 @@ class SearchControllerSpec @Autowired constructor(
         val protocolSearchRequest = SearchRequestFactory.create(
           context = searchResponse.context!!,
           searchString = "Fictional mystery books",
-          providerId = "tulsidev",
+          providerId = "padma coffee works",
           location = "12.9259,77.583"
         )
         retailBengaluruBg.verify(

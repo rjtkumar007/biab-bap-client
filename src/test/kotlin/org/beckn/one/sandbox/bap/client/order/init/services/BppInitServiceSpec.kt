@@ -80,7 +80,7 @@ internal class BppInitServiceSpec : DescribeSpec() {
       bppUri = bppUri,
       order = OrderDtoFactory.create(
         bpp1_id = bppUri,
-        provider1_id = "BppServiceInitSpecpadma coffee works",
+        provider1_id = "BppServiceInitSpec padma coffee works",
         items = listOf(
           OrderItemDtoFactory.create(
             bppUri,
@@ -127,7 +127,8 @@ internal class BppInitServiceSpec : DescribeSpec() {
             )
           ),
           type = "home-delivery",
-          customer = ProtocolCustomer(person = ProtocolPerson(name = "Test"))
+          customer = ProtocolCustomer(person = ProtocolPerson(name = "Test")),
+          provider_id = ProtocolProvider(id = "padma coffee works")
         ),
         addOns = emptyList(),
         offers = emptyList()

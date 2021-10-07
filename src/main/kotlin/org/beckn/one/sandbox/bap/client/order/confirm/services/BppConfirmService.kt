@@ -55,11 +55,13 @@ class BppConfirmService @Autowired constructor(
       context = context,
       ProtocolConfirmRequestMessage(
         order = ProtocolOrder(
-          provider = ProtocolSelectMessageSelectedProvider(
-            id = order.items!!.first().provider.id,
-            locations = listOf(ProtocolSelectMessageSelectedProviderLocations(id = order.items.first().provider.locations!!.first()))
-          ),
-          items = order.items.map { ProtocolSelectMessageSelectedItems(id = it.id, quantity = it.quantity) },
+          provider = order.items?.first()?.provider?.let {
+            ProtocolSelectMessageSelectedProvider(
+              id = it?.id,
+              locations = listOf(ProtocolSelectMessageSelectedProviderLocations(id = it?.locations!!.first()))
+            )
+          },
+          items = order.items!!.map { ProtocolSelectMessageSelectedItems(id = it.id, quantity = it.quantity) },
           billing = order.billingInfo,
           fulfillment = ProtocolFulfillment(
             end = ProtocolFulfillmentEnd(
@@ -69,7 +71,8 @@ class BppConfirmService @Autowired constructor(
               ), location = order.deliveryInfo.location
             ),
             type = "home_delivery",
-            customer = ProtocolCustomer(person = ProtocolPerson(name = order.deliveryInfo.name))
+            customer = ProtocolCustomer(person = ProtocolPerson(name = order.deliveryInfo.name)),
+            provider_id = ProtocolProvider(id = order.items!!.first().provider.id)
           ),
           addOns = emptyList(),
           offers = emptyList(),
