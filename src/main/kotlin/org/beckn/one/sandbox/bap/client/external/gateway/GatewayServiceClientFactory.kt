@@ -32,7 +32,7 @@ class GatewayClientFactory @Autowired constructor(
   @Cacheable("gatewayClients")
   fun getClient(gatewayUri: String): GatewayClient {
     val retrofit = Retrofit.Builder()
-      .baseUrl(gatewayUri)
+      .baseUrl("$gatewayUri/")
       .client(buildHttpClient())
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(getRetryConfig(gatewayUri)))
