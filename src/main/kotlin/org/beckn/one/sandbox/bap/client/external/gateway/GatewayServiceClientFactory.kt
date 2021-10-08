@@ -5,6 +5,7 @@ import io.github.resilience4j.retrofit.CircuitBreakerCallAdapter
 import io.github.resilience4j.retrofit.RetryCallAdapter
 import io.github.resilience4j.retry.Retry
 import okhttp3.OkHttpClient
+import org.beckn.one.sandbox.bap.client.shared.Util
 import org.beckn.one.sandbox.bap.client.shared.security.SignRequestInterceptor
 import org.beckn.one.sandbox.bap.factories.CircuitBreakerFactory
 import org.beckn.one.sandbox.bap.factories.RetryFactory
@@ -31,8 +32,9 @@ class GatewayClientFactory @Autowired constructor(
 ) {
   @Cacheable("gatewayClients")
   fun getClient(gatewayUri: String): GatewayClient {
+    val url : String = Util.getBaseUri(gatewayUri)
     val retrofit = Retrofit.Builder()
-      .baseUrl("$gatewayUri/")
+      .baseUrl(url)
       .client(buildHttpClient())
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(getRetryConfig(gatewayUri)))

@@ -6,6 +6,7 @@ import io.github.resilience4j.retrofit.RetryCallAdapter
 import io.github.resilience4j.retry.Retry
 import okhttp3.OkHttpClient
 import org.beckn.one.sandbox.bap.client.external.registry.RegistryClient
+import org.beckn.one.sandbox.bap.client.shared.Util
 import org.beckn.one.sandbox.bap.client.shared.security.SignRequestInterceptor
 import org.beckn.one.sandbox.bap.factories.CircuitBreakerFactory
 import org.beckn.one.sandbox.bap.factories.RetryFactory
@@ -44,8 +45,9 @@ class RegistryClientConfiguration(
   @Bean
   @Primary
   fun registryServiceClient(): RegistryClient {
+    val url : String = Util.getBaseUri(registryServiceUrl)
     val retrofit = Retrofit.Builder()
-      .baseUrl(registryServiceUrl)
+      .baseUrl(url)
       .client(buildHttpClient())
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(getRetryConfig("RegistryClient")))
@@ -56,8 +58,9 @@ class RegistryClientConfiguration(
 
   @Bean(BPP_REGISTRY_SERVICE_CLIENT)
   fun bppRegistryServiceClient(): RegistryClient {
+    val url : String = Util.getBaseUri(bppRegistryServiceUrl)
     val retrofit = Retrofit.Builder()
-      .baseUrl(bppRegistryServiceUrl)
+      .baseUrl(url)
       .client(buildHttpClient())
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(getRetryConfig("BppRegistryClient")))

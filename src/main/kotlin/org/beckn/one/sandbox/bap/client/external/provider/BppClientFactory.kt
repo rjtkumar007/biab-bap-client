@@ -5,6 +5,7 @@ import io.github.resilience4j.retrofit.CircuitBreakerCallAdapter
 import io.github.resilience4j.retrofit.RetryCallAdapter
 import io.github.resilience4j.retry.Retry
 import okhttp3.OkHttpClient
+import org.beckn.one.sandbox.bap.client.shared.Util
 import org.beckn.one.sandbox.bap.client.shared.security.SignRequestInterceptor
 import org.beckn.one.sandbox.bap.factories.CircuitBreakerFactory
 import org.beckn.one.sandbox.bap.factories.RetryFactory
@@ -34,7 +35,7 @@ class BppClientFactory @Autowired constructor(
   ) {
   @Cacheable("bppClients")
   fun getClient(bppUri: String): BppClient {
-    val url = if (bppUri.endsWith("/")) bppUri else "$bppUri/"
+    val url : String = Util.getBaseUri(bppUri)
     val retrofit = Retrofit.Builder()
       .baseUrl(url)
       .client(buildHttpClient())
