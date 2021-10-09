@@ -128,7 +128,7 @@ internal class BppInitServiceSpec : DescribeSpec() {
           ),
           type = "home-delivery",
           customer = ProtocolCustomer(person = ProtocolPerson(name = "Test")),
-          provider_id = ProtocolProvider(id = "padma coffee works")
+          provider_id = "padma coffee works"
         ),
         addOns = emptyList(),
         offers = emptyList()

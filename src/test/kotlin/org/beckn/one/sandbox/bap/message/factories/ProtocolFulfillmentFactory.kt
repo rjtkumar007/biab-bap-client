@@ -7,7 +7,6 @@ import java.time.OffsetDateTime
 object ProtocolFulfillmentFactory {
 
   fun create(id: Int) = ProtocolFulfillment(
-    provider_id = ProtocolProvider(id = "padma coffee works"),
     id = IdFactory.forFulfillment(id),
     type = "Delivery",
     state = ProtocolState(

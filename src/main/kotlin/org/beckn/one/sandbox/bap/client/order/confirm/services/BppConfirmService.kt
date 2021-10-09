@@ -72,7 +72,7 @@ class BppConfirmService @Autowired constructor(
             ),
             type = "home_delivery",
             customer = ProtocolCustomer(person = ProtocolPerson(name = order.deliveryInfo.name)),
-            provider_id = ProtocolProvider(id = order.items!!.first().provider.id)
+            provider_id = order.items?.first()?.provider?.id
           ),
           addOns = emptyList(),
           offers = emptyList(),

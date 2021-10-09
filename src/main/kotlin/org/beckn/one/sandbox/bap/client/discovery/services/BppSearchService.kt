@@ -61,7 +61,7 @@ class BppSearchService @Autowired constructor(
     when {
       StringUtils.hasText(criteria.deliveryLocation) ->
         ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.deliveryLocation)),
-          provider_id = ProtocolProvider(id = criteria.providerId))
+          provider_id = criteria.providerId)
       else -> null
     }
 }

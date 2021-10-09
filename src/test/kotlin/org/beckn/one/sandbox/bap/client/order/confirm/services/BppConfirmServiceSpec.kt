@@ -106,7 +106,7 @@ internal class BppConfirmServiceSpec : DescribeSpec() {
         ).map { ProtocolSelectMessageSelectedItems(id = it.id, quantity = it.quantity) },
         billing = ProtocolBillingFactory.create(),
         fulfillment = ProtocolFulfillment(
-          provider_id = ProtocolProvider(id = "padma coffee works"),
+          provider_id = "padma coffee works",
           end = ProtocolFulfillmentEnd(
             contact = ProtocolContact(
               phone = "9999999999",
