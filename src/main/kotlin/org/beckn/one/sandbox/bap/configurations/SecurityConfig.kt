@@ -1,27 +1,24 @@
 package org.beckn.one.sandbox.bap.configurations
 
 
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.beans.factory.annotation.Autowired
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.beckn.one.sandbox.bap.auth.model.SecurityProperties
 import org.beckn.one.sandbox.bap.auth.utils.JwtRequestFilter
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import org.springframework.security.web.AuthenticationEntryPoint
-import org.springframework.web.cors.CorsConfiguration
-import kotlin.Throws
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.web.AuthenticationEntryPoint
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-import java.lang.Exception
 import java.sql.Timestamp
 import java.util.*
 import javax.servlet.http.HttpServletRequest
@@ -36,6 +33,8 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Autowired
     var restSecProps: SecurityProperties? = null
+
+
 
     @Autowired
     var tokenAuthenticationFilter: JwtRequestFilter? = null
@@ -75,8 +74,9 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         http.cors().configurationSource(corsConfigurationSource()).and().csrf().disable().formLogin().disable()
             .httpBasic().disable().exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint())
             .and().authorizeRequests()
-//            .antMatchers(*restSecProps!!.allowedPublicApis!!.toArray{arrayOf<String>() }).permitAll()
-            .antMatchers(HttpMethod.OPTIONS, "/**").permitAll().anyRequest().authenticated().and()
+            .antMatchers("/client/v1/").permitAll()
+            .antMatchers(*restSecProps?.protectedActions!!.toTypedArray()).authenticated()
+            .and()
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }

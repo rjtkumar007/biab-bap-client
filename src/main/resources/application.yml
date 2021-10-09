@@ -108,6 +108,17 @@ security:
     - /public/**
   exposed-headers:
     - X-Xsrf-Token
+  protected-actions:
+    - /**/search
+    - /**/select
+    - /**/init
+    - /**/confirm
+    - /**/status
+    - /**/rating
+    - /**/update
+    - /**/cancel
+    - /**/track
+    - /**/support
 database:
   mongo:
     url: mongodb://localhost:27017

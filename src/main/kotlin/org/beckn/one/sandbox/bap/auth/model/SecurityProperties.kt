@@ -16,5 +16,6 @@ data class SecurityProperties(
   var allowedHeaders: List<String>? = null,
   var exposedHeaders: List<String>? = null,
   var allowedMethods: List<String>? = null,
-  var allowedPublicApis: List<String>? = null
+  var allowedPublicApis: List<String>? = null,
+  var protectedActions: List<String>? = null
 )
