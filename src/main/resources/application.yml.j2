@@ -12,7 +12,7 @@ spring:
     property-naming-strategy: SNAKE_CASE
     default-property-inclusion: non_null
 registry_service:
-  url: {{ registry_url }}
+  url: https://demo4460370.mockable.io/registry/
   retry:
     max_attempts: 3
     initial_interval_in_millis: 1000
@@ -33,7 +33,7 @@ gateway_service:
     read_in_seconds: 10
     write_in_seconds: 10
 bpp_registry_service:
-  url: {{ registry_url }}
+  url: https://demo4460370.mockable.io/bpp_registry/
 bpp_service:
   retry:
     max_attempts: 3
@@ -61,7 +61,7 @@ context:
   bap_uri: https://qa.api.box.beckn.org/bap/protocol/v1
   ttl_seconds: 20
 beckn:
-  security.enabled: true
+  security.enabled: false
 security:
   self:
     private_key: {{ private_key }}
