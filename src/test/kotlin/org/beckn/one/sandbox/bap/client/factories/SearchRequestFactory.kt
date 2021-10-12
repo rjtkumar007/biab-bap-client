@@ -20,7 +20,12 @@ class SearchRequestFactory {
                 location = ProtocolLocation(
                   gps = location
                 )
-              )
+              ),
+                start = ProtocolFulfillmentStart(
+                  location = ProtocolLocation(
+                    gps = location
+                  )
+                )
             ),
             item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = searchString))
           )

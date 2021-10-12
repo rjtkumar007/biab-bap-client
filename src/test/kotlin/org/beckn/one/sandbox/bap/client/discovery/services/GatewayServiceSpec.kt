@@ -54,7 +54,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
         val response = gatewayService.search(
           gateway, context,
-          SearchCriteria(searchString = queryString, deliveryLocation = locationString)
+          SearchCriteria(searchString = queryString, deliveryLocation = locationString,pickupLocation = locationString)
         )
 
         response
@@ -71,7 +71,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
         val response = gatewayService.search(
           gateway, context,
-          SearchCriteria(searchString = queryString, deliveryLocation = locationString)
+          SearchCriteria(searchString = queryString, deliveryLocation = locationString,pickupLocation = locationString)
         )
 
         response
@@ -89,7 +89,7 @@ internal class GatewayServiceSpec : DescribeSpec() {
 
         val response = gatewayService.search(
           gateway, context,
-          SearchCriteria(searchString = queryString, deliveryLocation = locationString)
+          SearchCriteria(searchString = queryString, deliveryLocation = locationString, pickupLocation = locationString)
         )
 
         response
@@ -106,7 +106,10 @@ internal class GatewayServiceSpec : DescribeSpec() {
     contextFactory.create(),
     ProtocolSearchRequestMessage(
       ProtocolIntent(
-        fulfillment = ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString))),
+        fulfillment = ProtocolFulfillment(
+          start = ProtocolFulfillmentStart(location = ProtocolLocation(gps = locationString)),
+          end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString))
+        ),
         item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = queryString)),
         provider = ProtocolProvider()
       )

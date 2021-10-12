@@ -16,4 +16,5 @@ data class SearchCriteria @Default constructor(
   val deliveryLocation: String? = null,
   val providerId: String? = null,
   val categoryId: String? = null,
+  val pickupLocation: String? = null
 )
