@@ -63,7 +63,7 @@ dependencies {
   implementation("io.jsonwebtoken:jjwt:0.9.1")
   implementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
   implementation("com.google.firebase:firebase-admin:8.1.0")
-
+  implementation("org.litote.kmongo:kmongo:4.2.8")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("io.kotest:kotest-runner-junit5:4.4.3")
@@ -71,6 +71,8 @@ dependencies {
   testImplementation("com.github.tomakehurst:wiremock-jre8:2.28.0")
   testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
   testImplementation("io.kotest.extensions:kotest-assertions-arrow:1.0.2")
+  testImplementation("org.testcontainers:mongodb:1.15.3")
+
 }
 
 tasks.withType<KotlinCompile> {

@@ -122,7 +122,7 @@ security:
 database:
   mongo:
     url: mongodb://localhost:27017
-    name: sandbox_bap
+    name: sandbox_client
 management:
   endpoints:
     web:

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration
 import java.io.InputStream
 
 @Configuration
-class FirebaseConfig {
+class FirebaseConfiguration {
     @Primary
     @Bean
     fun firebaseInit() {

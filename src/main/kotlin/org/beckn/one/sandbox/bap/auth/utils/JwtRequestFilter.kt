@@ -25,10 +25,8 @@ class JwtRequestFilter : OncePerRequestFilter() {
   var securityService: SecurityService? = null
 
   @Autowired
-  var cookieUtils: CookieUtils? = null
-
-  @Autowired
   var securityProps: SecurityProperties? = null
+
 
 
 
@@ -42,18 +40,10 @@ class JwtRequestFilter : OncePerRequestFilter() {
     var decodedToken: FirebaseToken? = null
     var type: Credentials.CredentialType? = null
     val strictServerSessionEnabled: Boolean = securityProps?.firebaseProps!!.enableStrictServerSession
-    val sessionCookie: Cookie? = cookieUtils?.getCookie("session")
     val token: String? = securityService?.getBearerToken(request)
     logger.info(token)
     try {
-      if (sessionCookie != null) {
-        session = sessionCookie.value
-        decodedToken = FirebaseAuth.getInstance().verifySessionCookie(
-          session,
-          securityProps?.firebaseProps!!.enableCheckSessionRevoked
-        )
-        type = Credentials.CredentialType.SESSION
-      } else if (!strictServerSessionEnabled) {
+    if (!strictServerSessionEnabled) {
         if (token != null && !token.equals("undefined", ignoreCase = true)) {
           decodedToken = FirebaseAuth.getInstance().verifyIdToken(token)
           type = Credentials.CredentialType.ID_TOKEN
@@ -65,15 +55,20 @@ class JwtRequestFilter : OncePerRequestFilter() {
     }
     val user: User? = firebaseTokenToUserDto(decodedToken)
     if (user != null) {
+
       val authentication = UsernamePasswordAuthenticationToken(
         user,
         Credentials(type, decodedToken, token, session), null
       )
+
       authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
       SecurityContextHolder.getContext().authentication = authentication
     }
   }
 
+  fun insertUserData(user: User){
+
+  }
   fun firebaseTokenToUserDto(decodedToken: FirebaseToken?): User? {
     var user: User? = null
     if (decodedToken != null) {
