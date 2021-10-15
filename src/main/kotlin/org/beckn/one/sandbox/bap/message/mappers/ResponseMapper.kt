@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.message.mappers
 
+import org.beckn.one.sandbox.bap.client.shared.dtos.AccountDetailsResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.BillingDetailsResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
@@ -48,9 +49,22 @@ interface DeliveryAddressResponseMapper : GenericResponseMapper<DeliveryAddressR
   injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
 interface BillingDetailsResponseMapper : GenericResponseMapper<BillingDetailsResponse, BillingDetailsDao> {
+  @Mapping(ignore = true, target = "userId")
   override fun entityToProtocol(entity: BillingDetailsDao): BillingDetailsResponse
 
   override fun protocolToEntity(schema: BillingDetailsResponse): BillingDetailsDao
+}
+
+@Mapper(
+  componentModel = "spring",
+  unmappedTargetPolicy = ReportingPolicy.WARN,
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+)
+interface AccountDetailsResponseMapper : GenericResponseMapper<AccountDetailsResponse, AccountDetailsDao> {
+  @Mapping(ignore = true, target = "userId")
+  override fun entityToProtocol(entity: AccountDetailsDao): AccountDetailsResponse
+
+  override fun protocolToEntity(schema: AccountDetailsResponse): AccountDetailsDao
 }
 
 

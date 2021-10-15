@@ -1,30 +1,25 @@
-package org.beckn.one.sandbox.bap.client.accounts.address.services
+package org.beckn.one.sandbox.bap.client.accounts.user.services
 
-import arrow.core.Either
-import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
-import org.beckn.one.sandbox.bap.message.entities.DeliveryAddressDao
-import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressRequestDto
-import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
-import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.AddDeliveryAddressDao
+import org.beckn.one.sandbox.bap.client.shared.dtos.AccountDetailsResponse
+import org.beckn.one.sandbox.bap.message.entities.AccountDetailsDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.litote.kmongo.newId
+import org.beckn.protocol.schemas.ProtocolError
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
-class AddressServices @Autowired constructor(
-  private val addressRepository: GenericRepository<AddDeliveryAddressDao>,
-  private val responseStorageService: ResponseStorageService<DeliveryAddressResponse, AddDeliveryAddressDao>
+class AccountDetailsServices @Autowired constructor(
+  private val accountDetailRepository: GenericRepository<AccountDetailsDao>,
+  private val responseStorageService: ResponseStorageService<AccountDetailsResponse, AccountDetailsDao>
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  fun save(address: DeliveryAddressRequestDto): Either<HttpError, AddDeliveryAddressDao> {
+  /*fun save(address: UserDetails): Either<HttpError, AccountDetailsDao> {
     val user = SecurityUtil.getSecuredUserDetail()
     val deliveryAddressDao = DeliveryAddressDao(
       id =  newId<String>().toString(),
@@ -45,18 +40,18 @@ class AddressServices @Autowired constructor(
         it
       }
 
-  }
+  }*/
 
-  fun findAddressesForCurrentUser(
+  fun findAccountDetailForCurrentUser(
     userId: String
-  ): ResponseEntity<List<DeliveryAddressResponse>> = responseStorageService
-    .findManyByUserId(userId)
+  ): ResponseEntity<AccountDetailsResponse> = responseStorageService
+    .findByUserId(userId)
     .fold(
       {
         log.error("Error when finding search response by message id. Error: {}", it)
         ResponseEntity
           .status(it.status().value())
-          .body(listOf(DeliveryAddressResponse(userId = null,error = it.error(),context = null,address = null)))
+          .body(AccountDetailsResponse(userId = null,error = it.error(),context = null))
       },
       {
         log.info("Found responses for address {}", userId)

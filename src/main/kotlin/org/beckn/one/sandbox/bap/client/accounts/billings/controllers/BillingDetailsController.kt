@@ -30,7 +30,6 @@ class BillingDetailsController @Autowired constructor(
   val user = SecurityUtil.getSecuredUserDetail()
   val billingDao = BillingDetailsDao(
     userId = user?.uid,
-    billing = BillingDao(
     id =  newId<String>().toString(),
     address = request.address,
     organization = request.organization,
@@ -38,8 +37,8 @@ class BillingDetailsController @Autowired constructor(
      email = request.email,
      phone = request.phone,
      taxNumber = request.taxNumber,
-      name = request.name
-  ))
+      name = request.name,
+      )
   return  responseStorageService
       .save(billingDao)
       .fold(
@@ -47,7 +46,8 @@ class BillingDetailsController @Autowired constructor(
           log.error("Error when saving billing response by user Id. Error: {}", it)
           ResponseEntity
           .status(it.status())
-             .body(BillingDetailsResponse(context = null,billing = null,
+             .body(BillingDetailsResponse(id= null,
+               context = null, name= null, phone = null,
                error = ProtocolError(code = it.status().name,
                  message = it.message().toString()),userId = null))
         },
