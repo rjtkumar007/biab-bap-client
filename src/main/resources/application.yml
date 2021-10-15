@@ -119,6 +119,7 @@ security:
     - /**/cancel
     - /**/track
     - /**/support
+    - /**/delivery_address
 database:
   mongo:
     url: mongodb://localhost:27017

@@ -1,0 +1,56 @@
+package org.beckn.one.sandbox.bap.message.mappers
+
+import org.beckn.one.sandbox.bap.client.shared.dtos.BillingDetailsResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
+import org.beckn.one.sandbox.bap.message.entities.*
+import org.mapstruct.InjectionStrategy
+import org.mapstruct.Mapper
+import org.mapstruct.Mapping
+import org.mapstruct.ReportingPolicy
+import org.springframework.stereotype.Component
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneId
+
+
+interface GenericResponseMapper<Protocol : ClientResponse, Entity : BecknResponseDao> {
+  fun entityToProtocol(entity: Entity): Protocol
+  fun protocolToEntity(schema: Protocol): Entity
+}
+
+@Component
+class DateMapper {
+  fun map(instant: Instant?): OffsetDateTime? {
+    return instant?.let { OffsetDateTime.ofInstant(it, ZoneId.of("UTC")) }
+  }
+
+  fun map(offset: OffsetDateTime?): Instant? {
+    return offset?.toInstant()
+  }
+}
+
+@Mapper(
+  componentModel = "spring",
+  unmappedTargetPolicy = ReportingPolicy.WARN,
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+)
+interface DeliveryAddressResponseMapper : GenericResponseMapper<DeliveryAddressResponse, AddDeliveryAddressDao> {
+  @Mapping(ignore = true, target = "userId")
+  override fun entityToProtocol(entity: AddDeliveryAddressDao): DeliveryAddressResponse
+
+  override fun protocolToEntity(schema: DeliveryAddressResponse): AddDeliveryAddressDao
+}
+
+@Mapper(
+  componentModel = "spring",
+  unmappedTargetPolicy = ReportingPolicy.WARN,
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+)
+interface BillingDetailsResponseMapper : GenericResponseMapper<BillingDetailsResponse, BillingDetailsDao> {
+  override fun entityToProtocol(entity: BillingDetailsDao): BillingDetailsResponse
+
+  override fun protocolToEntity(schema: BillingDetailsResponse): BillingDetailsDao
+}
+
+

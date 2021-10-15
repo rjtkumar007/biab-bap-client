@@ -4,8 +4,8 @@ import org.beckn.protocol.schemas.Default
 import org.bson.codecs.pojo.annotations.BsonId
 
 data class UserDao @Default constructor(
-  val userId: String? = null,
-  val phoneNumber: String? = null,
-  val email: String? = null,
-  val name: String? = null
+  val userId: String,
+  val userPhone: String? = null,
+  val userEmail: String? = null,
+  val userName: String? = null
 )

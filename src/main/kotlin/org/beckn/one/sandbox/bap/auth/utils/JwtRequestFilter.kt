@@ -51,7 +51,6 @@ class JwtRequestFilter : OncePerRequestFilter() {
       }
     } catch (e: FirebaseAuthException) {
       e.printStackTrace()
-//      log.error("Firebase Exception:: ", e.localizedMessage)
     }
     val user: User? = firebaseTokenToUserDto(decodedToken)
     if (user != null) {
@@ -66,9 +65,6 @@ class JwtRequestFilter : OncePerRequestFilter() {
     }
   }
 
-  fun insertUserData(user: User){
-
-  }
   fun firebaseTokenToUserDto(decodedToken: FirebaseToken?): User? {
     var user: User? = null
     if (decodedToken != null) {

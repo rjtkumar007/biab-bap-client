@@ -4,6 +4,7 @@ import org.beckn.protocol.schemas.Default
 
 
 data class BillingDao  @Default constructor(
+  val id: String?,
   val name: String,
   val phone: String,
   val organization: OrganizationDao? = null,
@@ -12,7 +13,8 @@ data class BillingDao  @Default constructor(
   val time: TimeDao? = null,
   val taxNumber: String? = null,
   val createdAt: java.time.OffsetDateTime? = null,
-  val updatedAt: java.time.OffsetDateTime? = null
+  val updatedAt: java.time.OffsetDateTime? = null,
+  val locationId: String? = null
 )
 
 data class OrganizationDao  @Default constructor(
