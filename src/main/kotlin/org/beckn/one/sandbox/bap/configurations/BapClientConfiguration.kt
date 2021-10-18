@@ -6,6 +6,7 @@ import io.github.resilience4j.retrofit.RetryCallAdapter
 import io.github.resilience4j.retry.Retry
 import okhttp3.OkHttpClient
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
+import org.beckn.one.sandbox.bap.client.shared.Util
 import org.beckn.one.sandbox.bap.factories.CircuitBreakerFactory
 import org.beckn.one.sandbox.bap.factories.RetryFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,8 +34,9 @@ class BapClientConfiguration(
 ) {
   @Bean
   fun bapClient(): ProtocolClient {
+    val url : String = Util.getBaseUri(bapServiceUrl)
     val retrofit = Retrofit.Builder()
-      .baseUrl(bapServiceUrl)
+      .baseUrl(url)
       .client(buildHttpClient())
       .addConverterFactory(JacksonConverterFactory.create(objectMapper))
       .addCallAdapterFactory(RetryCallAdapter.of(getRetryConfig()))

@@ -10,7 +10,7 @@ data class SubscriberDto(
   val subscriber_url: String,
   val type: Type,
   val domain: String,
-  val city: String,
+  val city: String?,
   val country: String,
   val signing_public_key: String,
   val encr_public_key: String,

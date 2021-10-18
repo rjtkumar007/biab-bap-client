@@ -22,7 +22,11 @@ class SearchRequestFactory {
                   gps = location
                 )
               ),
-              provider_id = "padma coffee works"
+              start = ProtocolFulfillmentStart(
+                  location = ProtocolLocation(
+                    gps = location
+                  )
+                )
             ),
             item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = searchString))
           )

@@ -60,8 +60,10 @@ class BppSearchService @Autowired constructor(
   private fun getFulfillmentFilter(criteria: SearchCriteria) =
     when {
       StringUtils.hasText(criteria.deliveryLocation) ->
-        ProtocolFulfillment(end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.deliveryLocation)),
-          provider_id = criteria.providerId)
+        ProtocolFulfillment(
+          start = ProtocolFulfillmentStart(location = ProtocolLocation(gps=criteria.pickupLocation)),
+          end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.deliveryLocation))
+        )
       else -> null
     }
 }

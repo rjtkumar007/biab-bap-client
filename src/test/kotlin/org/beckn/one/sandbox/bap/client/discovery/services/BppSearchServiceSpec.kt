@@ -40,7 +40,8 @@ internal class BppSearchServiceSpec : DescribeSpec() {
 
       it("should return bpp internal server error when bpp search call fails with an exception") {
         val criteria =
-          SearchCriteria(providerId = "padma coffee works", deliveryLocation = "venugopala stores location 1", categoryId = "fruits")
+          SearchCriteria(providerId = "padma coffee works", deliveryLocation = "venugopala stores location 1", categoryId = "fruits", pickupLocation = "venugopala stores location 1")
+
         `when`(bppServiceClient.search(getSearchRequest(context, criteria))).thenReturn(
           Calls.failure(IOException("Timeout"))
         )
@@ -53,7 +54,8 @@ internal class BppSearchServiceSpec : DescribeSpec() {
 
       it("should return bpp internal server error when bpp search call returns null body") {
         val criteria =
-          SearchCriteria(providerId = "padma coffee works", deliveryLocation = "venugopala stores location 1", categoryId = "fruits")
+          SearchCriteria(providerId = "padma coffee works", deliveryLocation = "venugopala stores location 1", categoryId = "fruits",pickupLocation = "venugopala stores location 1")
+
         `when`(bppServiceClient.search(getSearchRequest(context, criteria))).thenReturn(
           Calls.response(null)
         )
@@ -66,7 +68,8 @@ internal class BppSearchServiceSpec : DescribeSpec() {
 
       it("should return bpp internal server error when bpp search call returns nack response body") {
         val criteria =
-          SearchCriteria(providerId = "padma coffee works", deliveryLocation = "venugopala stores location 1", categoryId = "fruits")
+          SearchCriteria(providerId = "padma coffee works", deliveryLocation = "venugopala stores location 1", categoryId = "fruits",pickupLocation = "venugopala stores location 1")
+
         `when`(bppServiceClient.search(getSearchRequest(context, criteria))).thenReturn(
           Calls.response(ProtocolAckResponse(context, ResponseMessage.nack()))
         )

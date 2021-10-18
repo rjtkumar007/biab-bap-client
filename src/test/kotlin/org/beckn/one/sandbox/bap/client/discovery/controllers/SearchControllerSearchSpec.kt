@@ -231,6 +231,7 @@ class SearchControllerSpec @Autowired constructor(
           searchString = "Fictional mystery books",
           deliveryLocation = location,
           providerId = providerId,
+          pickupLocation = location
         )
       )
     )
