@@ -7,14 +7,13 @@ import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollControl
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientErrorResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.OrderResponse
-import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.errors.HttpError
+import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
-import org.beckn.one.sandbox.bap.message.mappers.OnBapEntityToDao
-import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
+import org.beckn.one.sandbox.bap.message.mappers.OnOrderProtocolToEntityOrder
 import org.beckn.protocol.schemas.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -25,12 +24,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OnConfirmOrderController @Autowired constructor(
-    onPollService: GenericOnPollService<ProtocolOnConfirm, ClientConfirmResponse>,
-    val contextFactory: ContextFactory,
-    val protocolClient: ProtocolClient,
-    val repository: ResponseStorageService<OrderResponse,OrderDao>,
-    val mapping: OnBapEntityToDao,
-    val onConfirmOrderService: OnConfirmOrderService
+  onPollService: GenericOnPollService<ProtocolOnConfirm, ClientConfirmResponse>,
+  val contextFactory: ContextFactory,
+  val protocolClient: ProtocolClient,
+  val mapping: OnOrderProtocolToEntityOrder,
+  val onConfirmOrderService: OnConfirmOrderService
 ) : AbstractOnPollController<ProtocolOnConfirm, ClientConfirmResponse>(onPollService, contextFactory) {
 
   @RequestMapping("/client/v1/on_confirm_order")
@@ -42,28 +40,30 @@ class OnConfirmOrderController @Autowired constructor(
     val bapResult = onPoll(messageId, protocolClient.getConfirmResponsesCall(messageId))
     when (bapResult.statusCode.value()) {
       200 -> {
-        if(user != null){
+        if (user != null) {
           val resultResponse: ClientConfirmResponse = bapResult.body as ClientConfirmResponse
-          if(resultResponse.message != null){
-            val orderDao :OrderDao = mapping.entityToDao(resultResponse?.message?.order!!)
+          if (resultResponse.message?.order != null) {
+            val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message.order!!)
             orderDao.transactionId = "75nm6996-69b5-108a-b57e-298e130eb112" //resultResponse.context.transactionId
-            orderDao.userId =user.uid
-            orderDao.messageId =messageId
+            orderDao.userId = user.uid
+            orderDao.messageId = messageId
             onConfirmOrderService.updateOrder(orderDao).fold(
               {
-                return mapToErrorResponse( it,context = contextFactory.create(messageId = messageId))
+                return mapToErrorResponse(it, context = contextFactory.create(messageId = messageId))
               }, {
                 return bapResult
               }
             )
-          }else{
-            return mapToErrorResponse(ClientError.AuthenticationError,context = contextFactory.create(messageId = messageId))
+          } else {
+            return mapToErrorResponse(BppError.NullResponse, context = contextFactory.create(messageId = messageId))
           }
-          }else{
-            //token expired
-          return bapResult
+        } else {
+          //token expired
+          return mapToErrorResponse(
+            BppError.AuthenticationError,
+            context = contextFactory.create(messageId = messageId)
+          )
         }
-
       }
       else -> {
         return bapResult

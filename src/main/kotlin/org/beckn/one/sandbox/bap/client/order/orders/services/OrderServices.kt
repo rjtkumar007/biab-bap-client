@@ -22,16 +22,16 @@ class OrderServices @Autowired constructor(
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
 
-  fun findAllOrders(orderId: String, skip: Int?, limit: Int?):Either<DatabaseError,List<OrderResponse>>{
+  fun findAllOrders(orderId: String, skip: Int = 0, limit: Int  =10):Either<DatabaseError,List<OrderResponse>>{
     val user = SecurityUtil.getSecuredUserDetail()
-    return if(!orderId.isNullOrEmpty()){
-      ordersResponseRepository.findOrdersById(orderId)
+    return if( user != null){
+     if(!orderId.isNullOrEmpty()){
+      ordersResponseRepository.findOrdersById(orderId,0,1)
     }else{
-      if( user!= null){
-        ordersResponseRepository.findManyByUserId(user.uid!!)
-      }else{
-        Either.Left(DatabaseError.NotFound)
+      ordersResponseRepository.findManyByUserId(user.uid!!,skip,limit)
       }
+    }else{
+        Either.Left(DatabaseError.NotFound)
     }
   }
 }

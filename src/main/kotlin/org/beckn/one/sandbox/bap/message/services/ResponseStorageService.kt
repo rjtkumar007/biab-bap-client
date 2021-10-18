@@ -8,16 +8,18 @@ import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.BecknResponseDao
 import org.beckn.one.sandbox.bap.message.mappers.GenericResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
+import org.bson.conversions.Bson
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 interface ResponseStorageService<Proto : ClientResponse, Entity : BecknResponseDao> {
   fun save(protoResponse: Entity): Either<DatabaseError.OnWrite, Proto>
-  fun findManyByUserId(id: String): Either<DatabaseError, List<Proto>>
+  fun findManyByUserId(id: String,skip: Int , limit :Int): Either<DatabaseError, List<Proto>>
   fun findById(userId: String): Either<DatabaseError, Proto?>
   fun findByTransactionId(id: String): Either<DatabaseError, Proto?>
-  fun findOrdersById(id: String): Either<DatabaseError, List<Proto>>
+  fun findOrdersById(id: String,skip: Int  , limit :Int ): Either<DatabaseError, List<Proto>>
   fun updateOneById(id: String, requestData: Entity): Either<DatabaseError, Proto>
+  fun updateDocById(query: Bson, requestData: Entity): Either<DatabaseError, Proto>
   fun deleteOneById(id: String): Either<DatabaseError, DeleteResult>
 }
 
@@ -46,7 +48,7 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
   private fun toSchema(allResponses: List<Entity>) =
     allResponses.map { response -> mapper.entityToProtocol(response) }
 
-  override fun findManyByUserId(id: String): Either<DatabaseError, List<Proto>> = Either
+  override fun findManyByUserId(id: String ,skip: Int , limit :Int): Either<DatabaseError, List<Proto>> = Either
     .catch { responseRepository.findManyByUserId(id) }
     .map {
       return if (it.isNotEmpty()) {
@@ -99,6 +101,17 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
         mapper.entityToProtocol(requestData)
       }
 
+  override fun updateDocById(query: Bson, requestData: Entity): Either<DatabaseError, Proto> =
+    Either
+      .catch {
+        responseRepository.updateByUserId(query, requestData, UpdateOptions().upsert(true))
+      }.mapLeft { e ->
+        log.error("Error while updating user by id ", e)
+        DatabaseError.OnWrite
+      }.map {
+        mapper.entityToProtocol(requestData)
+      }
+
   override fun deleteOneById(id: String): Either<DatabaseError, DeleteResult> =
     Either
       .catch {
@@ -114,12 +127,11 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
         }
       }
 
-  override fun findOrdersById(id: String): Either<DatabaseError, List<Proto>> = Either
-    .catch { responseRepository.findOrdersById(id) }
+  override fun findOrdersById(id: String,skip: Int , limit :Int ): Either<DatabaseError, List<Proto>> = Either
+    .catch { responseRepository.findOrdersById(id, skip, limit) }
     .map {
       return if (it.isNotEmpty()) {
-        val a = toSchema(it)
-        Either.Right(a)
+        Either.Right(toSchema(it))
       } else {
         Either.Left(DatabaseError.NotFound)
       }
@@ -128,4 +140,5 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
       log.error("Exception while fetching search response", e)
       DatabaseError.OnRead
     }
+
 }

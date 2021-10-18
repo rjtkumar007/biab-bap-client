@@ -20,7 +20,7 @@ class BillingDetailService @Autowired constructor(
   fun findBillingsForCurrentUser(
     userId: String
   ): ResponseEntity<List<BillingDetailsResponse>> = responseStorageService
-    .findManyByUserId(userId)
+    .findManyByUserId(userId,0,0)
     .fold(
       {
         log.error("Error when finding search response by message id. Error: {}", it)

@@ -1,11 +1,9 @@
 package org.beckn.one.sandbox.bap.client.accounts.billings.controllers
 
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
-import org.beckn.one.sandbox.bap.client.accounts.billings.services.BillingDetailService
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
-import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.message.entities.BillingDao
 import org.beckn.one.sandbox.bap.message.entities.BillingDetailsDao
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.protocol.schemas.*
@@ -30,7 +28,7 @@ class BillingDetailsController @Autowired constructor(
   fun deliveryAddress(@RequestBody request: BillingDetailRequestDto): ResponseEntity<BillingDetailsResponse> {
     val user = SecurityUtil.getSecuredUserDetail()
     if (user == null) {
-     return  mapToErrorResponse(ClientError.AuthenticationError)
+     return  mapToErrorResponse(BppError.AuthenticationError)
     } else {
       val billingDao = BillingDetailsDao(
         userId = user?.uid,

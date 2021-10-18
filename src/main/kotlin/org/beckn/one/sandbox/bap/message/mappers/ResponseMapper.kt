@@ -99,6 +99,6 @@ interface OnConfirmResponseMapper : GenericResponseMapper<ClientConfirmResponse,
   injectionStrategy = InjectionStrategy.CONSTRUCTOR,
   uses = [DateMapper::class]
 )
-interface OnBapEntityToDao {
-   fun entityToDao(entity: ProtocolOrder): OrderDao
+interface OnOrderProtocolToEntityOrder {
+   fun protocolToEntity(entity: ProtocolOrder): OrderDao
 }

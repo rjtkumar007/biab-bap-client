@@ -19,7 +19,8 @@ class BecknResponseRepository<R : BecknResponseDao>(
   private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
 
-  fun findManyByUserId(id: String): List<R> = findAll(BecknResponseDao::userId eq id)
+  fun findManyByUserId(id: String, skip: Int = 0 , limit :Int = 10): List<R> =
+    collection.find(BecknResponseDao::userId eq id).limit(limit).skip(skip).toList()
 
   fun findByTransactionId(id: String): R? {
     return findOne(OrderDao::transactionId eq id)
@@ -36,8 +37,15 @@ class BecknResponseRepository<R : BecknResponseDao>(
       updateOptions
     )
   }
-
-  fun findOrdersById(id: String): List<R> = findAll(OrderDao::id eq id)
+  fun updateByUserId(id: Bson, requestData: R, updateOptions: UpdateOptions): UpdateResult {
+    return updateOneById(
+      id,
+      requestData,
+      updateOptions
+    )
+  }
+  fun findOrdersById(id: String, skip: Int = 0 , limit :Int = 10  ): List<R> =
+    collection.find(OrderDao::id eq id).limit(limit).skip(skip).toList()
 
 
 

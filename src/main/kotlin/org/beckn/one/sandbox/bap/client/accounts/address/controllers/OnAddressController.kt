@@ -2,14 +2,9 @@ package org.beckn.one.sandbox.bap.client.accounts.address.controllers
 
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.accounts.address.services.AddressServices
-import org.beckn.one.sandbox.bap.client.accounts.billings.services.BillingDetailService
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientErrorResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
-import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.protocol.schemas.ProtocolAckResponse
-import org.beckn.protocol.schemas.ProtocolContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,7 +24,7 @@ class OnAddressController @Autowired constructor(
     return if(user != null){
        addressService.findAddressesForCurrentUser(user?.uid!!)
     }else{
-      mapToErrorResponse(ClientError.AuthenticationError)
+      mapToErrorResponse(BppError.AuthenticationError)
     }
   }
 

@@ -3,18 +3,13 @@ package org.beckn.one.sandbox.bap.client.accounts.user.controllers
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.accounts.user.services.AccountDetailsServices
 import org.beckn.one.sandbox.bap.client.shared.dtos.AccountDetailsResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
-import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.AccountDetailsDao
-import org.beckn.one.sandbox.bap.message.mappers.GenericResponseMapper
-import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
-import org.beckn.protocol.schemas.ProtocolError
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
@@ -35,7 +30,8 @@ class OnAccountDetailsController @Autowired constructor(
     return if (user != null) {
       accountDetailsServices.findAccountDetailForCurrentUser(user?.uid!!)
     } else {
-      mapToErrorResponse(ClientError.AuthenticationError)
+      log.error("Error of authentication on getting account info}")
+      mapToErrorResponse(BppError.AuthenticationError)
     }
   }
 

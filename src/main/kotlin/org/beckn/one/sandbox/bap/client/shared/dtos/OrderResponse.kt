@@ -25,6 +25,7 @@ data class OrderResponse @Default constructor(
   val createdAt: java.time.OffsetDateTime? = null,
   val updatedAt: java.time.OffsetDateTime? = null,
   val transactionId: String? = null,
+  val messageId: String? = null,
   override val context: ProtocolContext?,
   override val error: ProtocolError?,
   @JsonIgnore val userId: String?,

@@ -3,8 +3,7 @@ package org.beckn.one.sandbox.bap.client.accounts.billings.controllers
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.accounts.billings.services.BillingDetailService
 import org.beckn.one.sandbox.bap.client.shared.dtos.BillingDetailsResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
-import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,7 +24,7 @@ class OnBillingDetailsController @Autowired constructor(
     return if (user != null) {
       billingService.findBillingsForCurrentUser(user?.uid!!)
     } else {
-      mapToErrorResponse(ClientError.AuthenticationError)
+      mapToErrorResponse(BppError.AuthenticationError)
     }
   }
 

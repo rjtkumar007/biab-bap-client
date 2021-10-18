@@ -1,11 +1,9 @@
 package org.beckn.one.sandbox.bap.client.accounts.address.controllers
 
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
-import org.beckn.one.sandbox.bap.client.accounts.billings.services.BillingDetailService
-import org.beckn.one.sandbox.bap.message.entities.DeliveryAddressDao
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressRequestDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
-import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.AddDeliveryAddressDao
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
@@ -31,7 +29,7 @@ class AddressController @Autowired constructor(
   fun deliveryAddress(@RequestBody request: DeliveryAddressRequestDto): ResponseEntity<DeliveryAddressResponse> {
     val user = SecurityUtil.getSecuredUserDetail()
     if (user == null) {
-      return mapToErrorResponse(ClientError.AuthenticationError)
+      return mapToErrorResponse(BppError.AuthenticationError)
     } else {
       val deliveryAddressDao = AddDeliveryAddressDao(
         userId = user?.uid,

@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.message.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.beckn.protocol.schemas.Default
 import java.time.Clock
 import java.time.OffsetDateTime
@@ -60,15 +61,15 @@ data class BillingDetailsDao @Default constructor(
 data class AccountDetailsDao @Default constructor(
   @field:JsonIgnore
   override val context: ContextDao? = null,
-  val userPhone: String? = null,
-  val userEmail: String? = null,
-  val userName: String? = null,
-  val deliveryAddresses: List<DeliveryAddressDao>? = null,
-  val billingInfo: List<BillingDetailsDao>? = null,
+  val phone: String? = null,
+  val email: String? = null,
+  val name: String? = null,
+  val address: List<DeliveryAddressDao>? = null,
+  val billing: List<BillingDetailsDao>? = null,
   @field:JsonIgnore
   override val error: ErrorDao? = null,
   override var userId: String?,
   @JsonIgnore val clock: Clock = Clock.systemUTC(),
-  val timestamp: OffsetDateTime = OffsetDateTime.now(clock)
+  val createdAt: OffsetDateTime = OffsetDateTime.now(clock),
 ) : BecknResponseDao
 

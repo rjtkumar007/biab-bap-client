@@ -4,7 +4,7 @@ import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.order.confirm.services.ConfirmOrderService
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderRequestDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderResponse
-import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
@@ -63,7 +63,7 @@ class ConfirmOrderController @Autowired constructor(
                 }
               )
           }else{
-            mapToErrorResponse(ClientError.AuthenticationError,context)
+            mapToErrorResponse(BppError.AuthenticationError,context)
           }
         }
       )

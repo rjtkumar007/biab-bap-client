@@ -27,13 +27,13 @@ class OnOrdersController @Autowired constructor(
   @RequestMapping("/client/v1/orders")
   @ResponseBody
   fun onOrdersList (
-    @RequestParam orderId: String,
+    @RequestParam orderId: String?,
     @RequestParam skip: Int?,
     @RequestParam limit: Int?
   ) :ResponseEntity<List<OrderResponse>>{
 
 
-       return  orderServices.findAllOrders(orderId, skip,limit).fold(
+       return  orderServices.findAllOrders(orderId?:"", skip?:0,limit?:10).fold(
           {
   //        log.error("Error when cancelling order with BPP: {}", it)
             mapToErrorResponse(it)

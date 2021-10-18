@@ -2,6 +2,8 @@ package org.beckn.one.sandbox.bap.auth.utils
 
 import org.beckn.one.sandbox.bap.auth.model.User
 import org.springframework.security.core.context.SecurityContextHolder
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 object SecurityUtil {
 
@@ -18,5 +20,10 @@ object SecurityUtil {
     }
   }
 
+ fun emailValidation(email: String) : Boolean {
+   val pattern: Pattern = Pattern.compile(".+@.+\\.[a-z]+")
+   val matcher: Matcher = pattern.matcher(email)
+   return matcher.matches()
+ }
 
 }

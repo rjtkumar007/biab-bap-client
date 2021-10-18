@@ -47,7 +47,7 @@ class AddressServices @Autowired constructor(
   fun findAddressesForCurrentUser(
     userId: String
   ): ResponseEntity<List<DeliveryAddressResponse>> = responseStorageService
-    .findManyByUserId(userId)
+    .findManyByUserId(userId,0,0)
     .fold(
       {
         log.error("Error when finding search response by message id. Error: {}", it)
