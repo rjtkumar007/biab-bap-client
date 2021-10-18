@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class BillingDetailService @Autowired constructor(
-  private val billingRepository: GenericRepository<BillingDetailsDao>,
   private val responseStorageService: ResponseStorageService<BillingDetailsResponse, BillingDetailsDao>
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)

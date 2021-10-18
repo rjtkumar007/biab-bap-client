@@ -3,6 +3,9 @@ package org.beckn.one.sandbox.bap.client.accounts.user.controllers
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.accounts.user.services.AccountDetailsServices
 import org.beckn.one.sandbox.bap.client.shared.dtos.AccountDetailsResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
+import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.AccountDetailsDao
 import org.beckn.one.sandbox.bap.message.mappers.GenericResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
@@ -29,17 +32,20 @@ class OnAccountDetailsController @Autowired constructor(
   @ResponseBody
   fun onAccountDetails(): ResponseEntity<out AccountDetailsResponse> {
     val user = SecurityUtil.getSecuredUserDetail()
-    return responseRepository.findGraphData(user?.uid!!).fold({
-      ResponseEntity
-        .status(it.status())
-        .body(AccountDetailsResponse(userId = null,context = null,error = ProtocolError(code = it.status().name, message = it.message().toString())))
-
-    },{
-      ResponseEntity
-        .status(HttpStatus.OK)
-        .body(AccountDetailsResponse(userId = null,context = null,error = ProtocolError(code ="122", message = "it.message().toString()")))
-
-    })
+    return if (user != null) {
+      accountDetailsServices.findAccountDetailForCurrentUser(user?.uid!!)
+    } else {
+      mapToErrorResponse(ClientError.AuthenticationError)
+    }
   }
 
+  private fun mapToErrorResponse(it: HttpError) = ResponseEntity
+    .status(it.status())
+    .body(
+      AccountDetailsResponse(
+        userId = null,
+        context = null,
+        error = it.error()
+      )
+    )
 }

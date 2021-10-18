@@ -17,6 +17,7 @@ import org.beckn.one.sandbox.bap.client.support.mappers.SupportClientResponseMap
 import org.beckn.one.sandbox.bap.message.entities.AccountDetailsDao
 import org.beckn.one.sandbox.bap.message.entities.AddDeliveryAddressDao
 import org.beckn.one.sandbox.bap.message.entities.BillingDetailsDao
+import org.beckn.one.sandbox.bap.message.entities.OrderDao
 import org.beckn.one.sandbox.bap.message.mappers.GenericResponseMapper
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
@@ -28,7 +29,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class ClientServicesConfiguration @Autowired constructor(
-  private val clientCatalogMapper: ClientCatalogMapper
+  private val clientCatalogMapper: ClientCatalogMapper,
 ) {
   @Bean
   fun forSearchResults(): GenericOnPollMapper<ProtocolOnSearch, ClientSearchResponse> =
@@ -158,5 +159,11 @@ class ClientServicesConfiguration @Autowired constructor(
     @Autowired responseRepository: BecknResponseRepository<AccountDetailsDao>,
     @Autowired mapper: GenericResponseMapper<AccountDetailsResponse, AccountDetailsDao>,
   ): ResponseStorageService<AccountDetailsResponse, AccountDetailsDao> = ResponseStorageServiceImpl(responseRepository,mapper)
+
+  @Bean
+  fun setOrderProtocolToDao(
+    @Autowired responseRepository: BecknResponseRepository<OrderDao>,
+    @Autowired mapper: GenericResponseMapper<OrderResponse, OrderDao>,
+  ): ResponseStorageService<OrderResponse, OrderDao> = ResponseStorageServiceImpl(responseRepository,mapper)
 
 }

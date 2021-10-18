@@ -2,7 +2,6 @@ package org.beckn.one.sandbox.bap.client.shared.dtos
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.beckn.one.sandbox.bap.message.entities.AddressDao
-import org.beckn.one.sandbox.bap.message.entities.BillingDao
 import org.beckn.one.sandbox.bap.message.entities.OrganizationDao
 import org.beckn.one.sandbox.bap.message.entities.TimeDao
 import org.beckn.protocol.schemas.ProtocolContext

@@ -3,6 +3,8 @@ package org.beckn.one.sandbox.bap.client.accounts.billings.controllers
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.accounts.billings.services.BillingDetailService
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
+import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.BillingDao
 import org.beckn.one.sandbox.bap.message.entities.BillingDetailsDao
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class BillingDetailsController @Autowired constructor(
-  private val addressService: BillingDetailService,
   private val responseStorageService: ResponseStorageService<BillingDetailsResponse,BillingDetailsDao>
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -27,34 +28,58 @@ class BillingDetailsController @Autowired constructor(
   @PostMapping("/client/v1/billing_details")
   @ResponseBody
   fun deliveryAddress(@RequestBody request: BillingDetailRequestDto): ResponseEntity<BillingDetailsResponse> {
-  val user = SecurityUtil.getSecuredUserDetail()
-  val billingDao = BillingDetailsDao(
-    userId = user?.uid,
-    id =  newId<String>().toString(),
-    address = request.address,
-    organization = request.organization,
-    locationId = request.locationId,
-     email = request.email,
-     phone = request.phone,
-     taxNumber = request.taxNumber,
-      name = request.name,
+    val user = SecurityUtil.getSecuredUserDetail()
+    if (user == null) {
+     return  mapToErrorResponse(ClientError.AuthenticationError)
+    } else {
+      val billingDao = BillingDetailsDao(
+        userId = user?.uid,
+        id = newId<String>().toString(),
+        address = request.address,
+        organization = request.organization,
+        locationId = request.locationId,
+        email = request.email,
+        phone = request.phone,
+        taxNumber = request.taxNumber,
+        name = request.name,
       )
-  return  responseStorageService
-      .save(billingDao)
-      .fold(
-        {
-          log.error("Error when saving billing response by user Id. Error: {}", it)
-          ResponseEntity
-          .status(it.status())
-             .body(BillingDetailsResponse(id= null,
-               context = null, name= null, phone = null,
-               error = ProtocolError(code = it.status().name,
-                 message = it.message().toString()),userId = null))
-        },
-        {
-          log.info("Saved Billing Info of User {}")
-          ResponseEntity.ok(it)
-        }
-      )
+      return responseStorageService
+        .save(billingDao)
+        .fold(
+          {
+            log.error("Error when saving billing response by user Id. Error: {}", it)
+            ResponseEntity
+              .status(it.status())
+              .body(
+                BillingDetailsResponse(
+                  id = null,
+                  context = null, name = null, phone = null,
+                  error = ProtocolError(
+                    code = it.status().name,
+                    message = it.message().toString()
+                  ), userId = null
+                )
+              )
+          },
+          {
+            log.info("Saved Billing Info of User {}")
+            ResponseEntity.ok(it)
+          }
+        )
+    }
   }
+
+  private fun mapToErrorResponse(it: HttpError) = ResponseEntity
+    .status(it.status())
+    .body(
+        BillingDetailsResponse(
+          userId = null,
+          context = null,
+          error = it.error(),
+          id = null,
+          name = null,
+          phone = null
+        )
+    )
+
 }

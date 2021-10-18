@@ -26,18 +26,15 @@ class AddressServices @Autowired constructor(
 
   fun save(address: DeliveryAddressRequestDto): Either<HttpError, AddDeliveryAddressDao> {
     val user = SecurityUtil.getSecuredUserDetail()
-    val deliveryAddressDao = DeliveryAddressDao(
-      id =  newId<String>().toString(),
-      descriptor = address.descriptor,
-      gps = address.gps,
-      default = address.default,
-      address = address.address
-    )
 
     return Either
       .catch { addressRepository.insertOne(AddDeliveryAddressDao(
         userId = user?.uid,
-        address = deliveryAddressDao)) }
+        id =  newId<String>().toString(),
+        descriptor = address.descriptor,
+        gps = address.gps,
+        default = address.default,
+        address = address.address)) }
       .mapLeft { e ->
         log.error("Error when saving message to DB", e)
         DatabaseError.OnWrite
@@ -56,7 +53,7 @@ class AddressServices @Autowired constructor(
         log.error("Error when finding search response by message id. Error: {}", it)
         ResponseEntity
           .status(it.status().value())
-          .body(listOf(DeliveryAddressResponse(userId = null,error = it.error(),context = null,address = null)))
+          .body(listOf(DeliveryAddressResponse(id= null,userId = null,error = it.error(),context = null)))
       },
       {
         log.info("Found responses for address {}", userId)

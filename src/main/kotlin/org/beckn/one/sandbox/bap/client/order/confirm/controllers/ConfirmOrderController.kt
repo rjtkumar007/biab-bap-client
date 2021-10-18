@@ -1,14 +1,14 @@
 package org.beckn.one.sandbox.bap.client.order.confirm.controllers
 
-import com.google.api.Authentication
-import org.beckn.one.sandbox.bap.auth.model.User
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.order.confirm.services.ConfirmOrderService
-import org.beckn.one.sandbox.bap.client.order.orders.services.OrderServices
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderRequestDto
+import org.beckn.one.sandbox.bap.client.shared.dtos.OrderResponse
+import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
+import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ResponseMessage
@@ -16,7 +16,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseBody
@@ -27,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController
 class ConfirmOrderController @Autowired constructor(
     private val contextFactory: ContextFactory,
     private val confirmOrderService: ConfirmOrderService,
-    private val orderServices: OrderServices
+    private  val confirmOrderRepository :ResponseStorageService<OrderResponse,OrderDao>
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -50,7 +49,9 @@ class ConfirmOrderController @Autowired constructor(
         {
           log.info("Successfully confirmed order. Message: {}", it)
           if(SecurityUtil.getSecuredUserDetail() != null){
-            orderServices.updateUserById(OrderDao(userId = SecurityUtil.getSecuredUserDetail()?.uid, transactionId = orderRequest.context.transactionId))
+            confirmOrderRepository.updateOneById(orderRequest.context.transactionId,
+              OrderDao(userId = SecurityUtil.getSecuredUserDetail()?.uid, messageId = null,
+              transactionId = orderRequest.context.transactionId))
               .fold(
                 {
                   log.error("Error when updating order: {}", it)
@@ -62,7 +63,7 @@ class ConfirmOrderController @Autowired constructor(
                 }
               )
           }else{
-            ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
+            mapToErrorResponse(ClientError.AuthenticationError,context)
           }
         }
       )

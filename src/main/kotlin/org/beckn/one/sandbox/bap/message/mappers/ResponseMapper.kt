@@ -1,10 +1,9 @@
 package org.beckn.one.sandbox.bap.message.mappers
 
-import org.beckn.one.sandbox.bap.client.shared.dtos.AccountDetailsResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.BillingDetailsResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.*
 import org.beckn.one.sandbox.bap.message.entities.*
+import org.beckn.protocol.schemas.ProtocolOnConfirm
+import org.beckn.protocol.schemas.ProtocolOrder
 import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -46,7 +45,8 @@ interface DeliveryAddressResponseMapper : GenericResponseMapper<DeliveryAddressR
 @Mapper(
   componentModel = "spring",
   unmappedTargetPolicy = ReportingPolicy.WARN,
-  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
 )
 interface BillingDetailsResponseMapper : GenericResponseMapper<BillingDetailsResponse, BillingDetailsDao> {
   @Mapping(ignore = true, target = "userId")
@@ -58,7 +58,8 @@ interface BillingDetailsResponseMapper : GenericResponseMapper<BillingDetailsRes
 @Mapper(
   componentModel = "spring",
   unmappedTargetPolicy = ReportingPolicy.WARN,
-  injectionStrategy = InjectionStrategy.CONSTRUCTOR
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
 )
 interface AccountDetailsResponseMapper : GenericResponseMapper<AccountDetailsResponse, AccountDetailsDao> {
   @Mapping(ignore = true, target = "userId")
@@ -67,4 +68,37 @@ interface AccountDetailsResponseMapper : GenericResponseMapper<AccountDetailsRes
   override fun protocolToEntity(schema: AccountDetailsResponse): AccountDetailsDao
 }
 
+@Mapper(
+  componentModel = "spring",
+  unmappedTargetPolicy = ReportingPolicy.WARN,
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
+)
+interface OrderResponseMapper : GenericResponseMapper<OrderResponse, OrderDao> {
+  @Mapping(ignore = true, target = "userId")
+  override fun entityToProtocol(entity: OrderDao): OrderResponse
 
+  override fun protocolToEntity(schema: OrderResponse): OrderDao
+}
+
+@Mapper(
+  componentModel = "spring",
+  unmappedTargetPolicy = ReportingPolicy.WARN,
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
+)
+interface OnConfirmResponseMapper : GenericResponseMapper<ClientConfirmResponse, OnConfirmDao> {
+  override fun entityToProtocol(entity: OnConfirmDao): ClientConfirmResponse
+
+  override fun protocolToEntity(schema: ClientConfirmResponse): OnConfirmDao
+}
+
+@Mapper(
+  componentModel = "spring",
+  unmappedTargetPolicy = ReportingPolicy.WARN,
+  injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+  uses = [DateMapper::class]
+)
+interface OnBapEntityToDao {
+   fun entityToDao(entity: ProtocolOrder): OrderDao
+}

@@ -30,10 +30,9 @@ class DatabaseConfiguration @Autowired constructor(
     return client.getDatabase(databaseName)
   }
 
-
   @Bean
-  fun createOrderDb(@Autowired database: MongoDatabase): GenericRepository<OrderDao> =
-    GenericRepository.create(database, "order")
+  fun createOrderDb(@Autowired database: MongoDatabase): BecknResponseRepository<OrderDao> =
+    BecknResponseRepository(database.getCollectionOfName("order"))
 
   @Bean
   fun createDeliverAddressResponseDb(@Autowired database: MongoDatabase): BecknResponseRepository<AddDeliveryAddressDao> =

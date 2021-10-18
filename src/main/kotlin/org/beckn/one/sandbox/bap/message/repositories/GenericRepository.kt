@@ -1,20 +1,12 @@
 package org.beckn.one.sandbox.bap.message.repositories
 
-import arrow.core.computations.option
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
-import com.mongodb.client.model.Aggregates
-import com.mongodb.client.model.GraphLookupOptions
 import com.mongodb.client.model.UpdateOptions
 import org.beckn.one.sandbox.bap.Open
-import org.beckn.one.sandbox.bap.message.entities.UserDao
 import org.bson.Document
 import org.bson.conversions.Bson
-import org.litote.kmongo.findOne
-import org.litote.kmongo.getCollection
-import org.litote.kmongo.getCollectionOfName
-import org.litote.kmongo.updateOneById
-import org.litote.kmongo.util.idValue
+import org.litote.kmongo.*
 
 @Open
 class GenericRepository<R : Any>(private val collection: MongoCollection<R>) {
@@ -46,6 +38,8 @@ class GenericRepository<R : Any>(private val collection: MongoCollection<R>) {
 
   fun clear() = collection.deleteMany(Document())
 
-  fun update(id: String, entity: R, options: UpdateOptions) = collection.updateOneById(id,entity,options)
+  fun updateOneById(query: Bson, entity: R, options: UpdateOptions) = collection.updateOne(query,entity,options)
+
+  fun deleteOneById(id: String) = collection.deleteOne(id)
 
 }

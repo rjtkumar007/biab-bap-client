@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.message.entities
 
 import org.beckn.protocol.schemas.Default
+import java.time.Instant
 
 data class TimeDao @Default constructor(
   val label: String? = null,
@@ -11,8 +12,8 @@ data class TimeDao @Default constructor(
 )
 
 data class TimeRangeDao @Default constructor(
-  val start: java.time.Instant? = null,
-  val end: java.time.Instant? = null
+  val start: Instant? = null,
+  val end: Instant? = null
 )
 
 

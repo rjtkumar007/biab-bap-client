@@ -4,6 +4,8 @@ import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.accounts.billings.services.BillingDetailService
 import org.beckn.one.sandbox.bap.client.shared.dtos.BillingDetailsResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
+import org.beckn.one.sandbox.bap.client.shared.errors.ClientError
+import org.beckn.one.sandbox.bap.errors.HttpError
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +22,26 @@ class OnBillingDetailsController @Autowired constructor(
   @ResponseBody
   fun onBillingDetails(): ResponseEntity<out List<BillingDetailsResponse>> {
     val user = SecurityUtil.getSecuredUserDetail()
-    return billingService.findBillingsForCurrentUser(user?.uid!!)
+    return if (user != null) {
+      billingService.findBillingsForCurrentUser(user?.uid!!)
+    } else {
+      mapToErrorResponse(ClientError.AuthenticationError)
+    }
   }
+
+  private fun mapToErrorResponse(it: HttpError) = ResponseEntity
+    .status(it.status())
+    .body(
+      listOf(
+        BillingDetailsResponse(
+          userId = null,
+          context = null,
+          error = it.error(),
+          id = null,
+          name = null,
+          phone = null
+        )
+      )
+    )
 
 }

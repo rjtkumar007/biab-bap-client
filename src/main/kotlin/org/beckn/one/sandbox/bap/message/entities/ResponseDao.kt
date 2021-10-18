@@ -12,21 +12,30 @@ interface BecknResponseDao {
   val userId: String?
 }
 
-data class OnUserDao @Default constructor(
-  override val context: ContextDao? = null,
-  val user: UserDao,
-  override val error: ErrorDao? = null,
+data class OnConfirmDao @Default constructor(
+  @field:JsonIgnore override val context: ContextDao,
+  val transactionId: String? = null,
+  val messageId: String? = null,
+  val message: OnConfirmMessageDao? = null,
+  @field:JsonIgnore override val error: ErrorDao? = null,
   override val userId: String?
 ) : BecknResponseDao
 
+data class OnConfirmMessageDao @Default constructor(
+  val order: OrderDao? = null
+)
 
 data class AddDeliveryAddressDao @Default constructor(
-    @field:JsonIgnore
+  @field:JsonIgnore
   override val context: ContextDao? = null,
-    override val userId: String?,
-    val address: DeliveryAddressDao,
-    @field:JsonIgnore
-  override val error: ErrorDao? = null
+  override val userId: String?,
+  @field:JsonIgnore
+  override val error: ErrorDao? = null,
+  val id: String,
+  val descriptor: DescriptorDao? = null,
+  val gps: String? = null,
+  val default: Boolean? = true,
+  val address: AddressDao? = null
 ) : BecknResponseDao
 
 data class BillingDetailsDao @Default constructor(
@@ -46,7 +55,7 @@ data class BillingDetailsDao @Default constructor(
   @field:JsonIgnore
   override val error: ErrorDao? = null,
   override val userId: String?
-  ) : BecknResponseDao
+) : BecknResponseDao
 
 data class AccountDetailsDao @Default constructor(
   @field:JsonIgnore
@@ -54,11 +63,12 @@ data class AccountDetailsDao @Default constructor(
   val userPhone: String? = null,
   val userEmail: String? = null,
   val userName: String? = null,
-  val deliveryAddresses : List<DeliveryAddressDao> ? = null,
-  val billingInfo : List<BillingDetailsDao>? = null,
+  val deliveryAddresses: List<DeliveryAddressDao>? = null,
+  val billingInfo: List<BillingDetailsDao>? = null,
   @field:JsonIgnore
   override val error: ErrorDao? = null,
   override var userId: String?,
   @JsonIgnore val clock: Clock = Clock.systemUTC(),
   val timestamp: OffsetDateTime = OffsetDateTime.now(clock)
 ) : BecknResponseDao
+

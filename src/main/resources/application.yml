@@ -120,6 +120,9 @@ security:
     - /**/track
     - /**/support
     - /**/delivery_address
+    - /**/confirm_order
+    - /**/billing_details
+    - /**/account_details
 database:
   mongo:
     url: mongodb://localhost:27017
