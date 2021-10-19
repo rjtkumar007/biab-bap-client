@@ -21,10 +21,10 @@ class OnOrderStatusService @Autowired constructor(
 ) {
    fun updateOrder(orderDao: OrderDao):Either<DatabaseError, ClientResponse>{
      return if(orderDao.messageId == null){
-       log.error("Transaction id is not available")
+       log.error("Message id is not available")
        Either.Left(DatabaseError.NotFound)
      }else{
-       log.error("Updating db on confirm callback")
+       log.error("Updating db on order status callback")
        repository.updateDocByQuery(OrderDao::messageId eq orderDao.messageId!!, orderDao)
      }
    }
