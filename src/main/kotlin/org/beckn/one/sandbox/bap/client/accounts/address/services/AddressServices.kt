@@ -2,6 +2,7 @@ package org.beckn.one.sandbox.bap.client.accounts.address.services
 
 import arrow.core.Either
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
+import org.beckn.one.sandbox.bap.client.shared.dtos.AccountDetailsResponse
 import org.beckn.one.sandbox.bap.message.entities.DeliveryAddressDao
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressRequestDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
@@ -51,13 +52,22 @@ class AddressServices @Autowired constructor(
     .fold(
       {
         log.error("Error when finding search response by message id. Error: {}", it)
-        ResponseEntity
-          .status(it.status().value())
-          .body(listOf(DeliveryAddressResponse(id= null,userId = null,error = it.error(),context = null)))
+        mapToErrorResponse(it)
       },
       {
         log.info("Found responses for address {}", userId)
         ResponseEntity.ok(it)
       }
     )
+
+  private fun mapToErrorResponse(it: HttpError) = ResponseEntity
+    .status(it.status())
+    .body(
+      listOf(DeliveryAddressResponse(
+        id = null,
+        userId = null,
+        context = null,
+        error = it.error()
+      )
+    ))
 }

@@ -20,12 +20,12 @@ class OnOrderStatusService @Autowired constructor(
   private val log: Logger = LoggerFactory.getLogger(OnOrderStatusService::class.java)
 ) {
    fun updateOrder(orderDao: OrderDao):Either<DatabaseError, ClientResponse>{
-     return if(orderDao.transactionId == null){
+     return if(orderDao.messageId == null){
        log.error("Transaction id is not available")
        Either.Left(DatabaseError.NotFound)
      }else{
        log.error("Updating db on confirm callback")
-       repository.updateOneById(orderDao.transactionId!!, orderDao)
+       repository.updateDocByQuery(OrderDao::messageId eq orderDao.messageId!!, orderDao)
      }
    }
 }

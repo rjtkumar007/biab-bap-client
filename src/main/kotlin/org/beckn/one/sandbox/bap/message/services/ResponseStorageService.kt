@@ -16,10 +16,8 @@ interface ResponseStorageService<Proto : ClientResponse, Entity : BecknResponseD
   fun save(protoResponse: Entity): Either<DatabaseError.OnWrite, Proto>
   fun findManyByUserId(id: String,skip: Int , limit :Int): Either<DatabaseError, List<Proto>>
   fun findById(userId: String): Either<DatabaseError, Proto?>
-  fun findByTransactionId(id: String): Either<DatabaseError, Proto?>
   fun findOrdersById(id: String,skip: Int  , limit :Int ): Either<DatabaseError, List<Proto>>
-  fun updateOneById(id: String, requestData: Entity): Either<DatabaseError, Proto>
-  fun updateDocById(query: Bson, requestData: Entity): Either<DatabaseError, Proto>
+  fun updateDocByQuery(query: Bson, requestData: Entity): Either<DatabaseError, Proto>
   fun deleteOneById(id: String): Either<DatabaseError, DeleteResult>
 }
 
@@ -32,7 +30,7 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
   override fun save(requestDao: Entity): Either<DatabaseError.OnWrite, Proto> =
     Either
       .catch {
-        log.info("Saving protocol response: {}", requestDao)
+        log.info("Saving client response: {}", requestDao)
         responseRepository.insertOne(requestDao)
       }
       .bimap(
@@ -62,21 +60,8 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
       DatabaseError.OnRead
     }
 
-  override fun findByTransactionId(query: String): Either<DatabaseError, Proto?> = Either
-    .catch { responseRepository.findByTransactionId(query) }
-    .mapLeft { e ->
-      log.error("Exception while fetching search response", e)
-      DatabaseError.OnRead
-    }.map { data ->
-      return if (data != null) {
-        Either.Right(mapper.entityToProtocol(data))
-      } else {
-        Either.Left(DatabaseError.NotFound)
-      }
-    }
-
   override fun findById(userId: String): Either<DatabaseError, Proto?> = Either
-    .catch { responseRepository.findByUserId(userId) }
+    .catch { responseRepository.findById(userId) }
     .mapLeft { e ->
       log.error("Exception while fetching search response", e)
       DatabaseError.OnRead
@@ -88,23 +73,10 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
       }
     }
 
-
-
-  override fun updateOneById(query: String, requestData: Entity): Either<DatabaseError, Proto> =
+  override fun updateDocByQuery(query: Bson, requestData: Entity): Either<DatabaseError, Proto> =
     Either
       .catch {
-        responseRepository.updateByTransactionId(query, requestData, UpdateOptions().upsert(true))
-      }.mapLeft { e ->
-        log.error("Error while updating user by id ", e)
-        DatabaseError.OnWrite
-      }.map {
-        mapper.entityToProtocol(requestData)
-      }
-
-  override fun updateDocById(query: Bson, requestData: Entity): Either<DatabaseError, Proto> =
-    Either
-      .catch {
-        responseRepository.updateByUserId(query, requestData, UpdateOptions().upsert(true))
+        responseRepository.updateByIdQuery(query, requestData, UpdateOptions().upsert(true))
       }.mapLeft { e ->
         log.error("Error while updating user by id ", e)
         DatabaseError.OnWrite

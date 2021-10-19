@@ -38,7 +38,7 @@ class GenericRepository<R : Any>(private val collection: MongoCollection<R>) {
 
   fun clear() = collection.deleteMany(Document())
 
-  fun updateOneById(query: Bson, entity: R, options: UpdateOptions) = collection.updateOne(query,entity,options)
+  fun updateOneByQuery(query: Bson, entity: R, options: UpdateOptions) = collection.updateOne(query,entity,options)
 
   fun deleteOneById(id: String) = collection.deleteOne(id)
 

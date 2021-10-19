@@ -97,7 +97,7 @@ class AccountDetailsServices @Autowired constructor(
 
   private fun updateAccountDetailInDb(requestBody: AccountDetailsDao): ResponseEntity<AccountDetailsResponse> {
     return responseStorageService
-      .updateDocById(BecknResponseDao::userId eq requestBody.userId!!, requestBody)
+      .updateDocByQuery(BecknResponseDao::userId eq requestBody.userId!!, requestBody)
       .fold(
         {
           log.error("Error when saving account details response. Error: {}", it)

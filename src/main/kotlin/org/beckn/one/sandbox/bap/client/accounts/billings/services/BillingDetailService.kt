@@ -1,6 +1,8 @@
 package org.beckn.one.sandbox.bap.client.accounts.billings.services
 
 import org.beckn.one.sandbox.bap.client.shared.dtos.BillingDetailsResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
+import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.BillingDetailsDao
 import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
@@ -24,17 +26,25 @@ class BillingDetailService @Autowired constructor(
     .fold(
       {
         log.error("Error when finding search response by message id. Error: {}", it)
-        ResponseEntity
-          .status(it.status().value())
-          .body(
-            listOf(BillingDetailsResponse(id= null,
-            context = null, name= null, phone = null,
-            error = ProtocolError(code = it.status().name,
-              message = it.message().toString()),userId = null)))
+        mapToErrorResponse(it)
       },
       {
         log.info("Found responses for address {}", userId)
         ResponseEntity.ok(it)
       }
     )
+
+  private fun mapToErrorResponse(it: HttpError) = ResponseEntity
+    .status(it.status())
+    .body(
+      listOf(
+        BillingDetailsResponse(
+        id = null,
+        name = null,
+        phone = null,
+        userId = null,
+        context = null,
+        error = it.error()
+      )
+      ))
 }

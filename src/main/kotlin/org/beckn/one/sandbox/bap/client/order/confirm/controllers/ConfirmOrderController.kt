@@ -7,11 +7,13 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.OrderResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
+import org.beckn.one.sandbox.bap.message.entities.BecknResponseDao
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ResponseMessage
+import org.litote.kmongo.eq
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,9 +51,10 @@ class ConfirmOrderController @Autowired constructor(
         {
           log.info("Successfully confirmed order. Message: {}", it)
           if(SecurityUtil.getSecuredUserDetail() != null){
-            confirmOrderRepository.updateOneById(orderRequest.context.transactionId,
-              OrderDao(userId = SecurityUtil.getSecuredUserDetail()?.uid, messageId = null,
-              transactionId = orderRequest.context.transactionId))
+            confirmOrderRepository.updateDocByQuery(
+              OrderDao::messageId eq context?.messageId,
+              OrderDao(userId = SecurityUtil.getSecuredUserDetail()?.uid, messageId = context?.messageId,
+              transactionId = null))
               .fold(
                 {
                   log.error("Error when updating order: {}", it)

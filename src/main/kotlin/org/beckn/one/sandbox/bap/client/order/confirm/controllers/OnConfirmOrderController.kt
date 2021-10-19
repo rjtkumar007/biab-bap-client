@@ -44,7 +44,7 @@ class OnConfirmOrderController @Autowired constructor(
           val resultResponse: ClientConfirmResponse = bapResult.body as ClientConfirmResponse
           if (resultResponse.message?.order != null) {
             val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message.order!!)
-            orderDao.transactionId = "75nm6996-69b5-108a-b57e-298e130eb112" //resultResponse.context.transactionId
+            orderDao.transactionId = resultResponse.context.transactionId
             orderDao.userId = user.uid
             orderDao.messageId = messageId
             onConfirmOrderService.updateOrder(orderDao).fold(

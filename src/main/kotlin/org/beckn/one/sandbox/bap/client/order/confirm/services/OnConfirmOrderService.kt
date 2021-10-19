@@ -25,7 +25,7 @@ class OnConfirmOrderService @Autowired constructor(
        Either.Left(DatabaseError.NotFound)
      }else{
        log.error("Updating db on confirm callback")
-       repository.updateOneById(orderDao.transactionId!!, orderDao)
+       repository.updateDocByQuery(OrderDao::messageId eq orderDao.messageId, orderDao)
      }
    }
 }
