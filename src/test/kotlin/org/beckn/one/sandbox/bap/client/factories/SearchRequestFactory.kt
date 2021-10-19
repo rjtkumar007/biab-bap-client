@@ -9,19 +9,20 @@ class SearchRequestFactory {
       searchString: String? = null,
       providerId: String? = null,
       location: String? = null,
+      categoryId: String? = null
     ): ProtocolSearchRequest {
       return ProtocolSearchRequest(
         context = context,
         message = ProtocolSearchRequestMessage(
           intent = ProtocolIntent(
-            provider = ProtocolProvider(id = providerId),
+            provider = ProtocolProvider(id = providerId,category_id = categoryId),
             fulfillment = ProtocolFulfillment(
               end = ProtocolFulfillmentEnd(
                 location = ProtocolLocation(
                   gps = location
                 )
               ),
-                start = ProtocolFulfillmentStart(
+              start = ProtocolFulfillmentStart(
                   location = ProtocolLocation(
                     gps = location
                   )

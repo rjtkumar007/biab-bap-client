@@ -87,7 +87,7 @@ internal class BppSelectServiceSpec : DescribeSpec() {
   private fun getSelectRequest() = ProtocolSelectRequest(
     contextFactory.create(),
     ProtocolSelectRequestMessage(
-      selected = ProtocolSelectMessageSelected(
+      order = ProtocolSelectMessageSelected(
         provider = ProtocolProvider(
           id = "venugopala stores",
           locations = listOf(ProtocolLocationFactory.idLocation(1))

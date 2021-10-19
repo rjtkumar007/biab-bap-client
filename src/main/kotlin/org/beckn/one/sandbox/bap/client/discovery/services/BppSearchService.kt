@@ -34,7 +34,7 @@ class BppSearchService @Autowired constructor(
           ProtocolSearchRequestMessage(
             ProtocolIntent(
               item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = criteria.searchString)),
-              provider = ProtocolProvider(id = criteria.providerId),
+              provider = ProtocolProvider(id = criteria.providerId, category_id = criteria.categoryId),
               fulfillment = getFulfillmentFilter(criteria),
             )
           )
@@ -62,7 +62,8 @@ class BppSearchService @Autowired constructor(
       StringUtils.hasText(criteria.deliveryLocation) ->
         ProtocolFulfillment(
           start = ProtocolFulfillmentStart(location = ProtocolLocation(gps=criteria.pickupLocation)),
-          end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.deliveryLocation)))
+          end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.deliveryLocation))
+        )
       else -> null
     }
 }

@@ -57,7 +57,7 @@ class BppSelectService @Autowired constructor(
     val selectRequest = ProtocolSelectRequest(
       context = context,
       ProtocolSelectRequestMessage(
-        selected = ProtocolSelectMessageSelected(
+        order = ProtocolSelectMessageSelected(
           provider = ProtocolProvider(id = providerId, locations = listOf(providerLocation)),
           items = items
         )
