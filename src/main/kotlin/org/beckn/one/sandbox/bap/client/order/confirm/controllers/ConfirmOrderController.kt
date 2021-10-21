@@ -26,59 +26,85 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class ConfirmOrderController @Autowired constructor(
-    private val contextFactory: ContextFactory,
-    private val confirmOrderService: ConfirmOrderService,
-    private  val confirmOrderRepository :ResponseStorageService<OrderResponse,OrderDao>
+  private val contextFactory: ContextFactory,
+  private val confirmOrderService: ConfirmOrderService,
+  private val confirmOrderRepository: ResponseStorageService<OrderResponse, OrderDao>
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @PostMapping("/client/v1/confirm_order")
+  @PostMapping("/client/v2/confirm_order")
   @ResponseBody
-  fun confirmOrderV1(
-    @RequestBody orderRequest: OrderRequestDto
-  ): ResponseEntity<ProtocolAckResponse> {
+  fun confirmOrderV2(
+    @RequestBody orderRequest: List<OrderRequestDto>
+  ): ResponseEntity<List<ProtocolAckResponse>> {
 
-    val context = getContext(orderRequest.context.transactionId)
-    return confirmOrderService.confirmOrder(
-      context = context,
-      order = orderRequest.message
-    )
-      .fold(
-        {
-          log.error("Error when confirming order: {}", it)
-          mapToErrorResponse(it, context)
-        },
-        {
-          log.info("Successfully confirmed order. Message: {}", it)
-          if(SecurityUtil.getSecuredUserDetail() != null){
-            confirmOrderRepository.updateDocByQuery(
-              OrderDao::messageId eq context?.messageId,
-              OrderDao(userId = SecurityUtil.getSecuredUserDetail()?.uid, messageId = context?.messageId,
-              transactionId = null))
-              .fold(
-                {
-                  log.error("Error when updating order: {}", it)
-                  mapToErrorResponse(it,context)
-                },
-                {
-                  log.info("Successfully updated  user : {}", it)
-                  ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
-                }
-              )
-          }else{
-            mapToErrorResponse(BppError.AuthenticationError,context)
-          }
+    var okResponseConfirmOrders: MutableList<ProtocolAckResponse> = ArrayList()
+    if (!orderRequest.isNullOrEmpty()) {
+      if (SecurityUtil.getSecuredUserDetail() != null) {
+        for (order in orderRequest) {
+          val context = getContext(order.context.transactionId)
+          confirmOrderService.confirmOrder(
+            context = context,
+            order = order.message
+          )
+            .fold(
+              {
+                log.error("Error when confirming order: {}", it)
+                okResponseConfirmOrders.add(
+                  ProtocolAckResponse(
+                    context = context,
+                    message = it.message(),
+                    error = it.error()
+                  )
+                )
+              },
+              {
+                log.info("Successfully confirmed order. Message: {}", it)
+                confirmOrderRepository.updateDocByQuery(
+                  OrderDao::messageId eq context?.messageId,
+                  OrderDao(
+                    userId = SecurityUtil.getSecuredUserDetail()?.uid, messageId = context?.messageId,
+                    transactionId = null
+                  )
+                ).fold(
+                  {
+                    log.error("Error when updating order: {}", it)
+                    mapToErrorResponse(it, context)
+                    okResponseConfirmOrders.add(
+                      ProtocolAckResponse(
+                        context = context,
+                        message = it.message(),
+                        error = it.error()
+                      )
+                    )
+
+                  },
+                  {
+                    log.info("Successfully updated  order in client layer db : {}", it)
+                    okResponseConfirmOrders.add(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
+                  }
+                )
+              }
+            )
         }
-      )
+        return ResponseEntity.ok(okResponseConfirmOrders)
+      } else {
+        return mapToErrorResponse(BppError.AuthenticationError, null)
+      }
+    } else {
+      return mapToErrorResponse(BppError.BadRequestError, null)
+    }
   }
 
-  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext) = ResponseEntity
+  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext?) = ResponseEntity
     .status(it.status())
     .body(
-      ProtocolAckResponse(
-        context = context,
-        message = it.message(),
-        error = it.error()
+      listOf(
+        ProtocolAckResponse(
+          context = context,
+          message = it.message(),
+          error = it.error()
+        )
       )
     )
 

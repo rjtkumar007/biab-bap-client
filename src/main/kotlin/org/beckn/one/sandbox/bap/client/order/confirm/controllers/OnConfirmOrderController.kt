@@ -6,6 +6,7 @@ import org.beckn.one.sandbox.bap.client.order.confirm.services.OnConfirmOrderSer
 import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollController
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientErrorResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
@@ -31,52 +32,80 @@ class OnConfirmOrderController @Autowired constructor(
   val onConfirmOrderService: OnConfirmOrderService
 ) : AbstractOnPollController<ProtocolOnConfirm, ClientConfirmResponse>(onPollService, contextFactory) {
 
-  @RequestMapping("/client/v1/on_confirm_order")
+  @RequestMapping("/client/v2/on_confirm_order")
   @ResponseBody
-  fun onConfirmOrderV1(
-    @RequestParam messageId: String
-  ): ResponseEntity<out ClientResponse> {
+  fun onConfirmOrderV2(
+    @RequestParam messageIds: String
+  ): ResponseEntity<out List<ClientConfirmResponse>> {
     val user = SecurityUtil.getSecuredUserDetail()
-    val bapResult = onPoll(messageId, protocolClient.getConfirmResponsesCall(messageId))
-    when (bapResult.statusCode.value()) {
-      200 -> {
-        if (user != null) {
-          val resultResponse: ClientConfirmResponse = bapResult.body as ClientConfirmResponse
-          if (resultResponse.message?.order != null) {
-            val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message.order!!)
-            orderDao.transactionId = resultResponse.context?.transactionId
-            orderDao.userId = user.uid
-            orderDao.messageId = resultResponse.context?.messageId
-            onConfirmOrderService.updateOrder(orderDao).fold(
-              {
-                return mapToErrorResponse(it, context = contextFactory.create(messageId = messageId))
-              }, {
-                return bapResult
+    if (user != null) {
+      if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
+        val messageIdArray = messageIds.split(",")
+        var okResponseConfirmOrder: MutableList<ClientConfirmResponse> = ArrayList()
+        if (messageIdArray.isNotEmpty()) {
+          for (messageId in messageIdArray) {
+            val bapResult = onPoll(messageId, protocolClient.getConfirmResponsesCall(messageId))
+            when (bapResult.statusCode.value()) {
+              200 -> {
+                val resultResponse: ClientConfirmResponse = bapResult.body as ClientConfirmResponse
+                if (resultResponse.message?.order != null) {
+                  val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message.order!!)
+                  orderDao.transactionId = resultResponse.context?.transactionId
+                  orderDao.userId = user.uid
+                  orderDao.messageId = resultResponse.context?.messageId
+                  onConfirmOrderService.updateOrder(orderDao).fold(
+                    {
+                      okResponseConfirmOrder.add(
+                        ClientConfirmResponse(
+                          error = it.error(),
+                          context = contextFactory.create(messageId = messageId)
+                        )
+                      )
+                    }, {
+                      okResponseConfirmOrder.add(resultResponse)
+                    }
+                  )
+                } else {
+                  return mapToErrorResponse(
+                    BppError.NullResponse,
+                    context = contextFactory.create(messageId = messageId)
+                  )
+                }
               }
-            )
-          } else {
-            return mapToErrorResponse(BppError.NullResponse, context = contextFactory.create(messageId = messageId))
+              else -> {
+                okResponseConfirmOrder.add(
+                  ClientConfirmResponse(
+                    error = bapResult.body?.error,
+                    context = contextFactory.create(messageId = messageId)
+                  )
+                )
+              }
+            }
           }
+          return ResponseEntity.ok(okResponseConfirmOrder)
         } else {
-          //token expired
-          return mapToErrorResponse(
-            BppError.AuthenticationError,
-            context = contextFactory.create(messageId = messageId)
-          )
+          return mapToErrorResponse(BppError.BadRequestError)
         }
+
+      } else {
+        return mapToErrorResponse(BppError.BadRequestError)
       }
-      else -> {
-        return bapResult
-      }
+    } else {
+      //token expired
+      return mapToErrorResponse(
+        BppError.AuthenticationError
+      )
     }
   }
 
-  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext) = ResponseEntity
+  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext? = null) = ResponseEntity
     .status(it.status())
     .body(
-      ClientErrorResponse(
-        context = context,
-        error = it.error()
+      listOf(
+        ClientConfirmResponse(
+          context = context,
+          error = it.error()
+        )
       )
     )
 }
