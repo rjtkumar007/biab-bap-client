@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 
+
 @RestController
 class OnOrderStatusPollController(
   onPollService: GenericOnPollService<ProtocolOnOrderStatus, ClientOrderStatusResponse>,
@@ -30,55 +31,70 @@ class OnOrderStatusPollController(
   val onOrderStatusService: OnOrderStatusService
 ) : AbstractOnPollController<ProtocolOnOrderStatus, ClientOrderStatusResponse>(onPollService, contextFactory) {
 
-  @RequestMapping("/client/v1/on_order_status")
+  @RequestMapping("/client/v2/on_order_status")
   @ResponseBody
-  fun onOrderStatus(@RequestParam messageId: String): ResponseEntity<out ClientResponse> {
+  fun onOrderStatus(@RequestParam messageIds: String): ResponseEntity<out List<ClientResponse>> {
 
-    val user = SecurityUtil.getSecuredUserDetail()
-    val bapResult =  onPoll(messageId, protocolClient.getOrderStatusResponsesCall(messageId))
-    when (bapResult.statusCode.value()) {
-      200 -> {
-        if (user != null) {
-          val resultResponse = bapResult.body as ClientOrderStatusResponse
+    if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
+      val messageIdArray = messageIds.split(",")
+      var okResponseOnOrderStatus: MutableList<ClientResponse> = ArrayList()
+      if (messageIdArray.isNotEmpty()) {
+        if (SecurityUtil.getSecuredUserDetail() != null) {
+          val user = SecurityUtil.getSecuredUserDetail()
+          for (messageId in messageIdArray) {
+            val bapResult = onPoll(messageId, protocolClient.getOrderStatusResponsesCall(messageId))
+            when (bapResult.statusCode.value()) {
+              200 -> {
+                  val resultResponse = bapResult.body as ClientOrderStatusResponse
 
-          if (resultResponse.message?.order != null) {
-            val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message.order!!)
-            orderDao.transactionId = resultResponse.context.transactionId
-            orderDao.userId = user.uid
-            orderDao.messageId = messageId
-            onOrderStatusService.updateOrder(orderDao).fold(
-              {
-                return mapToErrorResponse(it, context = contextFactory.create(messageId = messageId))
-              }, {
-                return bapResult
+                  val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message?.order!!)
+                  orderDao.transactionId = resultResponse.context.transactionId
+                  orderDao.userId = user?.uid
+                  orderDao.messageId = messageId
+                  onOrderStatusService.updateOrder(orderDao).fold(
+                    {
+                      okResponseOnOrderStatus.add(
+                        ClientErrorResponse(
+                          context = contextFactory.create(messageId = messageId),
+                          error = it.error()
+                        )
+                      )
+                    }, {
+                      okResponseOnOrderStatus.add(resultResponse)
+                    }
+                  )
               }
-            )
-          } else {
-            return mapToErrorResponse(BppError.NullResponse, context = contextFactory.create(messageId = messageId))
+              else -> {
+                okResponseOnOrderStatus.add(
+                  ClientErrorResponse(
+                    context = contextFactory.create(messageId = messageId),
+                    error = bapResult.body?.error
+                  )
+                )
+              }
+            }
           }
-
-          return bapResult
-
-        } else {
-          //token expired
-          return mapToErrorResponse(
-            BppError.AuthenticationError,
-            context = contextFactory.create(messageId = messageId)
-          )
+        }else{
+          return mapToErrorResponse(BppError.AuthenticationError)
         }
+
+        return ResponseEntity.ok(okResponseOnOrderStatus)
+      } else {
+        return mapToErrorResponse(BppError.BadRequestError)
       }
-      else -> {
-        return bapResult
-      }
+    } else {
+      return mapToErrorResponse(BppError.BadRequestError)
     }
   }
 
-  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext) = ResponseEntity
+  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext? = null) = ResponseEntity
     .status(it.status())
     .body(
-      ClientErrorResponse(
-        context = context,
-        error = it.error()
+      listOf(
+        ClientErrorResponse(
+          context = context,
+          error = it.error()
+        )
       )
     )
 }

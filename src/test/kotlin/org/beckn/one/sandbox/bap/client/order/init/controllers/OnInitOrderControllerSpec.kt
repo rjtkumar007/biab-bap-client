@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.client.order.init.controllers
 
 import arrow.core.Either
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.core.spec.style.DescribeSpec
@@ -13,6 +14,7 @@ import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnInitMessageInitializedFactory
+import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolOnInit
 import org.beckn.protocol.schemas.ProtocolOnInitMessage
 import org.mockito.kotlin.any
@@ -49,14 +51,14 @@ internal class OnInitOrderControllerSpec @Autowired constructor(
 
       context("when called for given message id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/protocol/response/v1/on_init?messageId=${context.messageId}")
+          WireMock.get("/protocol/response/v1/on_init?messageIds=${context.messageId}")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(entityOnInitResults())))
         )
         val onInitCallBack = mockMvc
           .perform(
-            MockMvcRequestBuilders.get("/client/v1/on_initialize_order")
+            MockMvcRequestBuilders.get("/client/v2/on_initialize_order")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageId", context.messageId)
+              .param("messageIds", context.messageId)
           )
 
         it("should respond with status ok") {
@@ -66,8 +68,8 @@ internal class OnInitOrderControllerSpec @Autowired constructor(
         it("should respond with all on init responses in body") {
           val results = onInitCallBack.andReturn()
           val body = results.response.contentAsString
-          val clientResponse = mapper.readValue(body, ClientInitResponse::class.java)
-          clientResponse.message shouldNotBe null
+          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientInitResponse>>(){})
+          clientResponse.get(0) shouldNotBe null
         }
       }
 
@@ -77,8 +79,8 @@ internal class OnInitOrderControllerSpec @Autowired constructor(
         }
         val onInitPollController = OnInitOrderController(mockOnPollService, contextFactory, protocolClient)
         it("should respond with failure") {
-          val response = onInitPollController.onInitOrderV1(context.messageId)
-          response.statusCode shouldBe DatabaseError.OnRead.status()
+          val response = onInitPollController.initializeOrderV2(context.messageId)
+          response.body?.get(0)?.error shouldNotBe null
         }
       }
     }

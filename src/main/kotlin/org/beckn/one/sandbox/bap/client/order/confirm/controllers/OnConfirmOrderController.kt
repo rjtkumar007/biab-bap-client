@@ -5,17 +5,14 @@ import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
 import org.beckn.one.sandbox.bap.client.order.confirm.services.OnConfirmOrderService
 import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollController
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientErrorResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
 import org.beckn.one.sandbox.bap.message.mappers.OnOrderProtocolToEntityOrder
-import org.beckn.protocol.schemas.*
+import org.beckn.protocol.schemas.ProtocolContext
+import org.beckn.protocol.schemas.ProtocolOnConfirm
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
@@ -91,7 +88,6 @@ class OnConfirmOrderController @Autowired constructor(
         return mapToErrorResponse(BppError.BadRequestError)
       }
     } else {
-      //token expired
       return mapToErrorResponse(
         BppError.AuthenticationError
       )

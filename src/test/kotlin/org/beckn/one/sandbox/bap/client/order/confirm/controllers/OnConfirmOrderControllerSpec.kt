@@ -6,15 +6,19 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.beckn.one.sandbox.bap.auth.model.User
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
+import org.beckn.one.sandbox.bap.client.order.confirm.services.OnConfirmOrderService
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOrderFactory
+import org.beckn.one.sandbox.bap.message.mappers.OnOrderProtocolToEntityOrder
 import org.beckn.protocol.schemas.ProtocolOnConfirm
 import org.beckn.protocol.schemas.ProtocolOnConfirmMessage
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,6 +26,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
@@ -33,10 +41,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 internal class OnConfirmOrderControllerSpec @Autowired constructor(
-    private val contextFactory: ContextFactory,
-    private val mapper: ObjectMapper,
-    private val protocolClient: ProtocolClient,
-    private val mockMvc: MockMvc
+  private val contextFactory: ContextFactory,
+  private val mapper: ObjectMapper,
+  private val protocolClient: ProtocolClient,
+  private val mockMvc: MockMvc,
+  private val mapping: OnOrderProtocolToEntityOrder,
+  private val onConfirmOrderService: OnConfirmOrderService
 ) : DescribeSpec() {
   val context = contextFactory.create()
   private val protocolOnConfirm = ProtocolOnConfirm(
@@ -47,19 +57,36 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
   )
   val mockProtocolBap = MockProtocolBap.withResetInstance()
 
-  init {
+    init {
     describe("OnConfirm callback") {
+
+      beforeEach{
+        val authentication: Authentication = Mockito.mock(Authentication::class.java)
+        val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
+        SecurityContextHolder.setContext(securityContext)
+        Mockito.`when`(securityContext.authentication).thenReturn(authentication)
+        Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
+        Mockito.`when`(securityContext.authentication.principal).thenReturn(
+          User(
+            uid = "1234533434343",
+            name = "John",
+            email = "john@gmail.com",
+            isEmailVerified = true
+          )
+        )
+      }
+
 
       context("when called for given message id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/protocol/response/v1/on_confirm?messageId=${context.messageId}")
+          WireMock.get("/protocol/response/v2/on_confirm?messageIds=${context.messageId}")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(entityOnConfirmResults())))
         )
         val onConfirmCallBack = mockMvc
           .perform(
-            MockMvcRequestBuilders.get("/client/v1/on_confirm_order")
+            MockMvcRequestBuilders.get("/client/v2/on_confirm_order")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageId", context.messageId)
+              .param("messageIds", context.messageId)
           )
 
         it("should respond with status ok") {
@@ -78,10 +105,10 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
         val mockOnPollService = mock<GenericOnPollService<ProtocolOnConfirm, ClientConfirmResponse>> {
           onGeneric { onPoll(any(), any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
         }
-        val onConfirmPollController = OnConfirmOrderController(mockOnPollService, contextFactory, protocolClient)
+        val onConfirmPollController = OnConfirmOrderController(mockOnPollService, contextFactory, protocolClient,mapping,onConfirmOrderService)
         it("should respond with failure") {
-          val response = onConfirmPollController.onConfirmOrderV1(context.messageId)
-          response.statusCode shouldBe DatabaseError.OnRead.status()
+          val response  = onConfirmPollController.onConfirmOrderV2(context.messageId)
+          response?.body?.get(0)?.error shouldNotBe null
         }
       }
     }

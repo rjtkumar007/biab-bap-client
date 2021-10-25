@@ -1,11 +1,13 @@
 package org.beckn.one.sandbox.bap.client.order.confirm.controllers
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.beckn.one.sandbox.bap.auth.model.User
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
@@ -25,15 +27,21 @@ import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.beckn.protocol.schemas.*
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -67,7 +75,8 @@ class ConfirmOrderControllerSpec @Autowired constructor(
         retailBengaluruBpp.stubFor(post("/confirm").willReturn(serverError()))
 
         val confirmOrderResponseString =
-          invokeConfirmOrder(orderRequest).andExpect(MockMvcResultMatchers.status().isInternalServerError)
+          invokeConfirmOrder(listOf(orderRequest))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
             .andReturn().response.contentAsString
 
         val confirmOrderResponse =
@@ -108,8 +117,8 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             )
           )
 
-        val confirmOrderResponseString = invokeConfirmOrder(orderRequestForTest)
-          .andExpect(MockMvcResultMatchers.status().is4xxClientError)
+        val confirmOrderResponseString = invokeConfirmOrder(listOf(orderRequestForTest))
+          .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
 
@@ -137,11 +146,10 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             )
           )
 
-        val confirmOrderResponseString = invokeConfirmOrder(orderRequestForTest)
+        val confirmOrderResponseString = invokeConfirmOrder(listOf(orderRequestForTest))
           .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
-
         verifyConfirmResponseMessage(confirmOrderResponseString, orderRequestForTest, ResponseMessage.ack())
         verifyThatBppConfirmApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
@@ -155,7 +163,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             )
           )
 
-        val confirmOrderResponseString = invokeConfirmOrder(orderRequest)
+        val confirmOrderResponseString = invokeConfirmOrder(listOf(orderRequest))
           .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
@@ -228,14 +236,14 @@ class ConfirmOrderControllerSpec @Autowired constructor(
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null
   ): ProtocolAckResponse {
-    val confirmOrderResponse = objectMapper.readValue(confirmOrderResponseString, ProtocolAckResponse::class.java)
-    confirmOrderResponse.context shouldNotBe null
-    confirmOrderResponse.context?.messageId shouldNotBe null
-    confirmOrderResponse.context?.transactionId shouldBe orderRequest.context.transactionId
-    confirmOrderResponse.context?.action shouldBe ProtocolContext.Action.CONFIRM
-    confirmOrderResponse.message shouldBe expectedMessage
-    confirmOrderResponse.error shouldBe expectedError
-    return confirmOrderResponse
+    val confirmOrderResponse = objectMapper.readValue(confirmOrderResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+    confirmOrderResponse?.first()?.context shouldNotBe null
+    confirmOrderResponse?.first()?.context?.messageId shouldNotBe null
+    confirmOrderResponse?.first()?.context?.transactionId shouldBe orderRequest.context.transactionId
+    confirmOrderResponse?.first()?.context?.action shouldBe ProtocolContext.Action.CONFIRM
+    confirmOrderResponse?.first()?.message shouldBe expectedMessage
+    confirmOrderResponse?.first()?.error shouldBe expectedError
+    return confirmOrderResponse?.first()!!
   }
 
   private fun verifyThatBppConfirmApiWasInvoked(
@@ -295,9 +303,28 @@ class ConfirmOrderControllerSpec @Autowired constructor(
   }
 
 
-  private fun invokeConfirmOrder(orderRequest: OrderRequestDto) = mockMvc.perform(
-    MockMvcRequestBuilders.post("/client/v1/confirm_order").header(
-      org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
-    ).content(objectMapper.writeValueAsString(orderRequest))
-  )
+  private fun invokeConfirmOrder(orderRequest: List<OrderRequestDto>?) :ResultActions {
+    val authentication: Authentication = Mockito.mock(Authentication::class.java)
+    val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
+    SecurityContextHolder.setContext(securityContext)
+    Mockito.`when`(securityContext.authentication).thenReturn(authentication)
+    Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
+    Mockito.`when`(securityContext.authentication.principal).thenReturn(
+      User(
+        uid = "1234533434343",
+        name = "John",
+        email = "john@gmail.com",
+        isEmailVerified = true
+      )
+    )
+
+    return  mockMvc.perform(
+
+      MockMvcRequestBuilders.post("/client/v2/confirm_order").header(
+        org.springframework.http.HttpHeaders.CONTENT_TYPE,
+        MediaType.APPLICATION_JSON_VALUE
+      ).content(objectMapper.writeValueAsString(orderRequest))
+    )
+  }
+
 }

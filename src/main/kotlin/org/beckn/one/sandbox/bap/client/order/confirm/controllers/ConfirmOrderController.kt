@@ -46,8 +46,7 @@ class ConfirmOrderController @Autowired constructor(
           confirmOrderService.confirmOrder(
             context = context,
             order = order.message
-          )
-            .fold(
+          ).fold(
               {
                 log.error("Error when confirming order: {}", it)
                 okResponseConfirmOrders.add(
