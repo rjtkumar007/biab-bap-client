@@ -282,6 +282,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
           },
           billing = orderRequest.message.billingInfo,
           fulfillment = ProtocolFulfillment(
+            provider_id =  "padma coffee works",
             end = ProtocolFulfillmentEnd(
               contact = ProtocolContact(
                 phone = orderRequest.message.deliveryInfo.phone,

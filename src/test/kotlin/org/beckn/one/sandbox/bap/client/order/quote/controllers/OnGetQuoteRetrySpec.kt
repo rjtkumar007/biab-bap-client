@@ -32,7 +32,7 @@ internal class OnGetQuoteRetrySpec @Autowired constructor(
   val context = contextFactory.create()
   private val protocolOnSelect = ProtocolOnSelect(
     context,
-    message = ProtocolOnSelectMessage(selected = ProtocolOnSelectMessageSelectedFactory.create())
+    message = ProtocolOnSelectMessage(order = ProtocolOnSelectMessageSelectedFactory.create())
   )
   val mockProtocolBap = MockProtocolBap.withResetInstance()
 
@@ -44,7 +44,7 @@ internal class OnGetQuoteRetrySpec @Autowired constructor(
         it("should retry bpp select call if api returns error") {
           val protocolOnSelect = ProtocolOnSelect(
             context,
-            message = ProtocolOnSelectMessage(selected = ProtocolOnSelectMessageSelectedFactory.create())
+            message = ProtocolOnSelectMessage(order = ProtocolOnSelectMessageSelectedFactory.create())
           )
           stubBapOnSelectApi(response = serverError(), forState = Scenario.STARTED, nextState = "Success")
           stubBapOnSelectApi(response = okJson(objectMapper.toJson(listOf(protocolOnSelect))), forState = "Success")

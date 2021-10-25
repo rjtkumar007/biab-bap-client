@@ -26,6 +26,7 @@ import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.factories.UuidFactory
+import org.beckn.one.sandbox.bap.message.factories.ProtocolProviderFactory
 import org.beckn.protocol.schemas.*
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
@@ -307,6 +308,7 @@ class InitOrderControllerSpec @Autowired constructor(
           },
           billing = orderRequest?.first().message.billingInfo,
           fulfillment = ProtocolFulfillment(
+            provider_id = "padma coffee works",
             end = ProtocolFulfillmentEnd(
               contact = ProtocolContact(
                 phone = orderRequest?.first().message.deliveryInfo.phone,

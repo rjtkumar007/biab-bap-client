@@ -5,11 +5,13 @@ import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
 import org.bouncycastle.crypto.signers.Ed25519Signer
 import org.bouncycastle.jcajce.provider.digest.Blake2b
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.security.MessageDigest
 import java.util.*
 
 object Cryptic {
-
+  private val log: Logger = LoggerFactory.getLogger(Cryptic::class.java)
   fun sign(
     b64PrivateKey: String,
     requestBody: String,
@@ -19,7 +21,13 @@ object Cryptic {
     val signer = getEd25519SignerForSigning(b64PrivateKey)
     val formattedRequest = formatBodyForSigning(created, expires, requestBody)
     signer.update(formattedRequest.toByteArray(), 0, formattedRequest.length)
-    return Base64.getEncoder().encodeToString(signer.generateSignature())
+    val signature = Base64.getEncoder().encodeToString(signer.generateSignature())
+    if (log.isInfoEnabled){
+      log.info("RequestBody:$requestBody")
+      log.info("formattedRequest:$formattedRequest")
+      log.info("signature:$signature")
+    }
+    return signature
   }
 
   fun verify(
@@ -65,9 +73,3 @@ object Cryptic {
     return Base64.getEncoder().encodeToString(hash)
   }
 }
-
-
-
-
-
-

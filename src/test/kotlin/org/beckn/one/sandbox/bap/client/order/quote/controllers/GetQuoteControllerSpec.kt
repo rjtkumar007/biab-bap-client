@@ -168,7 +168,7 @@ class GetQuoteControllerSpec @Autowired constructor(
     return ProtocolSelectRequest(
       context = getQuoteResponse?.first().context!!,
       message = ProtocolSelectRequestMessage(
-        selected = ProtocolSelectMessageSelected(
+        order = ProtocolSelectMessageSelected(
           provider = ProtocolProvider(
             id = cart.items?.first()?.provider?.id,
             locations = locations
