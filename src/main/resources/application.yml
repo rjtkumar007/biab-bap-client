@@ -71,12 +71,6 @@ security:
     enable-check-session-revoked: false
     enable-logout-everywhere: false
     session-expiry-in-days: 5
-  cookie-props:
-    max-age-in-minutes: 7200
-    http-only: true
-    secure: true
-    domain: ${DOMAIN}
-    path: /
   allow-credentials: true
   allowed-origins:
     - http://localhost:9001
@@ -141,5 +135,3 @@ management:
     web:
       exposure:
         include: "configprops, env, health, loggers, metrics, mappings, httptrace"
-jwt:
-  secret: "beckn-bap-client"
