@@ -57,36 +57,19 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
   )
   val mockProtocolBap = MockProtocolBap.withResetInstance()
 
-    init {
+  init {
     describe("OnConfirm callback") {
-
-      beforeEach{
-        val authentication: Authentication = Mockito.mock(Authentication::class.java)
-        val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
-        SecurityContextHolder.setContext(securityContext)
-        Mockito.`when`(securityContext.authentication).thenReturn(authentication)
-        Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
-        Mockito.`when`(securityContext.authentication.principal).thenReturn(
-          User(
-            uid = "1234533434343",
-            name = "John",
-            email = "john@gmail.com",
-            isEmailVerified = true
-          )
-        )
-      }
-
 
       context("when called for given message id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/protocol/response/v2/on_confirm?messageIds=${context.messageId}")
+          WireMock.get("/protocol/response/v1/on_confirm?messageId=${context.messageId}")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(entityOnConfirmResults())))
         )
         val onConfirmCallBack = mockMvc
           .perform(
-            MockMvcRequestBuilders.get("/client/v2/on_confirm_order")
+            MockMvcRequestBuilders.get("/client/v1/on_confirm_order")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageIds", context.messageId)
+              .param("messageId", context.messageId)
           )
 
         it("should respond with status ok") {
@@ -107,8 +90,8 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
         }
         val onConfirmPollController = OnConfirmOrderController(mockOnPollService, contextFactory, protocolClient,mapping,onConfirmOrderService)
         it("should respond with failure") {
-          val response  = onConfirmPollController.onConfirmOrderV2(context.messageId)
-          response?.body?.get(0)?.error shouldNotBe null
+          val response = onConfirmPollController.onConfirmOrderV1(context.messageId)
+          response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }
     }

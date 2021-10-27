@@ -26,9 +26,41 @@ class OrderStatusController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @PostMapping("/client/v2/order_status")
+  @PostMapping("/client/v1/order_status")
   @ResponseBody
   fun orderStatusV1(
+    @RequestBody orderStatusRequest: OrderStatusDto
+  ): ResponseEntity<ProtocolAckResponse> {
+    val context = getContext(orderStatusRequest.context.transactionId)
+    return orderStatusService.getOrderStatus(
+      context = context,
+      request = orderStatusRequest
+    )
+      .fold(
+        {
+          log.error("Error when getting order status: {}", it)
+          mapToErrorResponseV1(it, context)
+        },
+        {
+          log.info("Successfully triggered order status api. Message: {}", it)
+          ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
+        }
+      )
+  }
+
+  private fun mapToErrorResponseV1(it: HttpError, context: ProtocolContext) = ResponseEntity
+    .status(it.status())
+    .body(
+      ProtocolAckResponse(
+        context = context,
+        message = it.message(),
+        error = it.error()
+      )
+    )
+
+  @PostMapping("/client/v2/order_status")
+  @ResponseBody
+  fun orderStatusV2(
     @RequestBody orderStatusRequest: List<OrderStatusDto>
   ): ResponseEntity<List<ProtocolAckResponse>> {
     var okResponseOrderStatus : MutableList<ProtocolAckResponse> = ArrayList()

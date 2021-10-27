@@ -28,9 +28,14 @@ class OnGetQuotePollController @Autowired constructor(
   private val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnSelect, ClientQuoteResponse>(onPollService, contextFactory) {
 
+  @RequestMapping("/client/v1/on_get_quote")
+  @ResponseBody
+  fun onGetQuoteV1(@RequestParam messageId: String): ResponseEntity<out ClientResponse> =
+    onPoll(messageId, protocolClient.getSelectResponsesCall(messageId))
+
   @RequestMapping("/client/v2/on_get_quote")
   @ResponseBody
-  fun onGetQuote(@RequestParam messageIds: String): ResponseEntity<out List<ClientResponse>> {
+  fun onGetQuoteV2(@RequestParam messageIds: String): ResponseEntity<out List<ClientResponse>> {
 
     if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
       val messageIdArray = messageIds.split(",")

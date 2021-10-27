@@ -59,21 +59,6 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
   init {
     describe("OnOrderStatus callback") {
 
-      beforeEach {
-        val authentication: Authentication = Mockito.mock(Authentication::class.java)
-        val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
-        SecurityContextHolder.setContext(securityContext)
-        Mockito.`when`(securityContext.authentication).thenReturn(authentication)
-        Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
-        Mockito.`when`(securityContext.authentication.principal).thenReturn(
-          User(
-            uid = "1234533434343",
-            name = "John",
-            email = "john@gmail.com",
-            isEmailVerified = true
-          )
-        )
-      }
       context("when called for given message id") {
         mockProtocolBap.stubFor(
           WireMock.get("/protocol/response/v1/on_status?messageId=${context.messageId}")
@@ -81,9 +66,9 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
         )
         val onOrderStatusCall = mockMvc
           .perform(
-            MockMvcRequestBuilders.get("/client/v2/on_order_status")
+            MockMvcRequestBuilders.get("/client/v1/on_order_status")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageIds", context.messageId)
+              .param("messageId", context.messageId)
           )
 
         it("should respond with status ok") {
@@ -103,10 +88,11 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
         val mockOnPollService = mock<GenericOnPollService<ProtocolOnOrderStatus, ClientOrderStatusResponse>> {
           onGeneric { onPoll(any(), any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
         }
-        val onOrderStatusPollController = OnOrderStatusPollController(mockOnPollService, contextFactory,mapping, protocolClient,onOrderStatusService)
+        val onOrderStatusPollController = OnOrderStatusPollController(mockOnPollService, contextFactory,mapping,
+          protocolClient,onOrderStatusService)
         it("should respond with failure") {
-          val response = onOrderStatusPollController.onOrderStatus(context.messageId)
-          response.body?.get(0)?.error shouldNotBe null
+          val response = onOrderStatusPollController.onOrderStatusV1(context.messageId)
+          response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }
     }

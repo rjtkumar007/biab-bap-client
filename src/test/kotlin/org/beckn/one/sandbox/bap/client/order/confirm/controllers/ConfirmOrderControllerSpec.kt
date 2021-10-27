@@ -48,10 +48,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @ActiveProfiles(value = ["test"])
 @TestPropertySource(locations = ["/application-test.yml"])
 class ConfirmOrderControllerSpec @Autowired constructor(
-    val mockMvc: MockMvc,
-    val objectMapper: ObjectMapper,
-    val contextFactory: ContextFactory,
-    val uuidFactory: UuidFactory
+  val mockMvc: MockMvc,
+  val objectMapper: ObjectMapper,
+  val contextFactory: ContextFactory,
+  val uuidFactory: UuidFactory
 ) : DescribeSpec() {
   init {
     describe("Confirm order with BPP") {
@@ -75,8 +75,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
         retailBengaluruBpp.stubFor(post("/confirm").willReturn(serverError()))
 
         val confirmOrderResponseString =
-          invokeConfirmOrder(listOf(orderRequest))
-            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+          invokeConfirmOrder(orderRequest).andExpect(MockMvcResultMatchers.status().isInternalServerError)
             .andReturn().response.contentAsString
 
         val confirmOrderResponse =
@@ -117,8 +116,8 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             )
           )
 
-        val confirmOrderResponseString = invokeConfirmOrder(listOf(orderRequestForTest))
-          .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+        val confirmOrderResponseString = invokeConfirmOrder(orderRequestForTest)
+          .andExpect(MockMvcResultMatchers.status().is4xxClientError)
           .andReturn()
           .response.contentAsString
 
@@ -146,10 +145,11 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             )
           )
 
-        val confirmOrderResponseString = invokeConfirmOrder(listOf(orderRequestForTest))
+        val confirmOrderResponseString = invokeConfirmOrder(orderRequestForTest)
           .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
+
         verifyConfirmResponseMessage(confirmOrderResponseString, orderRequestForTest, ResponseMessage.ack())
         verifyThatBppConfirmApiWasNotInvoked(retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasNotInvoked(registryBppLookupApi)
@@ -163,7 +163,7 @@ class ConfirmOrderControllerSpec @Autowired constructor(
             )
           )
 
-        val confirmOrderResponseString = invokeConfirmOrder(listOf(orderRequest))
+        val confirmOrderResponseString = invokeConfirmOrder(orderRequest)
           .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
           .andReturn()
           .response.contentAsString
@@ -236,14 +236,14 @@ class ConfirmOrderControllerSpec @Autowired constructor(
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null
   ): ProtocolAckResponse {
-    val confirmOrderResponse = objectMapper.readValue(confirmOrderResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
-    confirmOrderResponse?.first()?.context shouldNotBe null
-    confirmOrderResponse?.first()?.context?.messageId shouldNotBe null
-    confirmOrderResponse?.first()?.context?.transactionId shouldBe orderRequest.context.transactionId
-    confirmOrderResponse?.first()?.context?.action shouldBe ProtocolContext.Action.CONFIRM
-    confirmOrderResponse?.first()?.message shouldBe expectedMessage
-    confirmOrderResponse?.first()?.error shouldBe expectedError
-    return confirmOrderResponse?.first()!!
+    val confirmOrderResponse = objectMapper.readValue(confirmOrderResponseString, ProtocolAckResponse::class.java)
+    confirmOrderResponse.context shouldNotBe null
+    confirmOrderResponse.context?.messageId shouldNotBe null
+    confirmOrderResponse.context?.transactionId shouldBe orderRequest.context.transactionId
+    confirmOrderResponse.context?.action shouldBe ProtocolContext.Action.CONFIRM
+    confirmOrderResponse.message shouldBe expectedMessage
+    confirmOrderResponse.error shouldBe expectedError
+    return confirmOrderResponse
   }
 
   private fun verifyThatBppConfirmApiWasInvoked(
@@ -304,28 +304,9 @@ class ConfirmOrderControllerSpec @Autowired constructor(
   }
 
 
-  private fun invokeConfirmOrder(orderRequest: List<OrderRequestDto>?) :ResultActions {
-    val authentication: Authentication = Mockito.mock(Authentication::class.java)
-    val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
-    SecurityContextHolder.setContext(securityContext)
-    Mockito.`when`(securityContext.authentication).thenReturn(authentication)
-    Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
-    Mockito.`when`(securityContext.authentication.principal).thenReturn(
-      User(
-        uid = "1234533434343",
-        name = "John",
-        email = "john@gmail.com",
-        isEmailVerified = true
-      )
-    )
-
-    return  mockMvc.perform(
-
-      MockMvcRequestBuilders.post("/client/v2/confirm_order").header(
-        org.springframework.http.HttpHeaders.CONTENT_TYPE,
-        MediaType.APPLICATION_JSON_VALUE
-      ).content(objectMapper.writeValueAsString(orderRequest))
-    )
-  }
-
+  private fun invokeConfirmOrder(orderRequest: OrderRequestDto) = mockMvc.perform(
+    MockMvcRequestBuilders.post("/client/v1/confirm_order").header(
+      org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
+    ).content(objectMapper.writeValueAsString(orderRequest))
+  )
 }

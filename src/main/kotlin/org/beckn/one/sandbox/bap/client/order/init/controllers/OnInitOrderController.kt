@@ -24,11 +24,18 @@ class OnInitOrderController @Autowired constructor(
   val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnInit, ClientInitResponse>(onPollService, contextFactory) {
 
+  @RequestMapping("/client/v1/on_initialize_order")
+  @ResponseBody
+  fun onInitOrderV1(
+    @RequestParam messageId: String
+  ): ResponseEntity<out ClientResponse> = onPoll(messageId, protocolClient.getInitResponsesCall(messageId))
+
+
   @RequestMapping("/client/v2/on_initialize_order")
   @ResponseBody
   fun initializeOrderV2(
     @RequestParam messageIds: String
-  ): ResponseEntity<out  List<ClientResponse>>
+  ): ResponseEntity<out List<ClientResponse>>
   {
 
     if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {

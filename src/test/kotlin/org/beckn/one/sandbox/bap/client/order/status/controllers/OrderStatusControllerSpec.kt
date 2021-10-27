@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.fp.success
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.apache.http.HttpHeaders.CONTENT_TYPE
 import org.beckn.one.sandbox.bap.auth.model.User
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
@@ -29,7 +31,7 @@ import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpHeaders.CONTENT_TYPE
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
@@ -37,6 +39,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -59,19 +62,6 @@ class OrderStatusControllerSpec @Autowired constructor(
         MockNetwork.resetAllSubscribers()
         stubBppLookupApi(registryBppLookupApi, retailBengaluruBpp)
         stubBppLookupApi(registryBppLookupApi, anotherRetailBengaluruBpp)
-        val authentication: Authentication = Mockito.mock(Authentication::class.java)
-        val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
-        SecurityContextHolder.setContext(securityContext)
-        Mockito.`when`(securityContext.authentication).thenReturn(authentication)
-        Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
-        Mockito.`when`(securityContext.authentication.principal).thenReturn(
-          User(
-            uid = "1234533434343",
-            name = "John",
-            email = "john@gmail.com",
-            isEmailVerified = true
-          )
-        )
       }
 
       it("should return error when BPP order status call fails") {
@@ -79,7 +69,7 @@ class OrderStatusControllerSpec @Autowired constructor(
 
         val orderStatusResponseString =
           invokeOrderStatusApi(getOrderStatusRequest(clientContext = context, orderId = orderId))
-            .andExpect(status().is2xxSuccessful)
+            .andExpect(status().isInternalServerError)
             .andReturn().response.contentAsString
 
         val orderStatusResponse =
@@ -96,7 +86,7 @@ class OrderStatusControllerSpec @Autowired constructor(
         retailBengaluruBpp
           .stubFor(
             post("/status")
-              .willReturn(okJson(objectMapper.writeValueAsString(listOf(ResponseFactory.getDefault(contextFactory.create())))))
+              .willReturn(okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create()))))
           )
 
         val orderStatusResponseString =
@@ -159,18 +149,18 @@ class OrderStatusControllerSpec @Autowired constructor(
     orderStatusResponseString: String,
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null
-  ): List<ProtocolAckResponse> {
-    val orderStatusResponse = objectMapper.readValue(orderStatusResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
-    orderStatusResponse.first().context shouldNotBe null
-    orderStatusResponse.first().context?.messageId shouldNotBe null
-    orderStatusResponse.first().context?.action shouldBe ProtocolContext.Action.STATUS
-    orderStatusResponse.first().message shouldBe expectedMessage
-    orderStatusResponse.first().error shouldBe expectedError
+  ): ProtocolAckResponse {
+    val orderStatusResponse = objectMapper.readValue(orderStatusResponseString, ProtocolAckResponse::class.java)
+    orderStatusResponse.context shouldNotBe null
+    orderStatusResponse.context?.messageId shouldNotBe null
+    orderStatusResponse.context?.action shouldBe ProtocolContext.Action.STATUS
+    orderStatusResponse.message shouldBe expectedMessage
+    orderStatusResponse.error shouldBe expectedError
     return orderStatusResponse
   }
 
   private fun verifyThatBppOrderStatusApiWasInvoked(
-    orderStatusResponse: List<ProtocolAckResponse>,
+    orderStatusResponse: ProtocolAckResponse,
     orderId: String,
     providerApi: WireMockServer
   ) {
@@ -182,28 +172,28 @@ class OrderStatusControllerSpec @Autowired constructor(
   }
 
   private fun getProtocolOrderStatusRequest(
-    orderStatusResponse: List<ProtocolAckResponse>,
+    orderStatusResponse: ProtocolAckResponse,
     orderId: String
-  ): List<ProtocolOrderStatusRequest> {
-    return listOf(ProtocolOrderStatusRequest(
-      context = orderStatusResponse.first().context!!,
+  ): ProtocolOrderStatusRequest {
+    return ProtocolOrderStatusRequest(
+      context = orderStatusResponse.context!!,
       message = ProtocolOrderStatusRequestMessage(orderId = orderId)
-    ))
+    )
   }
 
   private fun getOrderStatusRequest(
     clientContext: ClientContext,
     orderId: String
-  ): List<OrderStatusDto> {
-    return listOf(OrderStatusDto(
+  ): OrderStatusDto {
+    return OrderStatusDto(
       context = clientContext,
       message = ProtocolOrderStatusRequestMessage(orderId = orderId)
-    ))
+    )
   }
 
-  private fun invokeOrderStatusApi(orderStatusDto: List<OrderStatusDto>) = mockMvc.perform(
+  private fun invokeOrderStatusApi(orderStatusDto: OrderStatusDto) = mockMvc.perform(
     MockMvcRequestBuilders
-      .post("/client/v2/order_status")
+      .post("/client/v1/order_status")
       .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(orderStatusDto))
   )
 }

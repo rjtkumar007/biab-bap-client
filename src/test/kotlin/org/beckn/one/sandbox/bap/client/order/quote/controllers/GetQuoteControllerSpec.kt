@@ -71,7 +71,7 @@ class GetQuoteControllerSpec @Autowired constructor(
         retailBengaluruBpp.stubFor(post("/select").willReturn(serverError()))
 
         val getQuoteResponseString = invokeGetQuoteApi(context = context, cart = cart)
-          .andExpect(status().is2xxSuccessful)
+          .andExpect(status().isInternalServerError)
           .andReturn()
           .response.contentAsString
 
@@ -137,19 +137,19 @@ class GetQuoteControllerSpec @Autowired constructor(
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null,
     expectedContext: ClientContext,
-  ): List<ProtocolAckResponse> {
-    val getQuoteResponse = objectMapper.readValue(getQuoteResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
-    getQuoteResponse?.first()?.context shouldNotBe null
-    getQuoteResponse?.first()?.context?.messageId shouldNotBe null
-    getQuoteResponse?.first()?.context?.transactionId shouldBe expectedContext.transactionId
-    getQuoteResponse?.first()?.context?.action shouldBe ProtocolContext.Action.SELECT
-    getQuoteResponse?.first()?.message shouldBe expectedMessage
-    getQuoteResponse?.first()?.error shouldBe expectedError
+  ): ProtocolAckResponse {
+    val getQuoteResponse = objectMapper.readValue(getQuoteResponseString, ProtocolAckResponse::class.java)
+    getQuoteResponse.context shouldNotBe null
+    getQuoteResponse.context?.messageId shouldNotBe null
+    getQuoteResponse.context?.transactionId shouldBe expectedContext.transactionId
+    getQuoteResponse.context?.action shouldBe ProtocolContext.Action.SELECT
+    getQuoteResponse.message shouldBe expectedMessage
+    getQuoteResponse.error shouldBe expectedError
     return getQuoteResponse
   }
 
   private fun verifyThatBppSelectApiWasInvoked(
-    getQuoteResponse: List<ProtocolAckResponse>,
+    getQuoteResponse: ProtocolAckResponse,
     cart: CartDto,
     bppApi: WireMockServer
   ) {
@@ -163,10 +163,10 @@ class GetQuoteControllerSpec @Autowired constructor(
   private fun verifyThatBppSelectApiWasNotInvoked(bppApi: WireMockServer) =
     bppApi.verify(0, postRequestedFor(urlEqualTo("/select")))
 
-  private fun getProtocolSelectRequest(getQuoteResponse: List<ProtocolAckResponse>, cart: CartDto): ProtocolSelectRequest {
+  private fun getProtocolSelectRequest(getQuoteResponse: ProtocolAckResponse, cart: CartDto): ProtocolSelectRequest {
     val locations = cart.items?.first()?.provider?.locations?.map { ProtocolLocation(id = it) }
     return ProtocolSelectRequest(
-      context = getQuoteResponse?.first().context!!,
+      context = getQuoteResponse.context!!,
       message = ProtocolSelectRequestMessage(
         order = ProtocolSelectMessageSelected(
           provider = ProtocolProvider(
@@ -187,29 +187,14 @@ class GetQuoteControllerSpec @Autowired constructor(
     )
   }
 
-  private fun invokeGetQuoteApi(context: ClientContext, cart: CartDto): ResultActions {
-    val authentication: Authentication = Mockito.mock(Authentication::class.java)
-    val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
-    SecurityContextHolder.setContext(securityContext)
-    Mockito.`when`(securityContext.authentication).thenReturn(authentication)
-    Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
-    Mockito.`when`(securityContext.authentication.principal).thenReturn(
-      User(
-        uid = "1234533434343",
-        name = "John",
-        email = "john@gmail.com",
-        isEmailVerified = true
-      )
-    )
-    val quoteList = listOf(GetQuoteRequestDto(context = context, message = GetQuoteRequestMessageDto(cart = cart)))
-
-    return mockMvc
-      .perform(
-        MockMvcRequestBuilders.post("/client/v2/get_quote")
-          .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-          .content(
-            objectMapper.writeValueAsString(quoteList)
+  private fun invokeGetQuoteApi(context: ClientContext, cart: CartDto) = mockMvc
+    .perform(
+      MockMvcRequestBuilders.post("/client/v1/get_quote")
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .content(
+          objectMapper.writeValueAsString(
+            GetQuoteRequestDto(context = context, message = GetQuoteRequestMessageDto(cart = cart))
           )
-      )
-  }
+        )
+    )
 }

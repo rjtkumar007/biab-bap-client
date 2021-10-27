@@ -26,6 +26,38 @@ class InitOrderController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
+  @PostMapping("/client/v1/initialize_order")
+  @ResponseBody
+  fun initiOrderV1(
+    @RequestBody orderRequest: OrderRequestDto
+  ): ResponseEntity<ProtocolAckResponse> {
+    val context = getContext(orderRequest.context.transactionId)
+    return initOrderService.initOrder(
+      context = context,
+      order = orderRequest.message
+    )
+      .fold(
+        {
+          log.error("Error when initializing order: {}", it)
+          mapToErrorResponse(it, context)
+        },
+        {
+          log.info("Successfully initialized order. Message: {}", it)
+          ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
+        }
+      )
+  }
+
+  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext) = ResponseEntity
+    .status(it.status())
+    .body(
+      ProtocolAckResponse(
+        context = context,
+        message = it.message(),
+        error = it.error()
+      )
+    )
+
   @PostMapping("/client/v2/initialize_order")
   @ResponseBody
   fun initializeOrderV2(

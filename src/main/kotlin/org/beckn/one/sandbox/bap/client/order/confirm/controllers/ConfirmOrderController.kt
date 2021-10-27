@@ -32,6 +32,40 @@ class ConfirmOrderController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
+  @PostMapping("/client/v1/confirm_order")
+  @ResponseBody
+  fun confirmOrderV1(
+    @RequestBody orderRequest: OrderRequestDto
+  ): ResponseEntity<ProtocolAckResponse> {
+    val context = getContext(orderRequest.context.transactionId)
+    return confirmOrderService.confirmOrder(
+      context = context,
+      order = orderRequest.message
+    )
+      .fold(
+        {
+          log.error("Error when confirming order: {}", it)
+          mapToErrorResponseV1(it, context)
+        },
+        {
+          log.info("Successfully confirmed order. Message: {}", it)
+          ResponseEntity.ok(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
+        }
+      )
+  }
+
+  private fun mapToErrorResponseV1(it: HttpError, context: ProtocolContext) = ResponseEntity
+    .status(it.status())
+    .body(
+      ProtocolAckResponse(
+        context = context,
+        message = it.message(),
+        error = it.error()
+      )
+    )
+
+
+
   @PostMapping("/client/v2/confirm_order")
   @ResponseBody
   fun confirmOrderV2(
@@ -68,7 +102,7 @@ class ConfirmOrderController @Autowired constructor(
                 ).fold(
                   {
                     log.error("Error when updating order: {}", it)
-                    mapToErrorResponse(it, context)
+                    mapToErrorResponseV2(it, context)
                     okResponseConfirmOrders.add(
                       ProtocolAckResponse(
                         context = context,
@@ -88,14 +122,14 @@ class ConfirmOrderController @Autowired constructor(
         }
         return ResponseEntity.ok(okResponseConfirmOrders)
       } else {
-        return mapToErrorResponse(BppError.AuthenticationError, null)
+        return mapToErrorResponseV2(BppError.AuthenticationError, null)
       }
     } else {
-      return mapToErrorResponse(BppError.BadRequestError, null)
+      return mapToErrorResponseV2(BppError.BadRequestError, null)
     }
   }
 
-  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext?) = ResponseEntity
+  private fun mapToErrorResponseV2(it: HttpError, context: ProtocolContext?) = ResponseEntity
     .status(it.status())
     .body(
       listOf(

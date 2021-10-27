@@ -49,7 +49,7 @@ internal class OnGetQuoteRetrySpec @Autowired constructor(
           stubBapOnSelectApi(response = serverError(), forState = Scenario.STARTED, nextState = "Success")
           stubBapOnSelectApi(response = okJson(objectMapper.toJson(listOf(protocolOnSelect))), forState = "Success")
 
-          val results = controller.onGetQuote(context.messageId)
+          val results = controller.onGetQuoteV1(context.messageId)
 
           results.statusCode shouldBe HttpStatus.OK
           verifyBapOnSelectApiIsInvoked(2)
@@ -59,7 +59,7 @@ internal class OnGetQuoteRetrySpec @Autowired constructor(
           stubBapOnSelectApi(response = serverError(), forState = Scenario.STARTED, nextState = "Failure")
           stubBapOnSelectApi(response = serverError(), forState = "Failure", nextState = "Failure")
 
-          val results = controller.onGetQuote(context.messageId)
+          val results = controller.onGetQuoteV1(context.messageId)
 
           results.statusCode shouldBe HttpStatus.OK
           verifyBapOnSelectApiIsInvoked(3)

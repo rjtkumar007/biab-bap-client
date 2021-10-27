@@ -5,6 +5,7 @@ import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
 import org.beckn.one.sandbox.bap.client.order.confirm.services.OnConfirmOrderService
 import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollController
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.errors.HttpError
@@ -29,11 +30,17 @@ class OnConfirmOrderController @Autowired constructor(
   val onConfirmOrderService: OnConfirmOrderService
 ) : AbstractOnPollController<ProtocolOnConfirm, ClientConfirmResponse>(onPollService, contextFactory) {
 
+  @RequestMapping("/client/v1/on_confirm_order")
+  @ResponseBody
+  fun onConfirmOrderV1(
+    @RequestParam messageId: String
+  ): ResponseEntity<out ClientResponse> = onPoll(messageId, protocolClient.getConfirmResponsesCall(messageId))
+
   @RequestMapping("/client/v2/on_confirm_order")
   @ResponseBody
   fun onConfirmOrderV2(
     @RequestParam messageIds: String
-  ): ResponseEntity<out List<ClientConfirmResponse>> {
+  ): ResponseEntity<out List<ClientResponse>> {
     val user = SecurityUtil.getSecuredUserDetail()
     if (user != null) {
       if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {

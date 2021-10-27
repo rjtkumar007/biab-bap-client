@@ -57,13 +57,13 @@ class InitOrderControllerSpec @Autowired constructor(
     describe("Initialize order with BPP") {
       MockNetwork.startAllSubscribers()
       val context = ClientContext(transactionId = uuidFactory.create())
-      val orderRequest = listOf(OrderRequestDto(
+      val orderRequest = OrderRequestDto(
         context = context,
         message = OrderDtoFactory.create(
           bpp1_id = retailBengaluruBpp.baseUrl(),
           provider1_id = "padma coffee works"
-        )
-      ))
+        ),
+      )
 
       beforeEach {
         MockNetwork.resetAllSubscribers()
@@ -71,11 +71,11 @@ class InitOrderControllerSpec @Autowired constructor(
         stubBppLookupApi(registryBppLookupApi, anotherRetailBengaluruBpp)
       }
 
-      it("should return success with error in body when BPP init call fails") {
+      it("should return error when BPP init call fails") {
         retailBengaluruBpp.stubFor(post("/init").willReturn(serverError()))
 
         val initOrderResponseString =
-          invokeInitOrder(orderRequest).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+          invokeInitOrder(orderRequest).andExpect(MockMvcResultMatchers.status().isInternalServerError)
             .andReturn().response.contentAsString
 
         val initOrderResponse =
@@ -92,7 +92,7 @@ class InitOrderControllerSpec @Autowired constructor(
       it("should validate that order contains items from only one bpp") {
 
         val orderRequestWithMultipleBppItems =
-          listOf(OrderRequestDto(
+          OrderRequestDto(
             context = context,
             message = OrderDtoFactory.create(
               null,
@@ -100,9 +100,10 @@ class InitOrderControllerSpec @Autowired constructor(
               bpp2_id = anotherRetailBengaluruBpp.baseUrl(),
               provider1_id = "padma coffee works"
             )
-          ))
+          )
+
         val initOrderResponseString = invokeInitOrder(orderRequestWithMultipleBppItems)
-          .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+          .andExpect(MockMvcResultMatchers.status().is4xxClientError)
           .andReturn()
           .response.contentAsString
 
@@ -118,7 +119,7 @@ class InitOrderControllerSpec @Autowired constructor(
       }
 
       it("should validate that order contains items from only one provider") {
-        val orderRequestWithMultipleProviderItems = listOf(OrderRequestDto(
+        val orderRequestWithMultipleProviderItems = OrderRequestDto(
           context = context,
           message = OrderDtoFactory.create(
             null,
@@ -126,10 +127,10 @@ class InitOrderControllerSpec @Autowired constructor(
             provider1_id = "padma coffee works",
             provider2_id = "Venugopal store"
           )
-        ))
+        )
 
         val initOrderResponseString = invokeInitOrder(orderRequestWithMultipleProviderItems)
-          .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+          .andExpect(MockMvcResultMatchers.status().is4xxClientError)
           .andReturn()
           .response.contentAsString
 
@@ -145,13 +146,13 @@ class InitOrderControllerSpec @Autowired constructor(
       }
 
       it("should return null when cart items are empty") {
-        val initRequestForTest = listOf(OrderRequestDto(
+        val initRequestForTest = OrderRequestDto(
           message = OrderDtoFactory.create(
             bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
             items = emptyList()
           ), context = context
-        ))
+        )
         retailBengaluruBpp
           .stubFor(
             post("/init").willReturn(
@@ -170,7 +171,7 @@ class InitOrderControllerSpec @Autowired constructor(
       }
 
       it("should invoke provide init api and save message") {
-        val initRequestForTest = listOf(OrderRequestDto(
+        val initRequestForTest = OrderRequestDto(
           message = OrderDtoFactory.create(
             bpp1_id = retailBengaluruBpp.baseUrl(),
             provider1_id = "padma coffee works",
@@ -181,7 +182,7 @@ class InitOrderControllerSpec @Autowired constructor(
               )
             )
           ), context = context
-        ))
+        )
         retailBengaluruBpp
           .stubFor(
             post("/init").willReturn(
@@ -258,23 +259,23 @@ class InitOrderControllerSpec @Autowired constructor(
 
   private fun verifyInitResponseMessage(
     initOrderResponseString: String,
-    orderRequest: List<OrderRequestDto>,
+    orderRequest: OrderRequestDto,
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null
-  ): List<ProtocolAckResponse> {
-    val initOrderResponse = objectMapper.readValue(initOrderResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
-    initOrderResponse?.first()?.context shouldNotBe null
-    initOrderResponse?.first()?.context?.messageId shouldNotBe null
-    initOrderResponse?.first()?.context?.transactionId shouldBe orderRequest?.first().context.transactionId
-    initOrderResponse?.first()?.context?.action shouldBe ProtocolContext.Action.INIT
-    initOrderResponse?.first()?.message shouldBe expectedMessage
-    initOrderResponse?.first()?.error shouldBe expectedError
+  ): ProtocolAckResponse {
+    val initOrderResponse = objectMapper.readValue(initOrderResponseString, ProtocolAckResponse::class.java)
+    initOrderResponse.context shouldNotBe null
+    initOrderResponse.context?.messageId shouldNotBe null
+    initOrderResponse.context?.transactionId shouldBe orderRequest.context.transactionId
+    initOrderResponse.context?.action shouldBe ProtocolContext.Action.INIT
+    initOrderResponse.message shouldBe expectedMessage
+    initOrderResponse.error shouldBe expectedError
     return initOrderResponse
   }
 
   private fun verifyThatBppInitApiWasInvoked(
-    initOrderResponse: List<ProtocolAckResponse>,
-    orderRequest: List<OrderRequestDto>,
+    initOrderResponse: ProtocolAckResponse,
+    orderRequest: OrderRequestDto,
     providerApi: WireMockServer
   ) {
     val protocolInitRequest = getProtocolInitRequest(initOrderResponse, orderRequest)
@@ -285,38 +286,38 @@ class InitOrderControllerSpec @Autowired constructor(
   }
 
   private fun getProtocolInitRequest(
-    initOrderResponse: List<ProtocolAckResponse>,
-    orderRequest: List<OrderRequestDto>
+    initOrderResponse: ProtocolAckResponse,
+    orderRequest: OrderRequestDto
   ): ProtocolInitRequest {
     val locations =
-      orderRequest?.first().message.items?.first()?.provider?.locations?.map { ProtocolSelectMessageSelectedProviderLocations(id = it) }
+      orderRequest.message.items?.first()?.provider?.locations?.map { ProtocolSelectMessageSelectedProviderLocations(id = it) }
     val provider =
-      orderRequest?.first().message.items?.first()?.provider// todo: does this hold good even for order object or is this gotten from somewhere else?
+      orderRequest.message.items?.first()?.provider// todo: does this hold good even for order object or is this gotten from somewhere else?
     return ProtocolInitRequest(
-      context = initOrderResponse?.first().context!!,
+      context = initOrderResponse.context!!,
       message = ProtocolInitRequestMessage(
         order = ProtocolOrder(
           provider = ProtocolSelectMessageSelectedProvider(
             id = provider!!.id,
             locations = locations
           ),
-          items = orderRequest?.first().message.items!!.map {
+          items = orderRequest.message.items!!.map {
             ProtocolSelectMessageSelectedItems(
               id = it.id,
               quantity = it.quantity
             )
           },
-          billing = orderRequest?.first().message.billingInfo,
+          billing = orderRequest.message.billingInfo,
           fulfillment = ProtocolFulfillment(
             provider_id = "padma coffee works",
             end = ProtocolFulfillmentEnd(
               contact = ProtocolContact(
-                phone = orderRequest?.first().message.deliveryInfo.phone,
-                email = orderRequest?.first().message.deliveryInfo.email
-              ), location = orderRequest?.first().message.deliveryInfo.location
+                phone = orderRequest.message.deliveryInfo.phone,
+                email = orderRequest.message.deliveryInfo.email
+              ), location = orderRequest.message.deliveryInfo.location
             ),
             type = "home-delivery",
-            customer = ProtocolCustomer(person = ProtocolPerson(name = orderRequest?.first().message.deliveryInfo.name))
+            customer = ProtocolCustomer(person = ProtocolPerson(name = orderRequest.message.deliveryInfo.name))
           ),
           addOns = emptyList(),
           offers = emptyList()
@@ -325,24 +326,9 @@ class InitOrderControllerSpec @Autowired constructor(
     )
   }
 
-  private fun invokeInitOrder(orderRequest: List<OrderRequestDto>): ResultActions {
-    val authentication: Authentication = Mockito.mock(Authentication::class.java)
-    val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
-    SecurityContextHolder.setContext(securityContext)
-    Mockito.`when`(securityContext.authentication).thenReturn(authentication)
-    Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
-    Mockito.`when`(securityContext.authentication.principal).thenReturn(
-      User(
-        uid = "1234533434343",
-        name = "John",
-        email = "john@gmail.com",
-        isEmailVerified = true
-      )
-    )
-    return mockMvc.perform(
-      MockMvcRequestBuilders.post("/client/v2/initialize_order").header(
-        org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
-      ).content(objectMapper.writeValueAsString(orderRequest))
-    )
-  }
+  private fun invokeInitOrder(orderRequest: OrderRequestDto) = mockMvc.perform(
+    MockMvcRequestBuilders.post("/client/v1/initialize_order").header(
+      org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
+    ).content(objectMapper.writeValueAsString(orderRequest))
+  )
 }

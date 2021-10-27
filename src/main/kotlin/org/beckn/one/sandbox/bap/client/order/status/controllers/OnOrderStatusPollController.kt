@@ -31,9 +31,14 @@ class OnOrderStatusPollController(
   val onOrderStatusService: OnOrderStatusService
 ) : AbstractOnPollController<ProtocolOnOrderStatus, ClientOrderStatusResponse>(onPollService, contextFactory) {
 
+  @RequestMapping("/client/v1/on_order_status")
+  @ResponseBody
+  fun onOrderStatusV1(@RequestParam messageId: String): ResponseEntity<out ClientResponse> =
+    onPoll(messageId, protocolClient.getOrderStatusResponsesCall(messageId))
+
   @RequestMapping("/client/v2/on_order_status")
   @ResponseBody
-  fun onOrderStatus(@RequestParam messageIds: String): ResponseEntity<out List<ClientResponse>> {
+  fun onOrderStatusV2(@RequestParam messageIds: String): ResponseEntity<out List<ClientResponse>> {
 
     if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
       val messageIdArray = messageIds.split(",")
@@ -75,19 +80,19 @@ class OnOrderStatusPollController(
             }
           }
         }else{
-          return mapToErrorResponse(BppError.AuthenticationError)
+          return mapToErrorResponseV2(BppError.AuthenticationError)
         }
 
         return ResponseEntity.ok(okResponseOnOrderStatus)
       } else {
-        return mapToErrorResponse(BppError.BadRequestError)
+        return mapToErrorResponseV2(BppError.BadRequestError)
       }
     } else {
-      return mapToErrorResponse(BppError.BadRequestError)
+      return mapToErrorResponseV2(BppError.BadRequestError)
     }
   }
 
-  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext? = null) = ResponseEntity
+  private fun mapToErrorResponseV2(it: HttpError, context: ProtocolContext? = null) = ResponseEntity
     .status(it.status())
     .body(
       listOf(

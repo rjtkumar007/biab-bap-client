@@ -43,7 +43,6 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
   private val protocolClient: ProtocolClient,
   private val mockMvc: MockMvc
 ) : DescribeSpec() {
-
   private val fixedClock = Clock.fixed(
     Instant.parse("2018-11-30T18:35:24.00Z"),
     ZoneId.of("UTC")
@@ -66,9 +65,9 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
         )
         val onGetQuoteCall = mockMvc
           .perform(
-            MockMvcRequestBuilders.get("/client/v2/on_get_quote")
+            MockMvcRequestBuilders.get("/client/v1/on_get_quote")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageIds", context.messageId)
+              .param("messageId", context.messageId)
           )
 
         it("should respond with status ok") {
@@ -78,9 +77,9 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
         it("should respond with all select responses in body") {
           val results = onGetQuoteCall.andReturn()
           val body = results.response.contentAsString
-          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientQuoteResponse>>(){})
-          clientResponse.first().message?.quote shouldNotBe null
-          clientResponse.first().message?.quote?.quote shouldBe protocolOnSelect.message?.order?.quote
+          val clientResponse = mapper.readValue(body, ClientQuoteResponse::class.java)
+          clientResponse.message?.quote shouldNotBe null
+          clientResponse.message?.quote?.quote shouldBe protocolOnSelect.message?.order?.quote
         }
       }
 
@@ -90,8 +89,8 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
         }
         val onSelectPollController = OnGetQuotePollController(mockOnPollService, contextFactory, protocolClient)
         it("should respond with failure") {
-          val response = onSelectPollController.onGetQuote(messageIds = context.messageId)
-          response.body?.get(0)?.error shouldNotBe null
+          val response = onSelectPollController.onGetQuoteV1(context.messageId)
+          response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }
     }
