@@ -104,29 +104,23 @@ security:
   exposed-headers:
     - X-Xsrf-Token
   protected-actions:
-    - /**/select
-    - /**/initialize_order
-    - /**/on_initialize_order
-    - /**/confirm_order
-    - /**/on_confirm_order
-    - /**/get_quote
-    - /**/on_get_quote
-    - /**/orders
-    - /**/on_rating
-    - /**/rating
-    - /**/update
-    - /**/cancel_order
-    - /**/on_cancel_order
-    - /**/on_track
-    - /**/track
-    - /**/on_order_status
-    - /**/order_status
-    - /**/delivery_address
-    - /**/confirm_order
-    - /**/billing_details
-    - /**/account_details
-    - /**/on_support
-    - /**/get_support
+    - /client/v2/initialize_order
+    - /client/v2/on_initialize_order
+    - /client/v2/confirm_order
+    - /client/v2/on_confirm_order
+    - /client/v2/get_quote
+    - /client/v2/on_get_quote
+    - /client/v1/orders
+    - /client/v2/on_track
+    - /client/v2/track
+    - /client/v2/on_order_status
+    - /client/v2/order_status
+    - /client/v1/delivery_address
+    - /client/v2/confirm_order
+    - /client/v1/billing_details
+    - /client/v1/account_details
+    - /client/v2/on_support
+    - /client/v2/get_support
 database:
   mongo:
     url: mongodb://{{ mongo_host }}:{{ mongo_port }}
