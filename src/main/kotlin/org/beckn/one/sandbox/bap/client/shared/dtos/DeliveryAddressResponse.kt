@@ -14,7 +14,7 @@ data class DeliveryAddressResponse(
   val id: String?,
   val descriptor: DescriptorDao? = null,
   val gps: String? = null,
-  val default: Boolean? = true,
+  val defaultAddress: Boolean? = null,
   val address: AddressDao? = null
   ):ClientResponse
 

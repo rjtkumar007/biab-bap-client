@@ -1,14 +1,12 @@
 package org.beckn.one.sandbox.bap.client.accounts.address.controllers
 
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
+import org.beckn.one.sandbox.bap.client.accounts.address.services.AddressServices
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressRequestDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
-import org.beckn.one.sandbox.bap.message.entities.AddDeliveryAddressDao
-import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.protocol.schemas.*
-import org.litote.kmongo.newId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class AddressController @Autowired constructor(
-  private val responseStorageService: ResponseStorageService<DeliveryAddressResponse, AddDeliveryAddressDao>
+  private val addressServices: AddressServices
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -31,16 +29,8 @@ class AddressController @Autowired constructor(
     if (user == null) {
       return mapToErrorResponse(BppError.AuthenticationError)
     } else {
-      val deliveryAddressDao = AddDeliveryAddressDao(
-        userId = user?.uid,
-        id = newId<String>().toString(),
-        descriptor = request.descriptor,
-        gps = request.gps,
-        default = request.default,
-        address = request.address
-      )
-      return responseStorageService
-        .save(deliveryAddressDao)
+      return addressServices
+        .updateAndSaveAddress(request)
         .fold(
           {
             log.error("Error when saving address response by user id. Error: {}", it)

@@ -52,7 +52,7 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
       return if (it.isNotEmpty()) {
         Either.Right(toSchema(it))
       } else {
-        Either.Left(DatabaseError.NotFound)
+        Either.Left(DatabaseError.NoDataFound)
       }
     }
     .mapLeft { e ->
@@ -69,7 +69,7 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
       return if (data != null) {
         Either.Right(mapper.entityToProtocol(data))
       } else {
-        Either.Left(DatabaseError.NotFound)
+        Either.Left(DatabaseError.NoDataFound)
       }
     }
 
@@ -105,7 +105,7 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
       return if (it.isNotEmpty()) {
         Either.Right(toSchema(it))
       } else {
-        Either.Left(DatabaseError.NotFound)
+        Either.Left(DatabaseError.NoDataFound)
       }
     }
     .mapLeft { e ->

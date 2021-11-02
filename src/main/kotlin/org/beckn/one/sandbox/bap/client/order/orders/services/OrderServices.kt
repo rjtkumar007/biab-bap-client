@@ -31,7 +31,7 @@ class OrderServices @Autowired constructor(
       ordersResponseRepository.findManyByUserId(user.uid!!,skip,limit)
       }
     }else{
-        Either.Left(DatabaseError.NotFound)
+        Either.Left(DatabaseError.NoDataFound)
     }
   }
 }
