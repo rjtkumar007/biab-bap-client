@@ -27,7 +27,7 @@ class AccountDetailsController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @PostMapping("/client/v1/account_details")
+  @PostMapping("/client/v2/account_details")
   @ResponseBody
   fun updateAccountDetails(@RequestBody request: AccountRequestDto): ResponseEntity<AccountDetailsResponse> {
     val user = SecurityUtil.getSecuredUserDetail()

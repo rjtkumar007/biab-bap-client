@@ -24,7 +24,7 @@ class OnOrdersController @Autowired constructor(
   val orderServices: OrderServices
 ){
 
-  @RequestMapping("/client/v1/orders")
+  @RequestMapping("/client/v2/orders")
   @ResponseBody
   fun onOrdersList (
     @RequestParam orderId: String?,

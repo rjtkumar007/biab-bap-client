@@ -41,7 +41,7 @@ class OnTrackPollController(
         val bapResult = onPoll(messageId, protocolClient.getTrackResponsesCall(messageId))
         when (bapResult.statusCode.value()) {
           200 -> {
-            val resultResponse = bapResult.body as ClientOrderStatusResponse
+            val resultResponse = bapResult.body as ClientTrackResponse
             okResponseOnSupport.add(resultResponse)
           }
           else -> {

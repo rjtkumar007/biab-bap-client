@@ -22,7 +22,7 @@ class AddressController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @PostMapping("/client/v1/delivery_address")
+  @PostMapping("/client/v2/delivery_address")
   @ResponseBody
   fun deliveryAddress(@RequestBody request: DeliveryAddressRequestDto): ResponseEntity<DeliveryAddressResponse> {
     val user = SecurityUtil.getSecuredUserDetail()

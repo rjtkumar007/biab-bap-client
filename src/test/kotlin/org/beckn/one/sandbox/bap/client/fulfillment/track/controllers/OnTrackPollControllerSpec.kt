@@ -1,12 +1,14 @@
 package org.beckn.one.sandbox.bap.client.fulfillment.track.controllers
 
 import arrow.core.Either
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientSupportResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientTrackResponse
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
@@ -84,6 +86,43 @@ internal class OnTrackPollControllerSpec @Autowired constructor(
           response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }
+
+      context("when called for given message ids of v2  ") {
+        mockProtocolBap.stubFor(
+          WireMock.get("/protocol/response/v2/on_track?messageIds=${context.messageId}")
+            .willReturn(WireMock.okJson(mapper.writeValueAsString(trackResults())))
+        )
+        val onTrackCall = mockMvc
+          .perform(
+            MockMvcRequestBuilders.get("/client/v2/on_track")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .param("messageIds", context.messageId)
+          )
+
+        it("should respond with status ok") {
+          onTrackCall.andExpect(status().isOk)
+        }
+
+        it("should respond with all track responses in body") {
+          val results = onTrackCall.andReturn()
+          val body = results.response.contentAsString
+          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientTrackResponse>>(){})
+          clientResponse.first().message?.tracking shouldNotBe null
+          clientResponse.first().message?.tracking shouldBe protocolOnTrack.message?.tracking
+        }
+      }
+
+      context("when failure occurs during request processing for v2") {
+        val mockOnPollService = mock<GenericOnPollService<ProtocolOnTrack, ClientTrackResponse>> {
+          onGeneric { onPoll(any(), any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
+        }
+        val onTrackPollController = OnTrackPollController(mockOnPollService, contextFactory, protocolClient)
+        it("should respond with failure for v2") {
+          val response = onTrackPollController.onTrackV2(context.messageId)
+          response.body?.get(0)?.error?.code shouldBe "BAP_007"
+        }
+      }
+
     }
   }
 
