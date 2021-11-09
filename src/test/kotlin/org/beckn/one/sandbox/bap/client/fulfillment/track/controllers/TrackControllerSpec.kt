@@ -99,10 +99,10 @@ class TrackControllerSpec @Autowired constructor(
           .andExpect(status().is4xxClientError)
           .andReturn().response.contentAsString
 
-        val getQuoteResponse = objectMapper.readValue(trackResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
-        getQuoteResponse.first().context shouldBe null
-        getQuoteResponse.first().message shouldBe ResponseMessage.nack()
-        getQuoteResponse.first().error shouldBe BppError.BadRequestError.badRequestError
+        val getTrackResponse = objectMapper.readValue(trackResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+        getTrackResponse.first().context shouldBe null
+        getTrackResponse.first().message shouldBe ResponseMessage.nack()
+        getTrackResponse.first().error shouldBe BppError.BadRequestError.badRequestError
       }
 
       it("should invoke provide track api v2 and save message") {
@@ -180,13 +180,13 @@ class TrackControllerSpec @Autowired constructor(
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null
   ): List<ProtocolAckResponse> {
-    val getQuoteResponse = objectMapper.readValue(responseString, object : TypeReference<List<ProtocolAckResponse>>(){})
-    getQuoteResponse.first().context shouldNotBe null
-    getQuoteResponse.first().context?.messageId shouldNotBe null
-    getQuoteResponse.first().context?.action shouldBe ProtocolContext.Action.TRACK
-    getQuoteResponse.first().message shouldBe expectedMessage
-    getQuoteResponse.first().error shouldBe expectedError
-    return getQuoteResponse
+    val getTrackResponse = objectMapper.readValue(responseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+    getTrackResponse.first().context shouldNotBe null
+    getTrackResponse.first().context?.messageId shouldNotBe null
+    getTrackResponse.first().context?.action shouldBe ProtocolContext.Action.TRACK
+    getTrackResponse.first().message shouldBe expectedMessage
+    getTrackResponse.first().error shouldBe expectedError
+    return getTrackResponse
   }
 
   private fun verifyResponseMessage(
@@ -194,13 +194,13 @@ class TrackControllerSpec @Autowired constructor(
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null
   ): ProtocolAckResponse {
-    val getQuoteResponse = objectMapper.readValue(responseString, ProtocolAckResponse::class.java)
-    getQuoteResponse.context shouldNotBe null
-    getQuoteResponse.context?.messageId shouldNotBe null
-    getQuoteResponse.context?.action shouldBe ProtocolContext.Action.TRACK
-    getQuoteResponse.message shouldBe expectedMessage
-    getQuoteResponse.error shouldBe expectedError
-    return getQuoteResponse
+    val getTrackResponse = objectMapper.readValue(responseString, ProtocolAckResponse::class.java)
+    getTrackResponse.context shouldNotBe null
+    getTrackResponse.context?.messageId shouldNotBe null
+    getTrackResponse.context?.action shouldBe ProtocolContext.Action.TRACK
+    getTrackResponse.message shouldBe expectedMessage
+    getTrackResponse.error shouldBe expectedError
+    return getTrackResponse
   }
 
   private fun verifyThatBppTrackApiWasInvoked(

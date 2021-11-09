@@ -8,7 +8,6 @@ import org.beckn.one.sandbox.bap.message.entities.AddDeliveryAddressDao
 import org.beckn.one.sandbox.bap.message.entities.BillingDetailsDao
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
 import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
-import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.litote.kmongo.KMongo
 import org.litote.kmongo.getCollectionOfName
 import org.springframework.beans.factory.annotation.Autowired

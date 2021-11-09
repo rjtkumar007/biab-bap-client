@@ -57,6 +57,7 @@ class GetQuoteController @Autowired constructor(
     if(!request.isNullOrEmpty()){
       for( quoteRequest:GetQuoteRequestDto in request){
         val context = getContext(quoteRequest.context.transactionId)
+
         quoteService.getQuote(context, quoteRequest.message.cart)
           .fold(
             {
@@ -75,7 +76,7 @@ class GetQuoteController @Autowired constructor(
         .body(
           listOf(ProtocolAckResponse(
             context = null,message = ResponseMessage.nack() ,
-            error = ProtocolError(code = "400",message = HttpStatus.BAD_REQUEST.reasonPhrase)))
+            error = BppError.BadRequestError.error()))
         )
     }
   }

@@ -10,11 +10,13 @@ import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnSelectMessageSelectedFactory
+import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolOnSelect
 import org.beckn.protocol.schemas.ProtocolOnSelectMessage
 import org.mockito.kotlin.any
@@ -91,6 +93,52 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
         it("should respond with failure") {
           val response = onSelectPollController.onGetQuoteV1(context.messageId)
           response.statusCode shouldBe DatabaseError.OnRead.status()
+        }
+      }
+
+      context("when called for empty message ids of v2 quotes") {
+        val onGetQuoteCall = mockMvc
+          .perform(
+            MockMvcRequestBuilders.get("/client/v2/on_get_quote")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .param("messageIds", "")
+          )
+
+        it("should respond with bad error") {
+          onGetQuoteCall.andExpect(status().is4xxClientError)
+        }
+
+        it("should respond with all select responses in body") {
+          val results = onGetQuoteCall.andReturn()
+          val body = results.response.contentAsString
+          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientQuoteResponse>>(){})
+          clientResponse.first().error shouldNotBe null
+          clientResponse.first().error?.message shouldBe BppError.BadRequestError.error().message
+        }
+      }
+
+      context("when called for message ids of v2 quotes") {
+        mockProtocolBap.stubFor(
+          WireMock.get("/protocol/response/v1/on_select?messageId=${context.messageId}")
+            .willReturn(WireMock.okJson(mapper.writeValueAsString(entitySelectResults())))
+        )
+        val onGetQuoteCall = mockMvc
+          .perform(
+            MockMvcRequestBuilders.get("/client/v2/on_get_quote")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .param("messageIds", context.messageId)
+          )
+
+        it("should respond with status ok") {
+          onGetQuoteCall.andExpect(status().isOk)
+        }
+
+        it("should respond with all select responses in body") {
+          val results = onGetQuoteCall.andReturn()
+          val body = results.response.contentAsString
+          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientQuoteResponse>>(){})
+          clientResponse.first().message?.quote shouldNotBe null
+          clientResponse.first().message?.quote?.quote shouldBe protocolOnSelect.message?.order?.quote
         }
       }
     }

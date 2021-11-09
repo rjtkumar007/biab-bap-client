@@ -1,6 +1,8 @@
 package org.beckn.one.sandbox.bap.client.order.status.controllers
 
 import arrow.core.Either
+import arrow.core.left
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.core.spec.style.DescribeSpec
@@ -10,6 +12,9 @@ import org.beckn.one.sandbox.bap.auth.model.User
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
 import org.beckn.one.sandbox.bap.client.order.status.services.OnOrderStatusService
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientOrderStatusResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
@@ -20,6 +25,7 @@ import org.beckn.protocol.schemas.*
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -93,6 +99,88 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
         it("should respond with failure") {
           val response = onOrderStatusPollController.onOrderStatusV1(context.messageId)
           response.statusCode shouldBe DatabaseError.OnRead.status()
+        }
+      }
+
+      context("when called for empty message ids of v2 order status") {
+        val onOrderStatusCall = mockMvc
+          .perform(
+            MockMvcRequestBuilders.get("/client/v2/on_order_status")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .param("messageIds", "")
+          )
+
+        it("should respond with bad error for v2 on Order status api") {
+          onOrderStatusCall.andExpect(status().is4xxClientError)
+        }
+
+        it("should respond with v2 on Order status api responses in body") {
+          val results = onOrderStatusCall.andReturn()
+          val body = results.response.contentAsString
+          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientQuoteResponse>>(){})
+          clientResponse.first().error shouldNotBe null
+          clientResponse.first().error?.message shouldBe BppError.BadRequestError.error().message
+        }
+      }
+
+      context("when called for message ids of v2 order status for authorized user ") {
+
+        val authentication: Authentication = Mockito.mock(Authentication::class.java)
+        val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
+        SecurityContextHolder.setContext(securityContext)
+        Mockito.`when`(securityContext.authentication).thenReturn(authentication)
+        Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
+        Mockito.`when`(securityContext.authentication.principal).thenReturn(
+          User(
+            uid = "1234533434343",
+            name = "John",
+            email = "john@gmail.com",
+            isEmailVerified = true
+          )
+        )
+
+        val onOrderStatusCall = mockMvc
+          .perform(
+            MockMvcRequestBuilders.get("/client/v2/on_order_status")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .param("messageIds", context.messageId)
+          )
+
+        it("should respond with successful for v2 on Order status api") {
+          onOrderStatusCall.andExpect(status().is2xxSuccessful)
+        }
+
+        it("should respond with v2 on Order status api responses in body") {
+          val results = onOrderStatusCall.andReturn()
+          val body = results.response.contentAsString
+          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientOrderStatusResponse>>(){})
+          clientResponse.first().message?.order shouldNotBe null
+          clientResponse.first().message?.order shouldBe protocolOnOrderStatus.message?.order
+        }
+      }
+      context("should respond error on polling for  v2 order status") {
+
+        val authentication: Authentication = Mockito.mock(Authentication::class.java)
+        val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
+        SecurityContextHolder.setContext(securityContext)
+        Mockito.`when`(securityContext.authentication).thenReturn(authentication)
+        Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
+        Mockito.`when`(securityContext.authentication.principal).thenReturn(
+          User(
+            uid = "1234533434343",
+            name = "John",
+            email = "john@gmail.com",
+            isEmailVerified = true
+          )
+        )
+        val mockOnPollService = mock<GenericOnPollService<ProtocolOnOrderStatus, ClientOrderStatusResponse>> {
+          onGeneric { onPoll(any(), any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
+        }
+        val onOrderStatusPollController = OnOrderStatusPollController(mockOnPollService, contextFactory,mapping,
+          protocolClient,onOrderStatusService)
+        it("should respond with failure for v2") {
+          val response = onOrderStatusPollController.onOrderStatusV2(context.messageId)
+          response.body?.get(0)?.error?.code shouldNotBe null
         }
       }
     }

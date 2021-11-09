@@ -64,6 +64,13 @@ class InitOrderControllerSpec @Autowired constructor(
           provider1_id = "padma coffee works"
         ),
       )
+      val orderRequestList = listOf(OrderRequestDto(
+        context = context,
+        message = OrderDtoFactory.create(
+          bpp1_id = retailBengaluruBpp.baseUrl(),
+          provider1_id = "padma coffee works"
+        ),
+      ))
 
       beforeEach {
         MockNetwork.resetAllSubscribers()
@@ -201,6 +208,43 @@ class InitOrderControllerSpec @Autowired constructor(
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
 
+      ///////////////
+
+//      it("should return error when BPP init v2 empty request") {
+//
+//        val initOrderResponseString =
+//          invokeInitOrderV2(listOf()).andExpect(MockMvcResultMatchers.status().is4xxClientError)
+//            .andReturn().response.contentAsString
+//
+//        val initOrderResponse =
+//          verifyInitResponseMessage(
+//            initOrderResponseString,
+//            orderRequest,
+//            ResponseMessage.nack(),
+//            ProtocolError("BAP_011", "BPP returned error")
+//          )
+//        verifyThatBppInitApiWasInvoked(initOrderResponse, orderRequest, retailBengaluruBpp)
+//        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
+//      }
+
+//      it("should return error when BPP init v2 fails") {
+//        retailBengaluruBpp.stubFor(post("/init").willReturn(serverError()))
+//
+//        val initOrderResponseString =
+//          invokeInitOrder(orderRequest).andExpect(MockMvcResultMatchers.status().isInternalServerError)
+//            .andReturn().response.contentAsString
+//
+//        val initOrderResponse =
+//          verifyInitResponseMessage(
+//            initOrderResponseString,
+//            orderRequest,
+//            ResponseMessage.nack(),
+//            ProtocolError("BAP_011", "BPP returned error")
+//          )
+//        verifyThatBppInitApiWasInvoked(initOrderResponse, orderRequest, retailBengaluruBpp)
+//        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
+//      }
+
       registryBppLookupApi.stop()
 
     }
@@ -331,4 +375,12 @@ class InitOrderControllerSpec @Autowired constructor(
       org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
     ).content(objectMapper.writeValueAsString(orderRequest))
   )
+
+  private fun invokeInitOrderV2(orderRequest: List<OrderRequestDto>): ResultActions {
+    return mockMvc.perform(
+      MockMvcRequestBuilders.post("/client/v1/initialize_order").header(
+        org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
+      ).content(objectMapper.writeValueAsString(orderRequest))
+    )
+  }
 }
