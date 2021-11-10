@@ -36,10 +36,7 @@ class OnGetQuotePollController @Autowired constructor(
     if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
       val messageIdArray = messageIds.split(",")
       var okResponseQuotes: MutableList<ClientQuoteResponse> = ArrayList()
-
-      if (messageIdArray.isNotEmpty()) {
-        for (msgId in messageIdArray) {
-
+       for (msgId in messageIdArray) {
           onPollService.onPoll(
             contextFactory.create(messageId = msgId),
             protocolClient.getSelectResponsesCall(msgId)
@@ -57,9 +54,6 @@ class OnGetQuotePollController @Autowired constructor(
           )
         }
         return ResponseEntity.ok(okResponseQuotes)
-      } else {
-        return mapToErrorResponse(BppError.BadRequestError)
-      }
     } else {
       return mapToErrorResponse(BppError.BadRequestError)
     }

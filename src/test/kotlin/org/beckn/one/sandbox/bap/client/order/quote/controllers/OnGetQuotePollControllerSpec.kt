@@ -8,6 +8,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
+import org.beckn.one.sandbox.bap.client.order.init.controllers.OnInitOrderController
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
@@ -17,6 +18,7 @@ import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnSelectMessageSelectedFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
+import org.beckn.protocol.schemas.ProtocolOnInit
 import org.beckn.protocol.schemas.ProtocolOnSelect
 import org.beckn.protocol.schemas.ProtocolOnSelectMessage
 import org.mockito.kotlin.any
@@ -25,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
@@ -141,6 +144,23 @@ internal class OnGetQuotePollControllerSpec @Autowired constructor(
           clientResponse.first().message?.quote?.quote shouldBe protocolOnSelect.message?.order?.quote
         }
       }
+
+      context("when failure occurs during request processing on quotes v2") {
+        val mockOnPollService = mock<GenericOnPollService<ProtocolOnSelect, ClientQuoteResponse>> {
+          onGeneric { onPoll(any(), any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
+        }
+        val onInitPollController = OnGetQuotePollController(mockOnPollService, contextFactory, protocolClient)
+        it("should respond with failure") {
+          val response = onInitPollController.onGetQuoteV2(context.messageId)
+          val responseMessage = response.body
+
+          responseMessage?.first()?.error shouldNotBe null
+          responseMessage?.first()?.error shouldBe DatabaseError.OnRead.error()
+          response.statusCode shouldBe HttpStatus.OK
+        }
+      }
+
+
     }
   }
 
