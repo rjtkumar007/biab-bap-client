@@ -237,23 +237,23 @@ class InitOrderControllerSpec @Autowired constructor(
         verifyThatBppInitApiWasInvokedV2(initOrderResponse, orderRequestList.first(), retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
-//      it("should return error when BPP init v2 fails") {
-//        retailBengaluruBpp.stubFor(post("/init").willReturn(serverError()))
-//
-//        val initOrderResponseString =
-//          invokeInitOrder(orderRequest).andExpect(MockMvcResultMatchers.status().isInternalServerError)
-//            .andReturn().response.contentAsString
-//
-//        val initOrderResponse =
-//          verifyInitResponseMessage(
-//            initOrderResponseString,
-//            orderRequest,
-//            ResponseMessage.nack(),
-//            ProtocolError("BAP_011", "BPP returned error")
-//          )
-//        verifyThatBppInitApiWasInvoked(initOrderResponse, orderRequest, retailBengaluruBpp)
-//        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
-//      }
+
+      it("should return success when BPP init v2 success") {
+        retailBengaluruBpp.stubFor(post("/init").willReturn(
+          okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
+        ))
+        val initOrderResponseString =
+          invokeInitOrderV2(orderRequestList).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+            .andReturn().response.contentAsString
+        val initOrderResponse =
+          verifyInitResponseMessageV2(
+            initOrderResponseString,
+            orderRequestList.first(),
+            ResponseMessage.ack()
+          )
+        verifyThatBppInitApiWasInvokedV2(initOrderResponse, orderRequestList.first(), retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
+      }
 
       registryBppLookupApi.stop()
 

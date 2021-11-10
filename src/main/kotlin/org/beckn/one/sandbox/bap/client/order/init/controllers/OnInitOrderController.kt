@@ -33,7 +33,7 @@ class OnInitOrderController @Autowired constructor(
 
   @RequestMapping("/client/v2/on_initialize_order")
   @ResponseBody
-  fun initializeOrderV2(
+  fun onInitOrderV2(
     @RequestParam messageIds: String
   ): ResponseEntity<out List<ClientResponse>>
   {
@@ -42,7 +42,6 @@ class OnInitOrderController @Autowired constructor(
       val messageIdArray = messageIds.split(",")
       var okResponseInit: MutableList<ClientInitResponse> = ArrayList()
 
-      if (messageIdArray.isNotEmpty()) {
         for (messageId in messageIdArray) {
           onPollService.onPoll(contextFactory.create(messageId = messageId),
             protocolClient.getInitResponsesCall(messageId))
@@ -63,10 +62,7 @@ class OnInitOrderController @Autowired constructor(
       } else {
         return mapToErrorResponse(BppError.BadRequestError)
       }
-    } else {
-      return mapToErrorResponse(BppError.BadRequestError)
     }
-  }
 
   private fun mapToErrorResponse(it: HttpError) = ResponseEntity
     .status(it.status())
