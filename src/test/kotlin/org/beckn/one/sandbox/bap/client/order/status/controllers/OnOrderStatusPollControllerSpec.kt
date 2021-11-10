@@ -128,6 +128,20 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
       }
       context("when called for  message ids should return error on update") {
 
+        val authentication: Authentication = Mockito.mock(Authentication::class.java)
+        val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
+        SecurityContextHolder.setContext(securityContext)
+        Mockito.`when`(securityContext.authentication).thenReturn(authentication)
+        Mockito.`when`(securityContext.authentication.isAuthenticated).thenReturn(true)
+        Mockito.`when`(securityContext.authentication.principal).thenReturn(
+          User(
+            uid = "1234533434343",
+            name = "John",
+            email = "john@gmail.com",
+            isEmailVerified = true
+          )
+        )
+
         it("should respond with v2 on Order status api failure") {
           val onOrderServiceSuccess = mock<OnOrderStatusService> {
             onGeneric { updateOrder(any()) }.thenReturn(Either.Left(DatabaseError.OnWrite))
