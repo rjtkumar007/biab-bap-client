@@ -11,6 +11,7 @@ import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.auth.model.User
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
 import org.beckn.one.sandbox.bap.client.order.status.services.OnOrderStatusService
+import org.beckn.one.sandbox.bap.client.shared.dtos.AccountDetailsResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientOrderStatusResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
@@ -19,8 +20,10 @@ import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
+import org.beckn.one.sandbox.bap.message.entities.AccountDetailsDao
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOrderFactory
 import org.beckn.one.sandbox.bap.message.mappers.OnOrderProtocolToEntityOrder
+import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.protocol.schemas.*
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -31,6 +34,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
@@ -122,6 +126,27 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
           clientResponse.first().error?.message shouldBe BppError.BadRequestError.error().message
         }
       }
+      context("when called for  message ids should return error on update") {
+
+        it("should respond with v2 on Order status api failure") {
+          val onOrderServiceSuccess = mock<OnOrderStatusService> {
+            onGeneric { updateOrder(any()) }.thenReturn(Either.Left(DatabaseError.OnWrite))
+          }
+          val mockPollResponse = ClientOrderStatusResponse(message =protocolOnOrderStatus.message,context = protocolOnOrderStatus.context!! )
+
+          val mockOnPollService = mock<GenericOnPollService<ProtocolOnOrderStatus, ClientOrderStatusResponse>> {
+            onGeneric { onPoll(any(), any()) }.thenReturn(Either.Right(mockPollResponse))
+          }
+
+          val onOrderStatusPollController = OnOrderStatusPollController(mockOnPollService, contextFactory,mapping,
+            protocolClient,onOrderServiceSuccess)
+
+          val response = onOrderStatusPollController.onOrderStatusV2(context.messageId)
+          response.body?.get(0)?.error shouldNotBe null
+          response.body?.get(0)?.error?.code shouldNotBe null
+        }
+
+      }
 
       context("when called for message ids of v2 order status for authorized user ") {
 
@@ -158,7 +183,7 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
           clientResponse.first().message?.order shouldBe protocolOnOrderStatus.message?.order
         }
       }
-      context("should respond error on polling for  v2 order status") {
+      /*context("should respond error on polling for  v2 order status") {
 
         val authentication: Authentication = Mockito.mock(Authentication::class.java)
         val securityContext: SecurityContext = Mockito.mock(SecurityContext::class.java)
@@ -180,9 +205,10 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
           protocolClient,onOrderStatusService)
         it("should respond with failure for v2") {
           val response = onOrderStatusPollController.onOrderStatusV2(context.messageId)
+          response.body?.get(0)?.error shouldNotBe null
           response.body?.get(0)?.error?.code shouldNotBe null
         }
-      }
+      }*/
     }
   }
 
