@@ -203,8 +203,6 @@ class InitOrderControllerSpec @Autowired constructor(
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
 
-      ///////////////
-
       it("should return error when BPP init v2 empty request") {
 
         val initOrderResponseString =
