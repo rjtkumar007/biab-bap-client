@@ -12,10 +12,7 @@ import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnInit
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class OnInitOrderController @Autowired constructor(
@@ -24,14 +21,14 @@ class OnInitOrderController @Autowired constructor(
   val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnInit, ClientInitResponse>(onPollService, contextFactory) {
 
-  @RequestMapping("/client/v1/on_initialize_order")
+  @RequestMapping(value = ["/client/v1/on_initialize_order"],method = [RequestMethod.GET])
   @ResponseBody
   fun onInitOrderV1(
     @RequestParam messageId: String
   ): ResponseEntity<out ClientResponse> = onPoll(messageId, protocolClient.getInitResponsesCall(messageId))
 
 
-  @RequestMapping("/client/v2/on_initialize_order")
+  @RequestMapping(value = ["/client/v2/on_initialize_order"],method = [RequestMethod.GET])
   @ResponseBody
   fun initializeOrderV2(
     @RequestParam messageIds: String

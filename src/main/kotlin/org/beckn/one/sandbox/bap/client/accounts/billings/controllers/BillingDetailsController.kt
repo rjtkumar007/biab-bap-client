@@ -25,7 +25,7 @@ class BillingDetailsController @Autowired constructor(
 
   @PostMapping("/client/v1/billing_details")
   @ResponseBody
-  fun deliveryAddress(@RequestBody request: BillingDetailRequestDto): ResponseEntity<BillingDetailsResponse> {
+  fun billingDetails(@RequestBody request: BillingDetailRequestDto): ResponseEntity<BillingDetailsResponse> {
     val user = SecurityUtil.getSecuredUserDetail()
     if (user == null) {
      return  mapToErrorResponse(BppError.AuthenticationError)

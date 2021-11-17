@@ -13,10 +13,7 @@ import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolOnTrack
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class OnTrackPollController(
@@ -25,12 +22,12 @@ class OnTrackPollController(
     val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnTrack, ClientTrackResponse>(onPollService, contextFactory) {
 
-  @RequestMapping("/client/v1/on_track")
+  @RequestMapping(value = ["/client/v1/on_track"],method = [RequestMethod.GET])
   @ResponseBody
   fun onTrack(@RequestParam messageId: String): ResponseEntity<out ClientResponse> =
     onPoll(messageId, protocolClient.getTrackResponsesCall(messageId))
 
-  @RequestMapping("/client/v2/on_track")
+  @RequestMapping(value = ["/client/v2/on_track"],method = [RequestMethod.GET])
   @ResponseBody
   fun onTrackV2(@RequestParam messageIds: String): ResponseEntity<out List<ClientResponse>> {
     if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {

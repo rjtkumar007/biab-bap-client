@@ -9,10 +9,7 @@ import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnSearch
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class OnSearchPollController @Autowired constructor(
@@ -21,7 +18,7 @@ class OnSearchPollController @Autowired constructor(
   val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnSearch, ClientSearchResponse>(onPollService, contextFactory) {
 
-  @RequestMapping("/client/v1/on_search")
+  @RequestMapping(value = ["/client/v1/on_search"],method = [RequestMethod.GET])
   @ResponseBody
   fun onSearchV1(
     @RequestParam messageId: String

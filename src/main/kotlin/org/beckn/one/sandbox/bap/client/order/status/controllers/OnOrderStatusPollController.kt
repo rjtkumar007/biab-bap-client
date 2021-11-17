@@ -16,10 +16,7 @@ import org.beckn.one.sandbox.bap.message.mappers.OnOrderProtocolToEntityOrder
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolOnOrderStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -31,12 +28,12 @@ class OnOrderStatusPollController(
   val onOrderStatusService: OnOrderStatusService
 ) : AbstractOnPollController<ProtocolOnOrderStatus, ClientOrderStatusResponse>(onPollService, contextFactory) {
 
-  @RequestMapping("/client/v1/on_order_status")
+  @RequestMapping(value = ["/client/v1/on_order_status"],method = [RequestMethod.GET])
   @ResponseBody
   fun onOrderStatusV1(@RequestParam messageId: String): ResponseEntity<out ClientResponse> =
     onPoll(messageId, protocolClient.getOrderStatusResponsesCall(messageId))
 
-  @RequestMapping("/client/v2/on_order_status")
+  @RequestMapping(value = ["/client/v2/on_order_status"],method = [RequestMethod.GET])
   @ResponseBody
   fun onOrderStatusV2(@RequestParam messageIds: String): ResponseEntity<out List<ClientResponse>> {
 

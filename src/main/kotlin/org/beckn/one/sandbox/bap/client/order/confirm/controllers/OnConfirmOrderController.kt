@@ -16,10 +16,7 @@ import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolOnConfirm
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class OnConfirmOrderController @Autowired constructor(
@@ -30,13 +27,13 @@ class OnConfirmOrderController @Autowired constructor(
   val onConfirmOrderService: OnConfirmOrderService
 ) : AbstractOnPollController<ProtocolOnConfirm, ClientConfirmResponse>(onPollService, contextFactory) {
 
-  @RequestMapping("/client/v1/on_confirm_order")
+  @RequestMapping(value = ["/client/v1/on_confirm_order"],method = [RequestMethod.GET])
   @ResponseBody
   fun onConfirmOrderV1(
     @RequestParam messageId: String
   ): ResponseEntity<out ClientResponse> = onPoll(messageId, protocolClient.getConfirmResponsesCall(messageId))
 
-  @RequestMapping("/client/v2/on_confirm_order")
+  @RequestMapping(value = ["/client/v2/on_confirm_order"],method = [RequestMethod.GET])
   @ResponseBody
   fun onConfirmOrderV2(
     @RequestParam messageIds: String

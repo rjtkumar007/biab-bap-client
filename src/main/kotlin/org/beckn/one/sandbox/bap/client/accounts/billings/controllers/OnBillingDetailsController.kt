@@ -17,7 +17,7 @@ class OnBillingDetailsController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @RequestMapping("/client/v1/billing_details")
+  @RequestMapping(value = ["/client/v1/billing_details"],method = [RequestMethod.GET])
   @ResponseBody
   fun onBillingDetails(): ResponseEntity<out List<BillingDetailsResponse>> {
     val user = SecurityUtil.getSecuredUserDetail()
