@@ -64,11 +64,12 @@ class GetQuoteController @Autowired constructor(
               okResponseQuotes.add(ProtocolAckResponse(context = context, message = it.message(), error = it.error()))
             },
             {
-              log.info("Successfully initiated get quote. Message: {}", it)
+              log.info("`Successfully initiated get quote`. Message: {}", it)
               okResponseQuotes.add(ProtocolAckResponse(context = context, message = ResponseMessage.ack()))
             }
           )
       }
+      log.info("`Initiated and returning quotes acknowledgment`. Message: {}", okResponseQuotes)
       return ResponseEntity.ok(okResponseQuotes)
     }else {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
