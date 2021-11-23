@@ -58,7 +58,7 @@ context:
   city: std:080
   country: IND
   bap_id: box.beckn.org
-  bap_uri: https://e200-106-200-248-227.ngrok.io/protocol/v1
+  bap_uri: http://localhost:9002/protocol/v1
   ttl_seconds: 20
 beckn:
   security.enabled: false
