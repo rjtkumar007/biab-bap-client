@@ -14,6 +14,8 @@ import org.beckn.one.sandbox.bap.message.entities.OrderDao
 import org.beckn.one.sandbox.bap.message.mappers.OnOrderProtocolToEntityOrder
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolOnConfirm
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
@@ -29,6 +31,7 @@ class OnConfirmOrderController @Autowired constructor(
   val mapping: OnOrderProtocolToEntityOrder,
   val onConfirmOrderService: OnConfirmOrderService
 ) : AbstractOnPollController<ProtocolOnConfirm, ClientConfirmResponse>(onPollService, contextFactory) {
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   @RequestMapping("/client/v1/on_confirm_order")
   @ResponseBody
@@ -86,6 +89,8 @@ class OnConfirmOrderController @Autowired constructor(
               }
             }
           }
+          log.info("`Initiated and returning onConfirm acknowledgment`. Message: {}", okResponseConfirmOrder)
+
           return ResponseEntity.ok(okResponseConfirmOrder)
         } else {
           return mapToErrorResponse(BppError.BadRequestError)
