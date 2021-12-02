@@ -79,7 +79,7 @@ internal class OnBillingDetailsControllerTest @Autowired constructor(
     );
     return mockMvc
       .perform(
-        MockMvcRequestBuilders.get("/client/v2/billing_details")
+        MockMvcRequestBuilders.get("/client/v1/billing_details")
           .contentType(MediaType.APPLICATION_JSON)
       )
   }

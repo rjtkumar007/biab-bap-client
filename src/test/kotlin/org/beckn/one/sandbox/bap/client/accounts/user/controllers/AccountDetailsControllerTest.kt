@@ -102,7 +102,7 @@ internal class AccountDetailsControllerTest @Autowired constructor(
     );
      mockMvc
       .perform(
-        MockMvcRequestBuilders.post("/client/v2/account_details")
+        MockMvcRequestBuilders.post("/client/v1/account_details")
           .content(objectMapper.writeValueAsString(accountRequestDto))
           .contentType(MediaType.APPLICATION_JSON)
       ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)

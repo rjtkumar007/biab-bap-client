@@ -23,7 +23,7 @@ class OnAccountDetailsController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @RequestMapping("/client/v2/account_details")
+  @RequestMapping("/client/v1/account_details")
   @ResponseBody
   fun onAccountDetails(): ResponseEntity<out AccountDetailsResponse> {
     val user = SecurityUtil.getSecuredUserDetail()

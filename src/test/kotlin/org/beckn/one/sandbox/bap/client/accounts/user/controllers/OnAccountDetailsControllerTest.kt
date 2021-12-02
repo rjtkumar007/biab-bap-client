@@ -95,7 +95,7 @@ internal class OnAccountDetailsControllerTest @Autowired constructor(
   private fun invokeOnAccountDetails(): ResultActions {
     return mockMvc
       .perform(
-        MockMvcRequestBuilders.get("/client/v2/account_details")
+        MockMvcRequestBuilders.get("/client/v1/account_details")
           .contentType(MediaType.APPLICATION_JSON)
       )
   }

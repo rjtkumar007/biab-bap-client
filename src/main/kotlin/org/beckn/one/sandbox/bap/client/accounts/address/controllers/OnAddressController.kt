@@ -17,7 +17,7 @@ class OnAddressController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @RequestMapping("/client/v2/delivery_address")
+  @RequestMapping("/client/v1/delivery_address")
   @ResponseBody
   fun onSearchAddress(): ResponseEntity<out List<DeliveryAddressResponse>> {
     val user = SecurityUtil.getSecuredUserDetail()

@@ -23,7 +23,7 @@ class BillingDetailsController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @PostMapping("/client/v2/billing_details")
+  @PostMapping("/client/v1/billing_details")
   @ResponseBody
   fun deliveryAddress(@RequestBody request: BillingDetailRequestDto): ResponseEntity<BillingDetailsResponse> {
     val user = SecurityUtil.getSecuredUserDetail()

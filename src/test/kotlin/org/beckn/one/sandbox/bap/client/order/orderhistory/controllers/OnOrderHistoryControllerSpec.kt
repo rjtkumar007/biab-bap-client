@@ -48,7 +48,7 @@ class OnOrderHistoryControllerSpec @Autowired constructor(
         setMockAuthentication()
         val onGetOrdersCall = mockMvc
           .perform(
-            MockMvcRequestBuilders.get("/client/v2/orders")
+            MockMvcRequestBuilders.get("/client/v1/orders")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
               .param("orderId", "121212")
           )
@@ -83,7 +83,7 @@ class OnOrderHistoryControllerSpec @Autowired constructor(
 
           val onGetOrdersCall = mockMvc
           .perform(
-            MockMvcRequestBuilders.get("/client/v2/orders")
+            MockMvcRequestBuilders.get("/client/v1/orders")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
               .param("orderId", "121212")
           )
