@@ -1,8 +1,10 @@
 package org.beckn.one.sandbox.bap.message.repositories
 
+import arrow.core.Either
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.result.UpdateResult
+import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.*
 import org.bson.conversions.Bson
 import org.litote.kmongo.*
@@ -32,6 +34,10 @@ class BecknResponseRepository<R : BecknResponseDao>(
   fun findOrdersById(id: String, skip: Int = 0 , limit :Int = 10  ): List<R> =
     collection.find(OrderDao::id eq id).limit(limit).skip(skip).toList()
 
-
-
+  fun updateManyById(id: Bson, requestColumn:Bson): UpdateResult {
+    return updateManyColumnById(
+      id,
+      requestColumn
+    )
+  }
 }

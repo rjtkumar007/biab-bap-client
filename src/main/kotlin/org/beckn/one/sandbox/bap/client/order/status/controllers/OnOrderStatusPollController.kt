@@ -43,7 +43,6 @@ class OnOrderStatusPollController(
     if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
       val messageIdArray = messageIds.split(",")
       var okResponseOnOrderStatus: MutableList<ClientResponse> = ArrayList()
-      if (messageIdArray.isNotEmpty()) {
         if (SecurityUtil.getSecuredUserDetail() != null) {
           val user = SecurityUtil.getSecuredUserDetail()
           for (messageId in messageIdArray) {
@@ -82,11 +81,7 @@ class OnOrderStatusPollController(
         }else{
           return mapToErrorResponseV2(BppError.AuthenticationError)
         }
-
         return ResponseEntity.ok(okResponseOnOrderStatus)
-      } else {
-        return mapToErrorResponseV2(BppError.BadRequestError)
-      }
     } else {
       return mapToErrorResponseV2(BppError.BadRequestError)
     }

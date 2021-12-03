@@ -35,7 +35,7 @@ data class AddDeliveryAddressDao @Default constructor(
   val id: String,
   val descriptor: DescriptorDao? = null,
   val gps: String? = null,
-  val default: Boolean? = true,
+  val defaultAddress: Boolean? = true,
   val address: AddressDao? = null
 ) : BecknResponseDao
 

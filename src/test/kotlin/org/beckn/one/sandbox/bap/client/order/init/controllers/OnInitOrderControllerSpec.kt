@@ -9,12 +9,12 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientInitResponse
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.factories.ProtocolOnInitMessageInitializedFactory
-import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolOnInit
 import org.beckn.protocol.schemas.ProtocolOnInitMessage
 import org.mockito.kotlin.any
@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
@@ -45,6 +46,7 @@ internal class OnInitOrderControllerSpec @Autowired constructor(
     context,
     message = ProtocolOnInitMessage(ProtocolOnInitMessageInitializedFactory.create(id = 1, numberOfItems = 1))
   )
+
   val mockProtocolBap = MockProtocolBap.withResetInstance()
   init {
     describe("OnInitialize callback") {
@@ -83,6 +85,68 @@ internal class OnInitOrderControllerSpec @Autowired constructor(
           response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }
+
+      context("when called for empty message ids of v2 init") {
+        val onGetQuoteCall = mockMvc
+          .perform(
+            MockMvcRequestBuilders.get("/client/v2/on_initialize_order")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .param("messageIds", "")
+          )
+
+        it("should respond with bad error") {
+          onGetQuoteCall.andExpect(MockMvcResultMatchers.status().is4xxClientError)
+        }
+
+        it("should respond with all init responses in body") {
+          val results = onGetQuoteCall.andReturn()
+          val body = results.response.contentAsString
+          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientInitResponse>>(){})
+          clientResponse.first().error shouldNotBe null
+          clientResponse.first().error?.message shouldBe BppError.BadRequestError.error().message
+        }
+      }
+
+      context("when called for message ids of v2 init") {
+        mockProtocolBap.stubFor(
+          WireMock.get("/protocol/response/v1/on_init?messageId=${context.messageId}")
+            .willReturn(WireMock.okJson(mapper.writeValueAsString(entityOnInitResults())))
+        )
+        val onGetQuoteCall = mockMvc
+          .perform(
+            MockMvcRequestBuilders.get("/client/v2/on_initialize_order")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .param("messageIds", context.messageId)
+          )
+
+        it("should respond with status ok") {
+          onGetQuoteCall.andExpect(MockMvcResultMatchers.status().isOk)
+        }
+
+        it("should respond with all select responses in body") {
+          val results = onGetQuoteCall.andReturn()
+          val body = results.response.contentAsString
+          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientInitResponse>>(){})
+          clientResponse.first().message?.order shouldNotBe null
+          clientResponse.first().message?.order?.quote shouldBe protocolOnInit.message?.order?.quote
+        }
+      }
+
+      context("when failure occurs during request processing on init v2") {
+        val mockOnPollService = mock<GenericOnPollService<ProtocolOnInit, ClientInitResponse>> {
+          onGeneric { onPoll(any(), any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
+        }
+        val onInitPollController = OnInitOrderController(mockOnPollService, contextFactory, protocolClient)
+        it("should respond with failure") {
+          val response = onInitPollController.onInitOrderV2(context.messageId)
+          val responseMessage = response.body
+
+          responseMessage?.first()?.error shouldNotBe null
+          responseMessage?.first()?.error shouldBe DatabaseError.OnRead.error()
+          response.statusCode shouldBe HttpStatus.OK
+        }
+      }
+
     }
   }
 

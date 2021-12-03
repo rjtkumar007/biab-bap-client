@@ -7,7 +7,6 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.OrderResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
-import org.beckn.one.sandbox.bap.message.entities.BecknResponseDao
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.protocol.schemas.ProtocolAckResponse
@@ -102,7 +101,6 @@ class ConfirmOrderController @Autowired constructor(
                 ).fold(
                   {
                     log.error("Error when updating order: {}", it)
-                    mapToErrorResponseV2(it, context)
                     okResponseConfirmOrders.add(
                       ProtocolAckResponse(
                         context = context,

@@ -10,6 +10,7 @@ sealed class DatabaseError : HttpError {
   val onReadError = ProtocolError("BAP_007", "Error when reading from DB")
   val notFoundError = ProtocolError("BAP_008", "No message with the given ID")
   val onDeleteError = ProtocolError("BAP_009", "Error when deleting from DB")
+  val noDataFoundError = ProtocolError("BAP_010", "No data found")
 
   object OnWrite : DatabaseError() {
     override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
@@ -35,11 +36,12 @@ sealed class DatabaseError : HttpError {
     override fun error(): ProtocolError = notFoundError
   }
 
-  object OnDelete: DatabaseError() {
-    override fun status(): HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
+  object NoDataFound: DatabaseError() {
+    override fun status(): HttpStatus =  HttpStatus.NOT_FOUND
 
     override fun message(): ResponseMessage = ResponseMessage.nack()
 
-    override fun error(): ProtocolError = onDeleteError
+    override fun error(): ProtocolError = noDataFoundError
   }
+
 }

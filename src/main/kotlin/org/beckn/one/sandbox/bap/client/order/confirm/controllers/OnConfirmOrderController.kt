@@ -9,6 +9,7 @@ import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.errors.HttpError
+import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
 import org.beckn.one.sandbox.bap.message.mappers.OnOrderProtocolToEntityOrder
@@ -49,7 +50,6 @@ class OnConfirmOrderController @Autowired constructor(
       if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
         val messageIdArray = messageIds.split(",")
         var okResponseConfirmOrder: MutableList<ClientConfirmResponse> = ArrayList()
-        if (messageIdArray.isNotEmpty()) {
           for (messageId in messageIdArray) {
             val bapResult = onPoll(messageId, protocolClient.getConfirmResponsesCall(messageId))
             when (bapResult.statusCode.value()) {
@@ -73,9 +73,11 @@ class OnConfirmOrderController @Autowired constructor(
                     }
                   )
                 } else {
-                  return mapToErrorResponse(
-                    BppError.NullResponse,
-                    context = contextFactory.create(messageId = messageId)
+                  okResponseConfirmOrder.add(
+                    ClientConfirmResponse(
+                      error = DatabaseError.NoDataFound.noDataFoundError,
+                      context = contextFactory.create(messageId = messageId)
+                    )
                   )
                 }
               }
@@ -92,10 +94,6 @@ class OnConfirmOrderController @Autowired constructor(
           log.info("`Initiated and returning onConfirm acknowledgment`. Message: {}", okResponseConfirmOrder)
 
           return ResponseEntity.ok(okResponseConfirmOrder)
-        } else {
-          return mapToErrorResponse(BppError.BadRequestError)
-        }
-
       } else {
         return mapToErrorResponse(BppError.BadRequestError)
       }
