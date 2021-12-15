@@ -12,7 +12,7 @@ spring:
     property-naming-strategy: SNAKE_CASE
     default-property-inclusion: non_null
 registry_service:
-  url: https://demo4460370.mockable.io/registry/
+  url: {{ registry_url }}
   retry:
     max_attempts: 3
     initial_interval_in_millis: 1000
