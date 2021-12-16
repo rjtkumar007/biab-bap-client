@@ -10,6 +10,7 @@ import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.SearchCriteria
 import org.beckn.one.sandbox.bap.client.shared.errors.gateway.GatewaySearchError
 import org.beckn.protocol.schemas.*
+import org.litote.kmongo.rename
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,7 +27,8 @@ class GatewayService @Autowired constructor(
     return Either.catch {
       log.info("Initiating Search using gateway: {}. Context: {}", gateway, context)
       val gatewayServiceClient = gatewayServiceClientFactory.getClient(gateway.subscriber_url)
-      val httpResponse = gatewayServiceClient.search(buildProtocolSearchRequest(context, criteria)).execute()
+      val requestBody = buildProtocolSearchRequest(context, criteria)
+      val httpResponse = gatewayServiceClient.search(requestBody).execute()
       log.info("Search response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
       return when {
         httpResponse.isInternalServerError() -> Left(GatewaySearchError.Internal)
@@ -49,7 +51,12 @@ class GatewayService @Autowired constructor(
       ProtocolSearchRequestMessage(
         ProtocolIntent(
           item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = criteria.searchString)),
-          provider = ProtocolProvider(id = criteria.providerId,category_id = criteria.categoryId),
+          provider = ProtocolProvider( id = criteria.providerId, category_id = criteria.categoryId,
+            descriptor = ProtocolDescriptor(name = criteria.providerName)),
+          category= ProtocolCategory(
+            id = criteria?.categoryId,
+            descriptor = ProtocolDescriptor(name = criteria?.categoryName)
+          ),
           fulfillment = ProtocolFulfillment(
             start = ProtocolFulfillmentStart(location = ProtocolLocation(gps=criteria.pickupLocation)),
             end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = criteria.deliveryLocation))),
