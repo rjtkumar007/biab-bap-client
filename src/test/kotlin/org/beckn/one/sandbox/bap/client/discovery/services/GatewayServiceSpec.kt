@@ -114,8 +114,12 @@ internal class GatewayServiceSpec : DescribeSpec() {
           start = ProtocolFulfillmentStart(location = ProtocolLocation(gps = locationString)),
           end = ProtocolFulfillmentEnd(location = ProtocolLocation(gps = locationString))
         ),
+        category= ProtocolCategory(
+          id = "fruits",
+          descriptor = ProtocolDescriptor(name = null)
+        ),
         item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = queryString)),
-        provider = ProtocolProvider(id = "padma coffee works",category_id= "fruits")
+        provider = ProtocolProvider(id = "padma coffee works",category_id= "fruits", descriptor = ProtocolDescriptor(name = null))
       )
     )
   )

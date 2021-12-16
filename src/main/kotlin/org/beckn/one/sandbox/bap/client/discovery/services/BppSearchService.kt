@@ -34,8 +34,9 @@ class BppSearchService @Autowired constructor(
           ProtocolSearchRequestMessage(
             ProtocolIntent(
               item = ProtocolIntentItem(descriptor = ProtocolIntentItemDescriptor(name = criteria.searchString)),
-              provider = ProtocolProvider(id = criteria.providerId, category_id = criteria.categoryId),
+              provider = ProtocolProvider(id = criteria.providerId, category_id = criteria.categoryId, descriptor = ProtocolDescriptor(name = criteria.providerName)),
               fulfillment = getFulfillmentFilter(criteria),
+              category = ProtocolCategory(id = criteria.categoryId,descriptor = ProtocolDescriptor(name = criteria.categoryName))
             )
           )
         )
