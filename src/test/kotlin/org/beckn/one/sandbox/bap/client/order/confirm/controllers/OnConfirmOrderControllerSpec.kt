@@ -200,7 +200,7 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
           val body = results.response.contentAsString
           val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientConfirmResponse>>() {})
           clientResponse.first().context shouldNotBe null
-          clientResponse.first().message shouldNotBe null
+          clientResponse.first().error shouldNotBe  null
         }
       }
       context("when network call success but db update fails") {
