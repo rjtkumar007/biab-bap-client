@@ -7,7 +7,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.beckn.one.sandbox.bap.auth.model.User
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
@@ -15,6 +14,7 @@ import org.beckn.one.sandbox.bap.client.factories.OrderDtoFactory
 import org.beckn.one.sandbox.bap.client.factories.OrderItemDtoFactory
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderRequestDto
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
@@ -26,16 +26,11 @@ import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.factories.UuidFactory
-import org.beckn.one.sandbox.bap.message.factories.ProtocolProviderFactory
 import org.beckn.protocol.schemas.*
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContext
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
@@ -64,6 +59,13 @@ class InitOrderControllerSpec @Autowired constructor(
           provider1_id = "padma coffee works"
         ),
       )
+      val orderRequestList = listOf(OrderRequestDto(
+        context = context,
+        message = OrderDtoFactory.create(
+          bpp1_id = retailBengaluruBpp.baseUrl(),
+          provider1_id = "padma coffee works"
+        ),
+      ))
 
       beforeEach {
         MockNetwork.resetAllSubscribers()
@@ -201,6 +203,50 @@ class InitOrderControllerSpec @Autowired constructor(
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
 
+      it("should return error when BPP init v2 empty request") {
+
+        val initOrderResponseString =
+          invokeInitOrderV2(listOf()).andExpect(MockMvcResultMatchers.status().is4xxClientError)
+            .andReturn().response.contentAsString
+        val clientResponse = objectMapper.readValue(initOrderResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+        clientResponse.first().context shouldBe  null
+        clientResponse.first().message shouldBe  ResponseMessage.nack()
+        clientResponse.first().error shouldBe BppError.BadRequestError.badRequestError
+      }
+
+      it("should return error when BPP init v2 fails") {
+        retailBengaluruBpp.stubFor(post("/init").willReturn(serverError()))
+        val initOrderResponseString =
+          invokeInitOrderV2(orderRequestList).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+            .andReturn().response.contentAsString
+        val initOrderResponse =
+          verifyInitResponseMessageV2(
+            initOrderResponseString,
+            orderRequestList.first(),
+            ResponseMessage.nack(),
+            ProtocolError("BAP_011", "BPP returned error")
+          )
+        verifyThatBppInitApiWasInvokedV2(initOrderResponse, orderRequestList.first(), retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
+      }
+
+      it("should return success when BPP init v2 success") {
+        retailBengaluruBpp.stubFor(post("/init").willReturn(
+          okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
+        ))
+        val initOrderResponseString =
+          invokeInitOrderV2(orderRequestList).andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+            .andReturn().response.contentAsString
+        val initOrderResponse =
+          verifyInitResponseMessageV2(
+            initOrderResponseString,
+            orderRequestList.first(),
+            ResponseMessage.ack()
+          )
+        verifyThatBppInitApiWasInvokedV2(initOrderResponse, orderRequestList.first(), retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
+      }
+
       registryBppLookupApi.stop()
 
     }
@@ -331,4 +377,81 @@ class InitOrderControllerSpec @Autowired constructor(
       org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
     ).content(objectMapper.writeValueAsString(orderRequest))
   )
+
+  private fun invokeInitOrderV2(orderRequest: List<OrderRequestDto>): ResultActions {
+    return mockMvc.perform(
+      MockMvcRequestBuilders.post("/client/v2/initialize_order").header(
+        org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
+      ).content(objectMapper.writeValueAsString(orderRequest))
+    )
+  }
+
+  private fun verifyInitResponseMessageV2(
+    initOrderResponseString: String,
+    orderRequest: OrderRequestDto,
+    expectedMessage: ResponseMessage,
+    expectedError: ProtocolError? = null
+  ): List<ProtocolAckResponse> {
+    val initOrderResponse = objectMapper.readValue(initOrderResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+    initOrderResponse.first().context shouldNotBe null
+    initOrderResponse.first().context?.messageId shouldNotBe null
+    initOrderResponse.first().context?.transactionId shouldBe orderRequest.context.transactionId
+    initOrderResponse.first().context?.action shouldBe ProtocolContext.Action.INIT
+    initOrderResponse.first().message shouldBe expectedMessage
+    initOrderResponse.first().error shouldBe expectedError
+    return initOrderResponse
+  }
+
+  private fun verifyThatBppInitApiWasInvokedV2(
+    initOrderResponse: List<ProtocolAckResponse>,
+    orderRequest: OrderRequestDto,
+    providerApi: WireMockServer
+  ) {
+    val protocolInitRequest = getProtocolInitRequestV2(initOrderResponse, orderRequest)
+    providerApi.verify(
+      postRequestedFor(urlEqualTo("/init"))
+        .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolInitRequest)))
+    )
+  }
+
+  private fun getProtocolInitRequestV2(
+    initOrderResponse: List<ProtocolAckResponse>,
+    orderRequest: OrderRequestDto
+  ): ProtocolInitRequest {
+    val locations =
+      orderRequest.message.items?.first()?.provider?.locations?.map { ProtocolSelectMessageSelectedProviderLocations(id = it) }
+    val provider =
+      orderRequest.message.items?.first()?.provider// todo: does this hold good even for order object or is this gotten from somewhere else?
+    return ProtocolInitRequest(
+      context = initOrderResponse.first().context!!,
+      message = ProtocolInitRequestMessage(
+        order = ProtocolOrder(
+          provider = ProtocolSelectMessageSelectedProvider(
+            id = provider!!.id,
+            locations = locations
+          ),
+          items = orderRequest.message.items!!.map {
+            ProtocolSelectMessageSelectedItems(
+              id = it.id,
+              quantity = it.quantity
+            )
+          },
+          billing = orderRequest.message.billingInfo,
+          fulfillment = ProtocolFulfillment(
+            provider_id = "padma coffee works",
+            end = ProtocolFulfillmentEnd(
+              contact = ProtocolContact(
+                phone = orderRequest.message.deliveryInfo.phone,
+                email = orderRequest.message.deliveryInfo.email
+              ), location = orderRequest.message.deliveryInfo.location
+            ),
+            type = "home-delivery",
+            customer = ProtocolCustomer(person = ProtocolPerson(name = orderRequest.message.deliveryInfo.name))
+          ),
+          addOns = emptyList(),
+          offers = emptyList()
+        )
+      )
+    )
+  }
 }

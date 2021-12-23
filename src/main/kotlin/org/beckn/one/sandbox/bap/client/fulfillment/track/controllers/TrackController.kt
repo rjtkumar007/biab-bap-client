@@ -2,6 +2,7 @@ package org.beckn.one.sandbox.bap.client.fulfillment.track.controllers
 
 import org.beckn.one.sandbox.bap.client.fulfillment.track.services.TrackService
 import org.beckn.one.sandbox.bap.client.shared.dtos.TrackRequestDto
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
@@ -72,15 +73,15 @@ class TrackController @Autowired constructor(
         .body(
           listOf(
             ProtocolAckResponse(
-              context = null, message = ResponseMessage.nack(),
-              error = ProtocolError(code = "400", message = HttpStatus.BAD_REQUEST.reasonPhrase)
+              context = null, message = BppError.BadRequestError.message(),
+              error = BppError.BadRequestError.error()
             )
           )
         )
     }
   }
 
-  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext) = ResponseEntity
+  private fun mapToErrorResponse(it: HttpError, context: ProtocolContext? = null) = ResponseEntity
     .status(it.status())
     .body(ProtocolAckResponse(context = context, message = it.message(), error = it.error()))
 
