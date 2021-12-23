@@ -40,7 +40,6 @@ class OnOrderStatusPollController(
     if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
       val messageIdArray = messageIds.split(",")
       var okResponseOnOrderStatus: MutableList<ClientResponse> = ArrayList()
-      if (messageIdArray.isNotEmpty()) {
         if (SecurityUtil.getSecuredUserDetail() != null) {
           val user = SecurityUtil.getSecuredUserDetail()
           for (messageId in messageIdArray) {
@@ -48,7 +47,7 @@ class OnOrderStatusPollController(
             when (bapResult.statusCode.value()) {
               200 -> {
                   val resultResponse = bapResult.body as ClientOrderStatusResponse
-
+                if (resultResponse.message?.order != null) {
                   val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message?.order!!)
                   orderDao.transactionId = resultResponse.context.transactionId
                   orderDao.userId = user?.uid
@@ -65,6 +64,14 @@ class OnOrderStatusPollController(
                       okResponseOnOrderStatus.add(resultResponse)
                     }
                   )
+                }else{
+                  okResponseOnOrderStatus.add(
+                    ClientErrorResponse(
+                      context = contextFactory.create(messageId = messageId),
+                      error = bapResult.body?.error
+                    )
+                  )
+                }
               }
               else -> {
                 okResponseOnOrderStatus.add(
@@ -79,11 +86,7 @@ class OnOrderStatusPollController(
         }else{
           return mapToErrorResponseV2(BppError.AuthenticationError)
         }
-
         return ResponseEntity.ok(okResponseOnOrderStatus)
-      } else {
-        return mapToErrorResponseV2(BppError.BadRequestError)
-      }
     } else {
       return mapToErrorResponseV2(BppError.BadRequestError)
     }

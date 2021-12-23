@@ -10,6 +10,8 @@ import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnInit
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -20,6 +22,7 @@ class OnInitOrderController @Autowired constructor(
   val contextFactory: ContextFactory,
   val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnInit, ClientInitResponse>(onPollService, contextFactory) {
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   @RequestMapping(value = ["/client/v1/on_initialize_order"],method = [RequestMethod.GET])
   @ResponseBody
@@ -30,7 +33,7 @@ class OnInitOrderController @Autowired constructor(
 
   @RequestMapping(value = ["/client/v2/on_initialize_order"],method = [RequestMethod.GET])
   @ResponseBody
-  fun initializeOrderV2(
+  fun onInitOrderV2(
     @RequestParam messageIds: String
   ): ResponseEntity<out List<ClientResponse>>
   {
@@ -39,7 +42,6 @@ class OnInitOrderController @Autowired constructor(
       val messageIdArray = messageIds.split(",")
       var okResponseInit: MutableList<ClientInitResponse> = ArrayList()
 
-      if (messageIdArray.isNotEmpty()) {
         for (messageId in messageIdArray) {
           onPollService.onPoll(contextFactory.create(messageId = messageId),
             protocolClient.getInitResponsesCall(messageId))
@@ -56,14 +58,12 @@ class OnInitOrderController @Autowired constructor(
             }
           )
         }
+        log.info("`Initiated and returning onInit acknowledgment`. Message: {}", okResponseInit)
         return ResponseEntity.ok(okResponseInit)
       } else {
         return mapToErrorResponse(BppError.BadRequestError)
       }
-    } else {
-      return mapToErrorResponse(BppError.BadRequestError)
     }
-  }
 
   private fun mapToErrorResponse(it: HttpError) = ResponseEntity
     .status(it.status())

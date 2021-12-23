@@ -5,16 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.fp.success
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.apache.http.HttpHeaders.CONTENT_TYPE
-import org.beckn.one.sandbox.bap.auth.model.User
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientContext
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderStatusDto
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
@@ -27,19 +26,13 @@ import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.beckn.protocol.schemas.*
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContext
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -100,7 +93,87 @@ class OrderStatusControllerSpec @Autowired constructor(
         verifyThatBppOrderStatusApiWasInvoked(orderStatusResponse, orderId, retailBengaluruBpp)
         verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
+
+     it("should return error when empty request is passed to the api v2") {
+        val orderStatusEmptyResponseString =
+          invokeOrderStatusApiV2(listOf())
+            .andExpect(status().is4xxClientError)
+            .andReturn().response.contentAsString
+
+        val orderStatusEmptyResponse =
+          objectMapper.readValue(orderStatusEmptyResponseString, object : TypeReference<List<ProtocolAckResponse>>() {})
+       orderStatusEmptyResponse.first().context shouldBe null
+       orderStatusEmptyResponse.first().message shouldBe ResponseMessage.nack()
+       orderStatusEmptyResponse.first().error shouldBe BppError.BadRequestError.error()
+      }
+
+      it("should return ack response when order status return error") {
+        retailBengaluruBpp.stubFor(post("/status").willReturn(serverError()))
+        val orderStatusResponseStringWithError =
+          invokeOrderStatusApiV2(listOf(getOrderStatusRequest(clientContext = context, orderId = orderId)))
+            .andExpect(status().is2xxSuccessful)
+            .andReturn()
+            .response.contentAsString
+          verifyOrderStatusResponseMessageV2(orderStatusResponseStringWithError, ResponseMessage.nack(),ProtocolError("BAP_011", "BPP returned error"))
+      }
+
+      it("should return ack response when order status api v2 invocation is successful") {
+        retailBengaluruBpp
+          .stubFor(
+            post("/status")
+              .willReturn(okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create()))))
+          )
+
+        val orderStatusResponseString =
+          invokeOrderStatusApiV2(listOf(getOrderStatusRequest(clientContext = context, orderId = orderId)))
+            .andExpect(status().is2xxSuccessful)
+            .andReturn()
+            .response.contentAsString
+
+        val orderStatusResponse =
+          verifyOrderStatusResponseMessageV2(orderStatusResponseString, ResponseMessage.ack())
+        verifyThatBppOrderStatusV2ApiWasInvoked(orderStatusResponse, orderId, retailBengaluruBpp)
+        verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
+      }
     }
+  }
+
+
+  private fun verifyThatBppOrderStatusV2ApiWasInvoked(
+    orderStatusResponse: List<ProtocolAckResponse>,
+    orderId: String,
+    providerApi: WireMockServer
+  ) {
+    val protocolOrderStatusRequest = getProtocolOrderStatusV2Request(orderStatusResponse, orderId)
+    providerApi.verify(
+      postRequestedFor(urlEqualTo("/status"))
+        .withRequestBody(equalToJson(objectMapper.writeValueAsString(protocolOrderStatusRequest)))
+    )
+  }
+
+  private fun getProtocolOrderStatusV2Request(
+    orderStatusResponse: List<ProtocolAckResponse>,
+    orderId: String
+  ): ProtocolOrderStatusRequest {
+    return ProtocolOrderStatusRequest(
+      context = orderStatusResponse.first().context!!,
+      message = ProtocolOrderStatusRequestMessage(orderId = orderId)
+    )
+  }
+
+  private fun verifyOrderStatusResponseMessageV2(
+    orderStatusResponseString: String,
+    expectedMessage: ResponseMessage,
+    expectedError: ProtocolError? = null
+  ): List<ProtocolAckResponse> {
+    val orderStatusResponse =
+      objectMapper.readValue(orderStatusResponseString, object : TypeReference<List<ProtocolAckResponse>>() {})
+    orderStatusResponse.first().context shouldNotBe null
+    orderStatusResponse.first().context?.messageId shouldNotBe null
+    orderStatusResponse.first().context?.action shouldBe ProtocolContext.Action.STATUS
+    orderStatusResponse.first().message shouldBe expectedMessage
+    orderStatusResponse.first().error shouldBe expectedError
+    return orderStatusResponse
   }
 
   private fun verifyThatSubscriberLookupApiWasInvoked(
@@ -195,5 +268,12 @@ class OrderStatusControllerSpec @Autowired constructor(
     MockMvcRequestBuilders
       .post("/client/v1/order_status")
       .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(orderStatusDto))
+  )
+
+  private fun invokeOrderStatusApiV2(orderStatusDtoList: List<OrderStatusDto>) = mockMvc.perform(
+    MockMvcRequestBuilders
+      .post("/client/v2/order_status")
+      .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      .content(objectMapper.writeValueAsString(orderStatusDtoList))
   )
 }

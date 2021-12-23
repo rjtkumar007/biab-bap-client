@@ -1,24 +1,36 @@
 package org.beckn.one.sandbox.bap.client.support.controllers
 
+import arrow.core.Either
+import arrow.core.left
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.string.shouldContain
 import org.beckn.one.sandbox.bap.client.external.domains.Subscriber
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberDto
 import org.beckn.one.sandbox.bap.client.external.registry.SubscriberLookupRequest
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
+import org.beckn.one.sandbox.bap.client.support.services.SupportService
 import org.beckn.one.sandbox.bap.common.City
 import org.beckn.one.sandbox.bap.common.Country
 import org.beckn.one.sandbox.bap.common.Domain
 import org.beckn.one.sandbox.bap.common.factories.MockNetwork
 import org.beckn.one.sandbox.bap.common.factories.ResponseFactory
 import org.beckn.one.sandbox.bap.common.factories.SubscriberDtoFactory
+import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.one.sandbox.bap.factories.UuidFactory
 import org.beckn.protocol.schemas.*
+import org.litote.kmongo.util.idValue
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -93,6 +105,35 @@ class SupportControllerSpec @Autowired constructor(
         verifyThatSubscriberLookupApiWasInvoked(MockNetwork.registryBppLookupApi, MockNetwork.retailBengaluruBpp)
       }
 
+      it("should invoke provide support api v2 and empty list throw error bad request") {
+          invokeSupportOrderV2(listOf()).andExpect(MockMvcResultMatchers.status().is4xxClientError)
+            .andReturn().response.contentAsString
+      }
+
+        it("should invoke provide support v2 api and save message") {
+          val supportRequestList = listOf(
+            SupportRequestDto(
+              context = context,
+              message = SupportRequestMessage(
+                refId = "abc123"
+              ),
+            )
+          )
+          MockNetwork.retailBengaluruBpp
+            .stubFor(
+              WireMock.post("/support").willReturn(
+                WireMock.okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
+              )
+            )
+
+          val supportResponseV2String = invokeSupportOrderV2(supportRequestList)
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful)
+            .andReturn()
+            .response.contentAsString
+
+            verifySupportV2ResponseMessage(supportResponseV2String, supportRequestList, ResponseMessage.ack())
+
+        }
       MockNetwork.registryBppLookupApi.stop()
 
     }
@@ -127,6 +168,12 @@ class SupportControllerSpec @Autowired constructor(
     ).content(objectMapper.writeValueAsString(supportRequest)).param("signature", "abc")
   )
 
+  private fun invokeSupportOrderV2(supportRequestList: List<SupportRequestDto>) = mockMvc.perform(
+    MockMvcRequestBuilders.post("/client/v2/get_support").header(
+      org.springframework.http.HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE
+    ).content(objectMapper.writeValueAsString(supportRequestList)).param("signature", "abc")
+  )
+
   private fun verifyThatSubscriberLookupApiWasInvoked(
     registryBppLookupApi: WireMockServer,
     bppApi: WireMockServer
@@ -148,6 +195,23 @@ class SupportControllerSpec @Autowired constructor(
         )
     )
   }
+
+  private fun verifySupportV2ResponseMessage(
+    supportResponseString: String,
+    supportRequest: List<SupportRequestDto>,
+    expectedMessage: ResponseMessage,
+    expectedError: ProtocolError? = null
+  ): List<ProtocolAckResponse> {
+    val supportOrderResponse = objectMapper.readValue(supportResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+    supportOrderResponse.first().context shouldNotBe null
+    supportOrderResponse.first().context?.messageId shouldNotBe null
+    supportOrderResponse.first().context?.transactionId shouldBe supportRequest.first().context.transactionId
+    supportOrderResponse.first().context?.action shouldBe ProtocolContext.Action.SUPPORT
+    supportOrderResponse.first().message shouldBe expectedMessage
+    supportOrderResponse.first().error shouldBe expectedError
+    return supportOrderResponse
+  }
+
 
   private fun verifySupportResponseMessage(
     supportResponseString: String,
@@ -177,6 +241,26 @@ class SupportControllerSpec @Autowired constructor(
     )
   }
 
+  private fun verifyThatBppSupportV2ApiWasInvoked(
+    supportResponse: List<ProtocolAckResponse>,
+    supportRequest: List<SupportRequestDto>,
+    providerApi: WireMockServer
+  ) {
+    val protocolSupportRequest = getProtocolSupportRequestV2(supportResponse, supportRequest)
+    providerApi.verify(
+      WireMock.postRequestedFor(WireMock.urlEqualTo("/support"))
+        .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(protocolSupportRequest)))
+    )
+  }
+  private fun getProtocolSupportRequestV2(
+    supportResponse: List<ProtocolAckResponse>,
+    supportRequest: List<SupportRequestDto>
+  ): List<ProtocolSupportRequest> = listOf(ProtocolSupportRequest(
+    context = supportResponse.first().context!!,
+    message = ProtocolSupportRequestMessage(
+      refId = supportRequest.first().message.refId
+    ))
+  )
   private fun getProtocolSupportRequest(
     supportResponse: ProtocolAckResponse,
     supportRequest: SupportRequestDto

@@ -3,6 +3,7 @@ package org.beckn.one.sandbox.bap.client.order.status.controllers
 import org.beckn.one.sandbox.bap.client.order.status.services.OrderStatusService
 import org.beckn.one.sandbox.bap.client.shared.dtos.GetQuoteRequestDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderStatusDto
+import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolAckResponse
@@ -95,7 +96,7 @@ class OrderStatusController @Autowired constructor(
           listOf(
             ProtocolAckResponse(
               context = null, message = ResponseMessage.nack(),
-              error = ProtocolError(code = "400", message = HttpStatus.BAD_REQUEST.reasonPhrase)
+              error = BppError.BadRequestError.badRequestError
             )
           )
         )

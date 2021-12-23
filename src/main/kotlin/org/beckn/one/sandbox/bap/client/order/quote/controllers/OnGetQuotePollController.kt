@@ -2,18 +2,18 @@ package org.beckn.one.sandbox.bap.client.order.quote.controllers
 
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
 import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollController
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientErrorResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientQuoteResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
-import org.beckn.one.sandbox.bap.client.shared.dtos.OrderResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
-import org.beckn.protocol.schemas.ProtocolAckResponse
-import org.beckn.protocol.schemas.ProtocolError
+
 import org.beckn.protocol.schemas.ProtocolOnSelect
+
 import org.beckn.protocol.schemas.ResponseMessage
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -24,6 +24,7 @@ class OnGetQuotePollController @Autowired constructor(
   val contextFactory: ContextFactory,
   private val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnSelect, ClientQuoteResponse>(onPollService, contextFactory) {
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   @RequestMapping(value = ["/client/v1/on_get_quote"],method = [RequestMethod.GET])
   @ResponseBody
@@ -37,10 +38,7 @@ class OnGetQuotePollController @Autowired constructor(
     if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
       val messageIdArray = messageIds.split(",")
       var okResponseQuotes: MutableList<ClientQuoteResponse> = ArrayList()
-
-      if (messageIdArray.isNotEmpty()) {
-        for (msgId in messageIdArray) {
-
+       for (msgId in messageIdArray) {
           onPollService.onPoll(
             contextFactory.create(messageId = msgId),
             protocolClient.getSelectResponsesCall(msgId)
@@ -57,10 +55,8 @@ class OnGetQuotePollController @Autowired constructor(
             }
           )
         }
+        log.info("`Initiated and returning on quotes polling result`. Message: {}", okResponseQuotes)
         return ResponseEntity.ok(okResponseQuotes)
-      } else {
-        return mapToErrorResponse(BppError.BadRequestError)
-      }
     } else {
       return mapToErrorResponse(BppError.BadRequestError)
     }

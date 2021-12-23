@@ -44,7 +44,7 @@ class OnSupportController @Autowired constructor(
         val bapResult = onPoll(messageId, protocolClient.getSupportResponseCall(messageId))
         when (bapResult.statusCode.value()) {
           200 -> {
-            val resultResponse = bapResult.body as ClientOrderStatusResponse
+            val resultResponse = bapResult.body as ClientSupportResponse
             okResponseOnSupport.add(resultResponse)
           }
           else -> {

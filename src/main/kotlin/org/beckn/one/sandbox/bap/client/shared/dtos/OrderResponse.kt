@@ -1,15 +1,10 @@
 package org.beckn.one.sandbox.bap.client.shared.dtos
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.message.entities.*
 import org.beckn.protocol.schemas.Default
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolError
-import org.beckn.protocol.schemas.ProtocolOrderStatusRequestMessage
 
 data class OrderResponse @Default constructor(
   val provider: SelectMessageSelectedProviderDao? = null,
@@ -29,5 +24,6 @@ data class OrderResponse @Default constructor(
   override val context: ProtocolContext?,
   override val error: ProtocolError?,
   @JsonIgnore val userId: String?,
+  val parentOrderId: String? = null,
   ) :ClientResponse
 

@@ -1,6 +1,7 @@
 package org.beckn.one.sandbox.bap.client.support.controllers
 
 import arrow.core.Either
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import io.kotest.core.spec.style.DescribeSpec
@@ -12,6 +13,7 @@ import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollService
 import org.beckn.one.sandbox.bap.common.factories.MockProtocolBap
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
+import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolOnSupport
 import org.beckn.protocol.schemas.ProtocolOnSupportMessage
 import org.mockito.kotlin.any
@@ -80,6 +82,43 @@ class OnSupportControllerSpec @Autowired constructor(
         it("should respond with failure") {
           val response = onSupportPollController.onSupportOrderV1(context.messageId)
           response.statusCode shouldBe DatabaseError.OnRead.status()
+        }
+      }
+
+
+      context("when called for given message ids") {
+        mockProtocolBap.stubFor(
+          WireMock.get("/protocol/response/v2/on_support?messageIds=${context.messageId}")
+            .willReturn(WireMock.okJson(mapper.writeValueAsString(entityOnSupportResults())))
+        )
+        val onSupportCallBack = mockMvc
+          .perform(
+            MockMvcRequestBuilders.get("/client/v2/on_support")
+              .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+              .param("messageIds", context.messageId)
+          )
+
+        it("should respond v2 with status ok") {
+          onSupportCallBack.andExpect(MockMvcResultMatchers.status().isOk)
+        }
+
+        it("should respond v2 with all on support responses in body") {
+          val results = onSupportCallBack.andReturn()
+          val body = results.response.contentAsString
+          val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientSupportResponse>>(){})
+
+          clientResponse.first().message shouldNotBe null
+        }
+      }
+
+      context("when failure occurs during request processing for v2") {
+        val mockOnPollService = mock<GenericOnPollService<ProtocolOnSupport, ClientSupportResponse>> {
+          onGeneric { onPoll(any(), any()) }.thenReturn(Either.Left(DatabaseError.OnRead))
+        }
+        val onSupportPollController = OnSupportController(mockOnPollService, contextFactory, protocolClient)
+        it("should respond with failure for v2") {
+          val response = onSupportPollController.onSupportOrderV2(context.messageId)
+          response.body?.get(0)?.error?.code shouldBe "BAP_007"
         }
       }
     }

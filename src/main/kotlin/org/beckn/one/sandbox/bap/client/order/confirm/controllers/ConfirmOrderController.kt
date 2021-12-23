@@ -2,12 +2,12 @@ package org.beckn.one.sandbox.bap.client.order.confirm.controllers
 
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.order.confirm.services.ConfirmOrderService
+import org.beckn.one.sandbox.bap.client.shared.Util
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderRequestDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderResponse
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.factories.ContextFactory
-import org.beckn.one.sandbox.bap.message.entities.BecknResponseDao
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.beckn.protocol.schemas.ProtocolAckResponse
@@ -75,6 +75,7 @@ class ConfirmOrderController @Autowired constructor(
     var okResponseConfirmOrders: MutableList<ProtocolAckResponse> = ArrayList()
     if (!orderRequest.isNullOrEmpty()) {
       if (SecurityUtil.getSecuredUserDetail() != null) {
+        val parentOrderId = Util.getRandomString()
         for (order in orderRequest) {
           val context = getContext(order.context.transactionId)
           confirmOrderService.confirmOrder(
@@ -96,13 +97,14 @@ class ConfirmOrderController @Autowired constructor(
                 confirmOrderRepository.updateDocByQuery(
                   OrderDao::messageId eq context?.messageId,
                   OrderDao(
-                    userId = SecurityUtil.getSecuredUserDetail()?.uid, messageId = context?.messageId,
-                    transactionId = null
+                    userId = SecurityUtil.getSecuredUserDetail()?.uid,
+                    messageId = context?.messageId,
+                    transactionId = null,
+                    parentOrderId =  parentOrderId
                   )
                 ).fold(
                   {
                     log.error("Error when updating order: {}", it)
-                    mapToErrorResponseV2(it, context)
                     okResponseConfirmOrders.add(
                       ProtocolAckResponse(
                         context = context,

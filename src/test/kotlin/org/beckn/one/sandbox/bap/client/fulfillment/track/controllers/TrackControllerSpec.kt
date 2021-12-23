@@ -1,5 +1,6 @@
 package org.beckn.one.sandbox.bap.client.fulfillment.track.controllers
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -90,6 +91,39 @@ class TrackControllerSpec @Autowired constructor(
         verifyThatBppTrackApiWasInvoked(trackResponse, retailBengaluruBpp)
         verifier.verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
+
+      it("should return error for v2 when bpp track call fails") {
+        retailBengaluruBpp.stubFor(post("/track").willReturn(serverError()))
+
+        val trackResponseString = invokeTrackApiV2(listOf())
+          .andExpect(status().is4xxClientError)
+          .andReturn().response.contentAsString
+
+        val getTrackResponse = objectMapper.readValue(trackResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+        getTrackResponse.first().context shouldBe null
+        getTrackResponse.first().message shouldBe ResponseMessage.nack()
+        getTrackResponse.first().error shouldBe BppError.BadRequestError.badRequestError
+      }
+
+      it("should invoke provide track api v2 and save message") {
+        retailBengaluruBpp
+          .stubFor(
+            post("/track").willReturn(
+              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create())))
+            )
+          )
+
+        val trackResponseString = invokeTrackApiV2(listOf(getTrackRequestDto()))
+          .andExpect(status().is2xxSuccessful)
+          .andReturn()
+          .response.contentAsString
+
+        verifyV2ResponseMessage(
+          responseString = trackResponseString,
+          expectedMessage = ResponseMessage.ack(),
+          expectedError = null
+        )
+      }
     }
   }
 
@@ -98,6 +132,15 @@ class TrackControllerSpec @Autowired constructor(
       .perform(
         MockMvcRequestBuilders.post("/client/v1/track")
           .content(objectMapper.writeValueAsString(trackRequestDto))
+          .contentType(MediaType.APPLICATION_JSON)
+      )
+  }
+
+  private fun invokeTrackApiV2(trackRequestDtoList: List<TrackRequestDto>): ResultActions {
+    return mockMvc
+      .perform(
+        MockMvcRequestBuilders.post("/client/v2/track")
+          .content(objectMapper.writeValueAsString(trackRequestDtoList))
           .contentType(MediaType.APPLICATION_JSON)
       )
   }
@@ -132,18 +175,32 @@ class TrackControllerSpec @Autowired constructor(
       )
     )
 
+  private fun verifyV2ResponseMessage(
+    responseString: String,
+    expectedMessage: ResponseMessage,
+    expectedError: ProtocolError? = null
+  ): List<ProtocolAckResponse> {
+    val getTrackResponse = objectMapper.readValue(responseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+    getTrackResponse.first().context shouldNotBe null
+    getTrackResponse.first().context?.messageId shouldNotBe null
+    getTrackResponse.first().context?.action shouldBe ProtocolContext.Action.TRACK
+    getTrackResponse.first().message shouldBe expectedMessage
+    getTrackResponse.first().error shouldBe expectedError
+    return getTrackResponse
+  }
+
   private fun verifyResponseMessage(
     responseString: String,
     expectedMessage: ResponseMessage,
     expectedError: ProtocolError? = null
   ): ProtocolAckResponse {
-    val getQuoteResponse = objectMapper.readValue(responseString, ProtocolAckResponse::class.java)
-    getQuoteResponse.context shouldNotBe null
-    getQuoteResponse.context?.messageId shouldNotBe null
-    getQuoteResponse.context?.action shouldBe ProtocolContext.Action.TRACK
-    getQuoteResponse.message shouldBe expectedMessage
-    getQuoteResponse.error shouldBe expectedError
-    return getQuoteResponse
+    val getTrackResponse = objectMapper.readValue(responseString, ProtocolAckResponse::class.java)
+    getTrackResponse.context shouldNotBe null
+    getTrackResponse.context?.messageId shouldNotBe null
+    getTrackResponse.context?.action shouldBe ProtocolContext.Action.TRACK
+    getTrackResponse.message shouldBe expectedMessage
+    getTrackResponse.error shouldBe expectedError
+    return getTrackResponse
   }
 
   private fun verifyThatBppTrackApiWasInvoked(

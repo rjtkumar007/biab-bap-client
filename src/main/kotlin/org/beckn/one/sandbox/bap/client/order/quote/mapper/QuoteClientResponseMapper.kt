@@ -12,12 +12,14 @@ class QuoteClientResponseMapper : GenericOnPollMapper<ProtocolOnSelect, ClientQu
   override fun transform(
     input: List<ProtocolOnSelect>,
     context: ProtocolContext
-  ): Either<HttpError, ClientQuoteResponse> =
-    Either.Right(
+  ): Either<HttpError, ClientQuoteResponse>{
+    return Either.Right(
       ClientQuoteResponse(
-        context = context,
+        context = input.firstOrNull()?.context ?: context,
         message = ClientQuoteResponseMessage(quote = input.firstOrNull()?.message?.order),
         error = input.firstOrNull()?.error
       )
     )
+  }
+
 }

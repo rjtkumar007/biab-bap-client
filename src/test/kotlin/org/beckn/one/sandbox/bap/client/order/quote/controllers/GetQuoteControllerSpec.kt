@@ -103,6 +103,60 @@ class GetQuoteControllerSpec @Autowired constructor(
         verifyThatBppSelectApiWasInvoked(getQuoteResponse, cart, retailBengaluruBpp)
         verifier.verifyThatSubscriberLookupApiWasInvoked(registryBppLookupApi, retailBengaluruBpp)
       }
+
+      it("should return error when empty quotes v2 call fails") {
+        retailBengaluruBpp.stubFor(post("/select").willReturn(serverError()))
+
+        val getQuoteResponseString = invokeGetQuoteApiV2(listOf())
+          .andExpect(status().is4xxClientError)
+          .andReturn()
+          .response.contentAsString
+
+        val getQuoteResponse = objectMapper.readValue(getQuoteResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+        getQuoteResponse.first().context shouldBe null
+        getQuoteResponse.first().message shouldBe  ResponseMessage.nack()
+        getQuoteResponse.first().error shouldBe BppError.BadRequestError.error()
+
+      }
+
+      it("should invoke provide quote v2 api and save message") {
+        retailBengaluruBpp
+          .stubFor(
+            post("/select").willReturn(
+              okJson(objectMapper.writeValueAsString(ResponseFactory.getDefault(contextFactory.create(transactionId = context.transactionId))))
+            )
+          )
+
+        val getQuoteResponseString = invokeGetQuoteApiV2(
+          listOf(GetQuoteRequestDto(context = context,
+          message = GetQuoteRequestMessageDto(cart = cart))))
+          .andExpect(status().is2xxSuccessful)
+          .andReturn()
+          .response.contentAsString
+
+       verifyResponseMessageV2(
+          getQuoteResponseString,
+          ResponseMessage.ack(),
+          expectedContext = context
+        )
+      }
+      it("should invoke  quote v2 api and throw error") {
+        retailBengaluruBpp.stubFor(post("/select").willReturn(serverError()))
+
+        val getQuoteResponseString = invokeGetQuoteApiV2(
+          listOf(GetQuoteRequestDto(context = context,
+            message = GetQuoteRequestMessageDto(cart = cart))))
+          .andExpect(status().is2xxSuccessful)
+          .andReturn()
+          .response.contentAsString
+
+        verifyResponseMessageV2(
+          getQuoteResponseString,
+          ResponseMessage.nack(),
+          BppError.Internal.error(),
+          expectedContext = context
+        )
+      }
     }
   }
 
@@ -194,6 +248,33 @@ class GetQuoteControllerSpec @Autowired constructor(
         .content(
           objectMapper.writeValueAsString(
             GetQuoteRequestDto(context = context, message = GetQuoteRequestMessageDto(cart = cart))
+          )
+        )
+    )
+
+  private fun verifyResponseMessageV2(
+    getQuoteResponseString: String,
+    expectedMessage: ResponseMessage,
+    expectedError: ProtocolError? = null,
+    expectedContext: ClientContext,
+  ): List<ProtocolAckResponse> {
+    val getQuoteResponse = objectMapper.readValue(getQuoteResponseString, object : TypeReference<List<ProtocolAckResponse>>(){})
+    getQuoteResponse.first().context shouldNotBe null
+    getQuoteResponse.first().context?.messageId shouldNotBe null
+    getQuoteResponse.first().context?.transactionId shouldBe expectedContext.transactionId
+    getQuoteResponse.first().context?.action shouldBe ProtocolContext.Action.SELECT
+    getQuoteResponse.first().message shouldBe expectedMessage
+    getQuoteResponse.first().error shouldBe expectedError
+    return getQuoteResponse
+  }
+
+  private fun invokeGetQuoteApiV2(getQuoteRequestDtoList: List<GetQuoteRequestDto>) = mockMvc
+    .perform(
+      MockMvcRequestBuilders.post("/client/v2/get_quote")
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .content(
+          objectMapper.writeValueAsString(
+            getQuoteRequestDtoList
           )
         )
     )
