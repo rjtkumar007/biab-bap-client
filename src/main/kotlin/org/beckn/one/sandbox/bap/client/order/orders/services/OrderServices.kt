@@ -3,11 +3,8 @@ package org.beckn.one.sandbox.bap.client.order.orders.services
 import arrow.core.Either
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderResponse
-import org.beckn.one.sandbox.bap.client.shared.errors.CartError
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
-import org.beckn.one.sandbox.bap.message.repositories.BecknResponseRepository
-import org.beckn.one.sandbox.bap.message.repositories.GenericRepository
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

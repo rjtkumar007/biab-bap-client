@@ -24,6 +24,7 @@ data class OrderDao @Default constructor(
   override var userId: String?,
   var transactionId: String? = null,
   var messageId: String? = null,
+  var parentOrderId:String? = null
   ):BecknResponseDao
 
 

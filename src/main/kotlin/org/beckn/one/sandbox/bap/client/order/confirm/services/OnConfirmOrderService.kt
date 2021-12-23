@@ -28,4 +28,13 @@ class OnConfirmOrderService @Autowired constructor(
        repository.updateDocByQuery(OrderDao::messageId eq orderDao.messageId, orderDao)
      }
    }
+
+  fun findById(messageId: String?):Either<DatabaseError, OrderDao>{
+    return if(messageId.isNullOrEmpty()){
+      log.error("Message id is not available")
+      Either.Left(DatabaseError.NotFound)
+    }else {
+      repository.findOrderId(OrderDao::messageId eq messageId)
+    }
+  }
 }
