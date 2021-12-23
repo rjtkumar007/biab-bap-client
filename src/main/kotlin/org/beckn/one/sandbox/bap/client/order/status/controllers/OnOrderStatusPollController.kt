@@ -50,7 +50,7 @@ class OnOrderStatusPollController(
             when (bapResult.statusCode.value()) {
               200 -> {
                   val resultResponse = bapResult.body as ClientOrderStatusResponse
-
+                if (resultResponse.message?.order != null) {
                   val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message?.order!!)
                   orderDao.transactionId = resultResponse.context.transactionId
                   orderDao.userId = user?.uid
@@ -67,6 +67,14 @@ class OnOrderStatusPollController(
                       okResponseOnOrderStatus.add(resultResponse)
                     }
                   )
+                }else{
+                  okResponseOnOrderStatus.add(
+                    ClientErrorResponse(
+                      context = contextFactory.create(messageId = messageId),
+                      error = bapResult.body?.error
+                    )
+                  )
+                }
               }
               else -> {
                 okResponseOnOrderStatus.add(
