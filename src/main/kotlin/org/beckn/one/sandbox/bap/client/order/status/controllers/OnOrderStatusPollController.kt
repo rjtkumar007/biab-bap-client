@@ -4,7 +4,6 @@ import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
 import org.beckn.one.sandbox.bap.client.external.bap.ProtocolClient
 import org.beckn.one.sandbox.bap.client.order.status.services.OnOrderStatusService
 import org.beckn.one.sandbox.bap.client.shared.controllers.AbstractOnPollController
-import org.beckn.one.sandbox.bap.client.shared.dtos.ClientConfirmResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientErrorResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientOrderStatusResponse
 import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
@@ -51,14 +50,12 @@ class OnOrderStatusPollController(
             val bapResult = onPoll(messageId, protocolClient.getOrderStatusResponsesCall(messageId))
             when (bapResult.statusCode.value()) {
               200 -> {
-                val resultResponse = bapResult.body as ClientOrderStatusResponse
+                  val resultResponse = bapResult.body as ClientOrderStatusResponse
 
-                if (resultResponse.message?.order != null) {
                   val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message?.order!!)
                   orderDao.transactionId = resultResponse.context.transactionId
                   orderDao.userId = user?.uid
                   orderDao.messageId = messageId
-
                   onOrderStatusService.updateOrder(orderDao).fold(
                     {
                       okResponseOnOrderStatus.add(
@@ -71,27 +68,18 @@ class OnOrderStatusPollController(
                       okResponseOnOrderStatus.add(resultResponse)
                     }
                   )
-                } else {
-                  okResponseOnOrderStatus.add(
-                    ClientErrorResponse(
-                      context = contextFactory.create(messageId = messageId),
-                      error = bapResult.body?.error
-                    )
-                  )
-                }
-
               }
               else -> {
                 okResponseOnOrderStatus.add(
                   ClientErrorResponse(
                     context = contextFactory.create(messageId = messageId),
-                    error = BppError.Internal.error()
+                    error = bapResult.body?.error
                   )
                 )
               }
             }
           }
-        } else {
+        }else{
           return mapToErrorResponseV2(BppError.AuthenticationError)
         }
 

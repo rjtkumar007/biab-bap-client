@@ -20,7 +20,7 @@ class ContextFactory @Autowired constructor(
     transactionId: String = uuidFactory.create(),
     messageId: String = uuidFactory.create(),
     action: ProtocolContext.Action? = ProtocolContext.Action.SEARCH,
-    bppId: String? = null
+    bppId: String? = null,
   ) = ProtocolContext(
     domain = domain,
     country = country,

@@ -56,34 +56,20 @@ class OnConfirmOrderController @Autowired constructor(
               200 -> {
                 val resultResponse: ClientConfirmResponse = bapResult.body as ClientConfirmResponse
                 if (resultResponse.message?.order != null) {
-                  onConfirmOrderService.findById(resultResponse.context?.messageId).fold(
+                  val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message.order!!)
+                  orderDao.transactionId = resultResponse.context?.transactionId
+                  orderDao.userId = user.uid
+                  orderDao.messageId = resultResponse.context?.messageId
+                  onConfirmOrderService.updateOrder(orderDao).fold(
                     {
-                      log.error("Db error to fetch order based on message id")
                       okResponseConfirmOrder.add(
                         ClientConfirmResponse(
                           error = it.error(),
                           context = contextFactory.create(messageId = messageId)
                         )
                       )
-                    },{
-                      val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message.order!!)
-                      orderDao.transactionId = resultResponse.context?.transactionId
-                      orderDao.userId = user.uid
-                      orderDao.messageId = resultResponse.context?.messageId
-                      orderDao.parentOrderId = it.parentOrderId
-                      onConfirmOrderService.updateOrder(orderDao).fold(
-                        {
-                          okResponseConfirmOrder.add(
-                            ClientConfirmResponse(
-                              error = it.error(),
-                              context = contextFactory.create(messageId = messageId)
-                            )
-                          )
-                        }, {
-                          resultResponse.parentOrderId = orderDao.parentOrderId
-                          okResponseConfirmOrder.add(resultResponse)
-                        }
-                      )
+                    }, {
+                      okResponseConfirmOrder.add(resultResponse)
                     }
                   )
                 } else {
