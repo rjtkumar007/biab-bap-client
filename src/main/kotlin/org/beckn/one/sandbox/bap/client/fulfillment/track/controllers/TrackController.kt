@@ -14,10 +14,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class TrackController @Autowired constructor(
@@ -26,7 +23,7 @@ class TrackController @Autowired constructor(
 ) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @RequestMapping("/client/v1/track")
+  @PostMapping("/client/v1/track")
   @ResponseBody
   fun track(@RequestBody request: TrackRequestDto): ResponseEntity<ProtocolAckResponse> {
     val context = contextFactory.create(action = ProtocolContext.Action.TRACK)
@@ -43,7 +40,7 @@ class TrackController @Autowired constructor(
       )
   }
 
-  @RequestMapping("/client/v2/track")
+  @PostMapping("/client/v2/track")
   @ResponseBody
   fun trackV2(@RequestBody trackRequestList: List<TrackRequestDto>): ResponseEntity<List<ProtocolAckResponse>> {
 

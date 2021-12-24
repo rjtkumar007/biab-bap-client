@@ -7,10 +7,7 @@ import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -18,7 +15,7 @@ class OnOrderHistoryController @Autowired constructor(
   val orderServices: OrderServices
 ){
 
-  @RequestMapping("/client/v1/orders")
+  @RequestMapping(value = ["/client/v1/orders"],method = [RequestMethod.GET])
   @ResponseBody
   fun onOrdersList (
     @RequestParam orderId: String?,

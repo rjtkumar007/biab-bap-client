@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import java.sql.Timestamp
 import java.util.*
 import javax.servlet.http.HttpServletRequest
@@ -74,10 +75,12 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
         http.cors().configurationSource(corsConfigurationSource()).and().csrf().disable().formLogin().disable()
             .httpBasic().disable().exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint())
             .and().authorizeRequests()
-            .antMatchers("/client/v1/").permitAll()
+            .antMatchers( "/client/v1/", "/swagger-ui.html",
+              "/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .antMatchers(*restSecProps?.protectedActions!!.toTypedArray()).authenticated()
             .and()
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }
+
 }

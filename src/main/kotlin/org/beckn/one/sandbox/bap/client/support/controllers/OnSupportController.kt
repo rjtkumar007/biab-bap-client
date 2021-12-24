@@ -15,10 +15,7 @@ import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolOnSupport
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class OnSupportController @Autowired constructor(
@@ -27,13 +24,13 @@ class OnSupportController @Autowired constructor(
   val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnSupport, ClientSupportResponse>(onPollService, contextFactory) {
 
-  @RequestMapping("/client/v1/on_support")
+  @RequestMapping(value = ["/client/v1/on_support"],method = [RequestMethod.GET])
   @ResponseBody
   fun onSupportOrderV1(
     @RequestParam messageId: String
   ): ResponseEntity<out ClientResponse> = onPoll(messageId, protocolClient.getSupportResponseCall(messageId))
 
-  @RequestMapping("/client/v2/on_support")
+  @RequestMapping(value = ["/client/v2/on_support"],method = [RequestMethod.GET])
   @ResponseBody
   fun onSupportOrderV2(
     @RequestParam messageIds: String

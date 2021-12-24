@@ -16,10 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class OnGetQuotePollController @Autowired constructor(
@@ -29,12 +26,12 @@ class OnGetQuotePollController @Autowired constructor(
 ) : AbstractOnPollController<ProtocolOnSelect, ClientQuoteResponse>(onPollService, contextFactory) {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  @RequestMapping("/client/v1/on_get_quote")
+  @RequestMapping(value = ["/client/v1/on_get_quote"],method = [RequestMethod.GET])
   @ResponseBody
   fun onGetQuoteV1(@RequestParam messageId: String): ResponseEntity<out ClientResponse> =
     onPoll(messageId, protocolClient.getSelectResponsesCall(messageId))
 
-  @RequestMapping("/client/v2/on_get_quote")
+  @RequestMapping(value = ["/client/v2/on_get_quote"],method = [RequestMethod.GET])
   @ResponseBody
   fun onGetQuoteV2(@RequestParam messageIds: String): ResponseEntity<out List<ClientResponse>> {
 

@@ -9,10 +9,7 @@ import org.beckn.one.sandbox.bap.factories.ContextFactory
 import org.beckn.protocol.schemas.ProtocolOnCancel
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class OnCancelOrderController @Autowired constructor(
@@ -21,7 +18,7 @@ class OnCancelOrderController @Autowired constructor(
   val protocolClient: ProtocolClient
 ) : AbstractOnPollController<ProtocolOnCancel, ClientCancelResponse>(onPollService, contextFactory) {
 
-  @RequestMapping("/client/v1/on_cancel_order")
+  @RequestMapping(value = ["/client/v1/on_cancel_order"],method = [RequestMethod.GET])
   @ResponseBody
   fun onCancelOrderV1(
     @RequestParam messageId: String
