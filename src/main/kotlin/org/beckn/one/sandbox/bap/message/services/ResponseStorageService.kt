@@ -16,7 +16,7 @@ interface ResponseStorageService<Proto : ClientResponse, Entity : BecknResponseD
   fun save(protoResponse: Entity): Either<DatabaseError.OnWrite, Proto>
   fun findManyByUserId(id: String,skip: Int , limit :Int): Either<DatabaseError, List<Proto>>
   fun findById(userId: String): Either<DatabaseError, Proto?>
-  fun findOrdersById(id: String,skip: Int  , limit :Int ): Either<DatabaseError, List<Proto>>
+  fun findOrdersById(bson: Bson, skip: Int  , limit :Int ): Either<DatabaseError, List<Proto>>
   fun updateDocByQuery(query: Bson, requestData: Entity): Either<DatabaseError, Proto>
   fun deleteOneById(id: String): Either<DatabaseError, DeleteResult>
   fun findOrderId(bson: Bson): Either<DatabaseError, Entity>
@@ -100,8 +100,8 @@ class ResponseStorageServiceImpl<Proto : ClientResponse, Entity : BecknResponseD
         }
       }
 
-  override fun findOrdersById(id: String,skip: Int , limit :Int ): Either<DatabaseError, List<Proto>> = Either
-    .catch { responseRepository.findOrdersById(id, skip, limit) }
+  override fun findOrdersById(bson: Bson,skip: Int , limit :Int ): Either<DatabaseError, List<Proto>> = Either
+    .catch { responseRepository.findOrdersById(bson, skip, limit) }
     .map {
       return if (it.isNotEmpty()) {
         Either.Right(toSchema(it))

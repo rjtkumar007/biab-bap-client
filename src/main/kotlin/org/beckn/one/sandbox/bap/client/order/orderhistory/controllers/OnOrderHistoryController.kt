@@ -22,12 +22,13 @@ class OnOrderHistoryController @Autowired constructor(
   @ResponseBody
   fun onOrdersList (
     @RequestParam orderId: String?,
+    @RequestParam parentOrderId: String?,
     @RequestParam skip: Int?,
     @RequestParam limit: Int?
   ) :ResponseEntity<List<OrderResponse>>{
     val user = SecurityUtil.getSecuredUserDetail()
     return if(user != null){
-      orderServices.findAllOrders(user,orderId?:"", skip?:0,limit?:10).fold(
+      orderServices.findAllOrders(user,orderId?: "", parentOrderId?: "",skip?:0,limit?:10).fold(
         {
           mapToErrorResponse(it)
         },
