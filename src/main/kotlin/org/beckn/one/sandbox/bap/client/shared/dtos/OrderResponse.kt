@@ -24,5 +24,6 @@ data class OrderResponse @Default constructor(
   override val context: ProtocolContext?,
   override val error: ProtocolError?,
   @JsonIgnore val userId: String?,
+  val parentOrderId: String? = null,
   ) :ClientResponse
 

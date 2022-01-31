@@ -61,12 +61,12 @@ class OnOrderHistoryControllerSpec @Autowired constructor(
         setMockAuthentication()
         val orderDao = OrderDao(messageId = "23232323232",userId = "james")
         val mockOrderServices= mock<OrderServices> {
-          onGeneric { findAllOrders(any(),any(), any(), any()) }.thenReturn(Either.Right(listOf(OrderResponse(
+          onGeneric { findAllOrders(any(),any(),any(), any(), any()) }.thenReturn(Either.Right(listOf(OrderResponse(
             messageId = "12121",userId = null,error =  null, context = context
           ))))
         }
         val onOrdersController = OnOrderHistoryController(mockOrderServices)
-        val response = onOrdersController.onOrdersList("111",0,1)
+        val response = onOrdersController.onOrdersList("111","1",0,1)
         it("should respond with success") {
           val responseMessage = response.body
           responseMessage?.first()?.error.shouldBe(null)
