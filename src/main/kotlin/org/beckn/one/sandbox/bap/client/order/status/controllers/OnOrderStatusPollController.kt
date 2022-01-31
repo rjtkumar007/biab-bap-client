@@ -34,7 +34,7 @@ class OnOrderStatusPollController(
   @RequestMapping("/client/v1/on_order_status")
   @ResponseBody
   fun onOrderStatusV1(@RequestParam messageId: String): ResponseEntity<out ClientResponse> =
-    onPoll(messageId, protocolClient.getOrderStatusResponsesCall(messageId))
+    onPoll(messageId, protocolClient.getOrderByIdStatusResponsesCall(messageId))
 
   @RequestMapping("/client/v2/on_order_status")
   @ResponseBody
