@@ -1,6 +1,6 @@
 ---
 server:
-  port: 9001
+  port: ${SERVER_PORT:9001}
 logging:
   level:
     org:
@@ -11,67 +11,79 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
     default-property-inclusion: non_null
+
+database:
+  mongo:
+    url: ${DATABASE_URL:mongodb://localhost:27017}
+    name: ${DATABASE_NAME:sandbox_client}
+
 registry_service:
-  url: https://demo4460370.mockable.io/registry/
+  url: ${REGISTRY_URL:https://beckn-one.succinct.in/subscribers/}
   retry:
-    max_attempts: 3
-    initial_interval_in_millis: 1000
-    interval_multiplier: 1.0
+    max_attempts: ${REGISTRY_RETRY_MAX_ATTEMPTS:3}
+    initial_interval_in_millis: ${REGISTRY_RETRY_INTERVAL:1000}
+    interval_multiplier: ${REGISTRY_RETRY_INTERVAL_MULTIPLIER:1.0}
   cache:
-    expiry_cron_schedule: "0 */5 * * * *"
+    expiry_cron_schedule: '0 */5 * * * *'
   timeouts:
-    connection_in_seconds: 10
-    read_in_seconds: 10
-    write_in_seconds: 10
-bpp_registry_service:
-  url: https://demo4460370.mockable.io/bpp_registry/
+    connection_in_seconds: ${REGISTRY_CONNECTION_TIMEOUT:10}
+    read_in_seconds: ${REGISTRY_READ_TIMEOUT:10}
+    write_in_seconds: ${REGISTRY_WRITE_TIMEOUT:10}
 gateway_service:
   retry:
-    max_attempts: 3
-    initial_interval_in_millis: 1000
-    interval_multiplier: 1.0
+    max_attempts: ${GATEWAY_RETRY_MAX_ATTEMPTS:3}
+    initial_interval_in_millis: ${GATEWAY_RETRY_INTERVAL:1000}
+    interval_multiplier: ${GATEWAY_RETRY_INTERVAL_MULTIPLIER:1.0}
+  cache:
+    expiry_cron_schedule: '0 */5 * * * *'
   timeouts:
-    connection_in_seconds: 10
-    read_in_seconds: 10
-    write_in_seconds: 10
+    connection_in_seconds: ${GATEWAY_CONNECTION_TIMEOUT:10}
+    read_in_seconds: ${GATEWAY_READ_TIMEOUT:10}
+    write_in_seconds: ${GATEWAY_WRITE_TIMEOUT:10}
+bpp_registry_service:
+  url: ${BPP_URL:https://beckn-one.succinct.in/subscribers/}
 bpp_service:
   retry:
-    max_attempts: 3
-    initial_interval_in_millis: 1000
-    interval_multiplier: 1.0
+    max_attempts: ${BPP_RETRY_MAX_ATTEMPTS:3}
+    initial_interval_in_millis: ${BPP_RETRY_INTERVAL:1000}
+    interval_multiplier: ${BPP_RETRY_INTERVAL_MULTIPLIER:1.0}
+  cache:
+    expiry_cron_schedule: '0 */5 * * * *'
   timeouts:
-    connection_in_seconds: 10
-    read_in_seconds: 10
-    write_in_seconds: 10
+    connection_in_seconds: ${BPP_CONNECTION_TIMEOUT:10}
+    read_in_seconds: ${BPP_READ_TIMEOUT:10}
+    write_in_seconds: ${BPP_WRITE_TIMEOUT:10}
 protocol_service:
-  url: http://localhost:9002/
+  url: ${PROTOCOL_HELPER_URL:http://localhost:9002/}
   retry:
-    max_attempts: 3
-    initial_interval_in_millis: 1000
-    interval_multiplier: 1.0
+    max_attempts: ${PROTOCOL_HELPER_RETRY_MAX_ATTEMPTS:3}
+    initial_interval_in_millis: ${PROTOCOL_HELPER_RETRY_INTERVAL:1000}
+    interval_multiplier: ${PROTOCOL_HELPER_RETRY_INTERVAL_MULTIPLIER:1.0}
   timeouts:
-    connection_in_seconds: 5
-    read_in_seconds: 5
-    write_in_seconds: 5
+    connection_in_seconds: ${PROTOCOL_HELPER_CONNECTION_TIMEOUT:5}
+    read_in_seconds: ${PROTOCOL_HELPER_READ_TIMEOUT:5}
+    write_in_seconds: ${PROTOCOL_HELPER_WRITE_TIMEOUT:5}
+
 context:
-  domain: nic2004:52110
-  city: std:080
-  country: IND
-  bap_id: box.beckn.org
-  bap_uri: http://localhost:9002/protocol/v1
-  ttl_seconds: 20
+  domain: ${BAP_DOMAIN:nic2004:52110}
+  city: ${BAP_CITY_CODE:std:080}
+  country: ${BAP_COUNTRY_CODE:IND}
+  bap_id: ${BAP_ID:box.beckn.org}
+  bap_uri: ${BAP_URL:http://localhost:9002/protocol/v1}
+  ttl_seconds: ${BAP_TTL:20}
+
 beckn:
-  security.enabled: false
+  security.enabled: ${BECKN_SECURITY_ENABLED:false}
 security:
   self:
-    private_key:
-    unique_key_id: key1
+    private_key: ${BAP_PRIVATE_KEY:some-key}
+    unique_key_id: ${BAP_KEY_ID:default-key}
   firebase-props:
-    enable-strict-server-session: false
-    enable-check-session-revoked: false
-    enable-logout-everywhere: false
-    session-expiry-in-days: 5
-  allow-credentials: true
+    enable-strict-server-session: ${FIREBASE_STRICT_SERVER_SESSION:false}
+    enable-check-session-revoked: ${FIREBASE_CHECK_SESSION_REVOKED:false}
+    enable-logout-everywhere: ${FIREBASE_ENABLE_LOGOUT_EVERYWHERE:false}
+    session-expiry-in-days: ${FIREBASE_SESSION_EXPIRY:5}
+  allow-credentials: ${BECKN_SECURITY_ALLOW_CREDENTIALS:true}
   allowed-origins:
     - http://localhost:9001
   allowed-methods:
@@ -120,12 +132,10 @@ security:
     - /client/v1/account_details
     - /client/v2/on_support
     - /client/v2/get_support
-database:
-  mongo:
-    url: mongodb://localhost:27017
-    name: sandbox_client
+
 management:
   endpoints:
     web:
       exposure:
-        include: "configprops, env, health, loggers, metrics, mappings, httptrace"
+        include:
+          'configprops, env, health, loggers, metrics, mappings, httptrace'
