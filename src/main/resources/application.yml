@@ -18,7 +18,7 @@ database:
     name: ${DATABASE_NAME:sandbox_client}
 
 registry_service:
-  url: ${REGISTRY_URL:https://demo4460370.mockable.io/registry/}
+  url: ${REGISTRY_URL:https://beckn-one.succinct.in/subscribers/}
   retry:
     max_attempts: ${REGISTRY_RETRY_MAX_ATTEMPTS:3}
     initial_interval_in_millis: ${REGISTRY_RETRY_INTERVAL:1000}
@@ -41,7 +41,7 @@ gateway_service:
     read_in_seconds: ${GATEWAY_READ_TIMEOUT:10}
     write_in_seconds: ${GATEWAY_WRITE_TIMEOUT:10}
 bpp_registry_service:
-  url: ${BPP_URL:https://demo4460370.mockable.io/bpp_registry/}
+  url: ${BPP_URL:https://beckn-one.succinct.in/subscribers/}
 bpp_service:
   retry:
     max_attempts: ${BPP_RETRY_MAX_ATTEMPTS:3}
