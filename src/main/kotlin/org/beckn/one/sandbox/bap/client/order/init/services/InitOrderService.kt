@@ -2,6 +2,7 @@ package org.beckn.one.sandbox.bap.client.order.init.services
 
 import arrow.core.Either
 import arrow.core.flatMap
+import org.beckn.one.sandbox.bap.client.shared.Util.isValidPincode
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.OrderItemDto
 import org.beckn.one.sandbox.bap.client.shared.errors.CartError
@@ -13,6 +14,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @Service
 class InitOrderService @Autowired constructor(
@@ -40,6 +43,14 @@ class InitOrderService @Autowired constructor(
       return Either.Left(CartError.MultipleProviders)
     }
 
+    if(!isValidPincode(order.billingInfo.address?.areaCode.toString())) {
+      log.info("Invalid area pincode for billing, returning error. Cart: {}", order)
+      return Either.Left(CartError.InvalidPincode)
+    }
+    if(!isValidPincode(order.deliveryInfo.location.address?.areaCode.toString())) {
+      log.info("Invalid area pincode for delivery, returning error. Cart: {}", order)
+      return Either.Left(CartError.InvalidPincode)
+    }
     return registryService.lookupBppById(order.items.first().bppId)
       .flatMap {
         bppInitService.init(

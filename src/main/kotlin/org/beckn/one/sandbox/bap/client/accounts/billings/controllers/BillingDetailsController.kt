@@ -1,7 +1,10 @@
 package org.beckn.one.sandbox.bap.client.accounts.billings.controllers
 
+import arrow.core.Either
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
+import org.beckn.one.sandbox.bap.client.shared.Util
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
+import org.beckn.one.sandbox.bap.client.shared.errors.CartError
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.message.entities.BillingDetailsDao
@@ -41,29 +44,42 @@ class BillingDetailsController @Autowired constructor(
         taxNumber = request.taxNumber,
         name = request.name,
       )
-      return responseStorageService
-        .save(billingDao)
-        .fold(
-          {
-            log.error("Error when saving billing response by user Id. Error: {}", it)
-            ResponseEntity
-              .status(it.status())
-              .body(
-                BillingDetailsResponse(
-                  id = null,
-                  context = null, name = null, phone = null,
-                  error = ProtocolError(
-                    code = it.status().name,
-                    message = it.message().toString()
-                  ), userId = null
+      if(!Util.isValidPincode(billingDao.address?.areaCode.toString())){
+        return ResponseEntity
+          .status(CartError.InvalidPincode.status())
+          .body(
+            BillingDetailsResponse(
+              id = null,
+              context = null, name = null, phone = null,
+              error = CartError.InvalidPincode.error(),
+              userId = null
+            )
+          )
+      } else {
+        return responseStorageService
+          .save(billingDao)
+          .fold(
+            {
+              log.error("Error when saving billing response by user Id. Error: {}", it)
+              ResponseEntity
+                .status(it.status())
+                .body(
+                  BillingDetailsResponse(
+                    id = null,
+                    context = null, name = null, phone = null,
+                    error = ProtocolError(
+                      code = it.status().name,
+                      message = it.message().toString()
+                    ), userId = null
+                  )
                 )
-              )
-          },
-          {
-            log.info("Saved Billing Info of User {}")
-            ResponseEntity.ok(it)
-          }
-        )
+            },
+            {
+              log.info("Saved Billing Info of User {}")
+              ResponseEntity.ok(it)
+            }
+          )
+      }
     }
   }
 

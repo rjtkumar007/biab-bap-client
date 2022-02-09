@@ -2,8 +2,10 @@ package org.beckn.one.sandbox.bap.client.accounts.address.services
 
 import arrow.core.Either
 import org.beckn.one.sandbox.bap.auth.utils.SecurityUtil
+import org.beckn.one.sandbox.bap.client.shared.Util.isValidPincode
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressRequestDto
 import org.beckn.one.sandbox.bap.client.shared.dtos.DeliveryAddressResponse
+import org.beckn.one.sandbox.bap.client.shared.errors.CartError
 import org.beckn.one.sandbox.bap.errors.HttpError
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
 import org.beckn.one.sandbox.bap.message.entities.AddDeliveryAddressDao
@@ -39,19 +41,24 @@ class AddressServices @Autowired constructor(
       defaultAddress = true,
       address = address.address)
 
-    return Either
-      .catch {
-        addressRepository.updateManyById(
-          AddDeliveryAddressDao::userId eq user?.uid,
-          setValue(AddDeliveryAddressDao::defaultAddress, false))
-      }
-      .mapLeft { e ->
-        log.error("Error when saving message to DB", e)
-        DatabaseError.OnWrite
-      }
-      .map {
-        return save(addressDao)
-      }
+    if(!isValidPincode(addressDao.address?.areaCode.toString())){
+      return Either.Left(CartError.InvalidPincode)
+    } else {
+      return Either
+        .catch {
+          addressRepository.updateManyById(
+            AddDeliveryAddressDao::userId eq user?.uid,
+            setValue(AddDeliveryAddressDao::defaultAddress, false)
+          )
+        }
+        .mapLeft { e ->
+          log.error("Error when saving message to DB", e)
+          DatabaseError.OnWrite
+        }
+        .map {
+          return save(addressDao)
+        }
+    }
   }
 
   fun save(requestDao: AddDeliveryAddressDao): Either<DatabaseError.OnWrite, DeliveryAddressResponse> = Either
