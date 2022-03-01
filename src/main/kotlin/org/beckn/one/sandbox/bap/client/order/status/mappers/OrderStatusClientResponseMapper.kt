@@ -16,7 +16,7 @@ class OrderStatusClientResponseMapper : GenericOnPollMapper<ProtocolOnOrderStatu
     Either.Right(
       ClientOrderStatusResponse(
         context = context,
-        message = ProtocolOnOrderStatusMessage(order = input.firstOrNull()?.message?.order),
+        message = ProtocolOnOrderStatusMessage(order = input?.sortedByDescending{ it.context?.timestamp }.firstOrNull()?.message?.order),
         error = input.firstOrNull()?.error
       )
     )
