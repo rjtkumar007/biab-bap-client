@@ -1,3 +1,5 @@
+> **Disclaimer:** This project is still in beta phase. Unstable for Production Use
+
 # Beckn-In-A-Box BAP Client
 
 Provides BAP Client APIs for Beckn-In-A-Box
