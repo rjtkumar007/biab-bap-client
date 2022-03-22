@@ -28,7 +28,7 @@ interface BppClient {
   fun rating(@Body request: ProtocolRatingRequest): Call<ProtocolAckResponse>
 
   @POST("get_cancellation_reasons")
-  fun getCancellationReasons(@Body request: ProtocolGetPolicyRequest): Call<List<ProtocolOption>>
+  fun getCancellationReasons(@Body request: ProtocolGetPolicyRequest): Call<ProtocolAckResponse>
 
   @POST("cancel")
   fun cancel(@Body request: ProtocolCancelRequest): Call<ProtocolAckResponse>

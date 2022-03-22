@@ -64,20 +64,20 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
   init {
     describe("OnOrderStatus callback") {
 
-      context("when called for given message id") {
+      context("when called for given order id") {
         mockProtocolBap.stubFor(
-          WireMock.get("/protocol/response/v1/on_status?messageId=${context.messageId}")
+          WireMock.get("/protocol/response/v1/on_status?orderId=1001")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(orderStatusResults())))
         )
         mockProtocolBap.stubFor(
-          WireMock.get("/protocol/response/v1/on_order_status?orderId=${context.messageId}")
+          WireMock.get("/protocol/response/v1/on_order_status?orderId=1001")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(orderStatusResults())))
         )
         val onOrderStatusCall = mockMvc
           .perform(
             MockMvcRequestBuilders.get("/client/v1/on_order_status")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageId", context.messageId)
+              .param("orderId", "1001")
           )
 
         it("should respond with status ok") {
@@ -100,7 +100,7 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
         val onOrderStatusPollController = OnOrderStatusPollController(mockOnPollService, contextFactory,mapping,
           protocolClient,onOrderStatusService)
         it("should respond with failure") {
-          val response = onOrderStatusPollController.onOrderStatusV1(context.messageId)
+          val response = onOrderStatusPollController.onOrderStatusV1("1001")
           response.statusCode shouldBe DatabaseError.OnRead.status()
         }
       }
@@ -110,7 +110,7 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
           .perform(
             MockMvcRequestBuilders.get("/client/v2/on_order_status")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageIds", "")
+              .param("orderIds", "")
           )
 
         it("should respond with bad error for v2 on Order status api") {
@@ -145,7 +145,7 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
         val onOrderStatusPollController = OnOrderStatusPollController(mockOnPollService, contextFactory,mapping,
           protocolClient,onOrderServiceSuccess)
 
-        val response = onOrderStatusPollController.onOrderStatusV2(context.messageId)
+        val response = onOrderStatusPollController.onOrderStatusV2("1001")
         response.body?.get(0)?.error shouldNotBe null
         response.body?.get(0)?.error?.code shouldNotBe null
         response.body?.get(0)?.error shouldBe BppError.AuthenticationError.autheticationError
@@ -166,7 +166,7 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
           val onOrderStatusPollController = OnOrderStatusPollController(mockOnPollService, contextFactory,mapping,
             protocolClient,onOrderServiceSuccess)
 
-          val response = onOrderStatusPollController.onOrderStatusV2(context.messageId)
+          val response = onOrderStatusPollController.onOrderStatusV2("1001")
           response.body?.get(0)?.error shouldNotBe null
           response.body?.get(0)?.error?.code shouldNotBe null
         }
@@ -179,7 +179,7 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
           .perform(
             MockMvcRequestBuilders.get("/client/v2/on_order_status")
               .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-              .param("messageIds", context.messageId)
+              .param("orderIds", "1001")
           )
         it("should respond with successful for v2 on Order status api") {
           onOrderStatusCall.andExpect(status().is2xxSuccessful)
@@ -200,7 +200,7 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
         val onOrderStatusPollController = OnOrderStatusPollController(mockOnPollService, contextFactory,mapping,
           protocolClient,onOrderStatusService)
         it("should respond with failure for v2") {
-          val response = onOrderStatusPollController.onOrderStatusV2(context.messageId)
+          val response = onOrderStatusPollController.onOrderStatusV2("1001")
           response.statusCode shouldBe HttpStatus.OK
           response.body?.get(0)?.error shouldNotBe null
           response.body?.get(0)?.error?.code shouldNotBe null

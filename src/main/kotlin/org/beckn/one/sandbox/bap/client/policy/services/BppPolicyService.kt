@@ -2,13 +2,11 @@ package org.beckn.one.sandbox.bap.client.policy.services
 
 import arrow.core.Either
 import org.beckn.one.sandbox.bap.client.external.hasBody
+import org.beckn.one.sandbox.bap.client.external.isAckNegative
 import org.beckn.one.sandbox.bap.client.external.isInternalServerError
 import org.beckn.one.sandbox.bap.client.external.provider.BppClientFactory
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
-import org.beckn.protocol.schemas.ProtocolContext
-import org.beckn.protocol.schemas.ProtocolGetPolicyRequest
-import org.beckn.protocol.schemas.ProtocolOption
-import org.beckn.protocol.schemas.ProtocolRatingCategory
+import org.beckn.protocol.schemas.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,7 +19,7 @@ class BppPolicyService @Autowired constructor(
 ) {
   private val log: Logger = LoggerFactory.getLogger(BppPolicyService::class.java)
 
-  fun getCancellationReasons(bppUri: String, context: ProtocolContext): Either<BppError, List<ProtocolOption>> =
+  fun getCancellationReasons(bppUri: String, context: ProtocolContext): Either<BppError, ProtocolAckResponse> =
     Either.catch {
       log.info("Invoking get cancellation reasons API on BPP: {}", bppUri)
       val bppServiceClient = bppServiceClientFactory.getClient(bppUri)
@@ -31,9 +29,11 @@ class BppPolicyService @Autowired constructor(
         )
       ).execute()
       log.info("BPP get cancellation reasons response. Status: {}, Body: {}", httpResponse.code(), httpResponse.body())
+
       return when {
         httpResponse.isInternalServerError() -> Either.Left(BppError.Internal)
-        !httpResponse.hasBody() || hasEmptyBody(httpResponse) -> Either.Left(BppError.NullResponse)
+        !httpResponse.hasBody() -> Either.Left(BppError.NullResponse)
+        httpResponse.isAckNegative() -> Either.Left(BppError.Nack)
         else -> Either.Right(httpResponse.body()!!)
       }
     }.mapLeft {

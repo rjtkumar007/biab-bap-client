@@ -58,7 +58,7 @@ class BppInitService @Autowired constructor(
           provider = order?.items?.first()?.provider?.let {
             ProtocolSelectMessageSelectedProvider(
               id = it?.id,
-              locations = listOf(ProtocolSelectMessageSelectedProviderLocations(id = it?.locations!!.first()))
+              locations = listOf(ProtocolSelectMessageSelectedProviderLocations(id = it?.locations?.first() ?: "" ))
             )
           },
           items = order.items!!.map { ProtocolSelectMessageSelectedItems(id = it.id, quantity = it.quantity) },

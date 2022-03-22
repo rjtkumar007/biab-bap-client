@@ -33,20 +33,21 @@ class OnOrderStatusPollController(
 
   @RequestMapping("/client/v1/on_order_status")
   @ResponseBody
-  fun onOrderStatusV1(@RequestParam messageId: String): ResponseEntity<out ClientResponse> =
-    onPoll(messageId, protocolClient.getOrderByIdStatusResponsesCall(messageId))
+  fun onOrderStatusV1(@RequestParam orderId: String): ResponseEntity<out ClientResponse> =
+    onPoll(orderId, protocolClient.getOrderByIdStatusResponsesCall(orderId))
 
   @RequestMapping("/client/v2/on_order_status")
   @ResponseBody
-  fun onOrderStatusV2(@RequestParam messageIds: String): ResponseEntity<out List<ClientResponse>> {
+  fun onOrderStatusV2(@RequestParam orderIds: String): ResponseEntity<out List<ClientResponse>> {
 
-    if (messageIds.isNotEmpty() && messageIds.trim().isNotEmpty()) {
-      val messageIdArray = messageIds.split(",")
+    if (orderIds.isNotEmpty() && orderIds.trim().isNotEmpty()) {
+      val orderIdArray = orderIds.split(",")
       var okResponseOnOrderStatus: MutableList<ClientResponse> = ArrayList()
         if (SecurityUtil.getSecuredUserDetail() != null) {
           val user = SecurityUtil.getSecuredUserDetail()
-          for (messageId in messageIdArray) {
-            val bapResult = onPoll(messageId, protocolClient.getOrderStatusResponsesCall(messageId))
+          for (orderId in orderIdArray) {
+            val messageId = contextFactory.create().messageId
+            val bapResult = onPoll(messageId, protocolClient.getOrderByIdStatusResponsesCall(orderId))
             when (bapResult.statusCode.value()) {
               200 -> {
                   val resultResponse = bapResult.body as ClientOrderStatusResponse
@@ -54,12 +55,12 @@ class OnOrderStatusPollController(
                   val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message?.order!!)
                   orderDao.transactionId = resultResponse.context.transactionId
                   orderDao.userId = user?.uid
-                  orderDao.messageId = messageId
+                  orderDao.messageId = resultResponse.context.messageId
                   onOrderStatusService.updateOrder(orderDao).fold(
                     {
                       okResponseOnOrderStatus.add(
                         ClientErrorResponse(
-                          context = contextFactory.create(messageId = messageId),
+                          context = contextFactory.create(messageId = resultResponse.context.messageId),
                           error = it.error()
                         )
                       )
@@ -70,7 +71,7 @@ class OnOrderStatusPollController(
                 }else{
                   okResponseOnOrderStatus.add(
                     ClientErrorResponse(
-                      context = contextFactory.create(messageId = messageId),
+                      context = contextFactory.create(messageId = resultResponse.context.messageId),
                       error = bapResult.body?.error
                     )
                   )
@@ -79,7 +80,7 @@ class OnOrderStatusPollController(
               else -> {
                 okResponseOnOrderStatus.add(
                   ClientErrorResponse(
-                    context = contextFactory.create(messageId = messageId),
+                    context = contextFactory.create(),
                     error = bapResult.body?.error
                   )
                 )

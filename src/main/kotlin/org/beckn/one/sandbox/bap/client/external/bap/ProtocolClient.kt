@@ -35,4 +35,7 @@ interface ProtocolClient {
 
   @GET("protocol/response/v1/on_order_status")
   fun getOrderByIdStatusResponsesCall(@Query("orderId") orderId: String): Call<List<ProtocolOnOrderStatus>>
+
+  @GET("protocol/response/v1/on_cancellation_reasons")
+  fun getOnCancellationReasonsResponsesCall(@Query("messageId") messageId: String): Call<List<ProtocolOnCancellationReasons>>
 }

@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import org.beckn.one.sandbox.bap.client.shared.errors.bpp.BppError
 import org.beckn.one.sandbox.bap.client.shared.services.RegistryService
 import org.beckn.one.sandbox.bap.errors.HttpError
+import org.beckn.protocol.schemas.ProtocolAckResponse
 import org.beckn.protocol.schemas.ProtocolContext
 import org.beckn.protocol.schemas.ProtocolOption
 import org.beckn.protocol.schemas.ProtocolRatingCategory
@@ -19,7 +20,7 @@ class GetPolicyService @Autowired constructor(
   private val registryService: RegistryService,
   private val log: Logger = LoggerFactory.getLogger(GetPolicyService::class.java)
 ) {
-  fun getCancellationPolicy(context: ProtocolContext): Either<HttpError, List<ProtocolOption>> {
+  fun getCancellationPolicy(context: ProtocolContext): Either<HttpError, ProtocolAckResponse> {
     log.info("Got a get cancellation policy request.  Context: {}", context)
 
     if (context.bppId == null) {
