@@ -34,7 +34,7 @@ class OnOrderStatusPollController(
   @RequestMapping("/client/v1/on_order_status")
   @ResponseBody
   fun onOrderStatusV1(@RequestParam messageId: String): ResponseEntity<out ClientResponse> =
-    onPoll(messageId, protocolClient.getOrderStatusResponsesCall(messageId))
+    onPoll(messageId, protocolClient.getOrderByIdStatusResponsesCall(messageId))
 
   @RequestMapping("/client/v2/on_order_status")
   @ResponseBody
@@ -50,7 +50,7 @@ class OnOrderStatusPollController(
             when (bapResult.statusCode.value()) {
               200 -> {
                   val resultResponse = bapResult.body as ClientOrderStatusResponse
-
+                if (resultResponse.message?.order != null) {
                   val orderDao: OrderDao = mapping.protocolToEntity(resultResponse.message?.order!!)
                   orderDao.transactionId = resultResponse.context.transactionId
                   orderDao.userId = user?.uid
@@ -67,6 +67,14 @@ class OnOrderStatusPollController(
                       okResponseOnOrderStatus.add(resultResponse)
                     }
                   )
+                }else{
+                  okResponseOnOrderStatus.add(
+                    ClientErrorResponse(
+                      context = contextFactory.create(messageId = messageId),
+                      error = bapResult.body?.error
+                    )
+                  )
+                }
               }
               else -> {
                 okResponseOnOrderStatus.add(

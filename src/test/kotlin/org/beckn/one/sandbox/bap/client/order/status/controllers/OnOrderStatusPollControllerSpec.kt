@@ -69,6 +69,10 @@ internal class OnOrderStatusPollControllerSpec @Autowired constructor(
           WireMock.get("/protocol/response/v1/on_status?messageId=${context.messageId}")
             .willReturn(WireMock.okJson(mapper.writeValueAsString(orderStatusResults())))
         )
+        mockProtocolBap.stubFor(
+          WireMock.get("/protocol/response/v1/on_order_status?orderId=${context.messageId}")
+            .willReturn(WireMock.okJson(mapper.writeValueAsString(orderStatusResults())))
+        )
         val onOrderStatusCall = mockMvc
           .perform(
             MockMvcRequestBuilders.get("/client/v1/on_order_status")

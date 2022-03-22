@@ -200,7 +200,7 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
           val body = results.response.contentAsString
           val clientResponse = mapper.readValue(body, object : TypeReference<List<ClientConfirmResponse>>() {})
           clientResponse.first().context shouldNotBe null
-          clientResponse.first().message shouldNotBe null
+          clientResponse.first().error shouldNotBe  null
         }
       }
       context("when network call success but db update fails") {
@@ -214,6 +214,10 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
         val onConfirmServiceProvider = mock<OnConfirmOrderService> {
           onGeneric { updateOrder(any()) }.thenReturn(
             Either.Left(DatabaseError.OnWrite))
+
+          onGeneric { findById(any()) }.thenReturn(
+            Either.Left(DatabaseError.OnWrite))
+
         }
 
         val onConfirmPollController =
@@ -235,9 +239,14 @@ internal class OnConfirmOrderControllerSpec @Autowired constructor(
               contextFactory.create(),message = ProtocolOnConfirmMessage(order = null)
             )))
         }
+
         val onConfirmServiceProvider = mock<OnConfirmOrderService> {
           onGeneric { updateOrder(any()) }.thenReturn(
             Either.Left(DatabaseError.OnWrite))
+
+          onGeneric { findById(any()) }.thenReturn(
+            Either.Left(DatabaseError.OnWrite))
+
         }
 
         val onConfirmPollController =

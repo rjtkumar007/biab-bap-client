@@ -1,9 +1,9 @@
 package org.beckn.one.sandbox.bap.client.order.confirm.services
 
 import arrow.core.Either
-import org.beckn.one.sandbox.bap.client.shared.dtos.*
+import org.beckn.one.sandbox.bap.client.shared.dtos.ClientResponse
+import org.beckn.one.sandbox.bap.client.shared.dtos.OrderResponse
 import org.beckn.one.sandbox.bap.errors.database.DatabaseError
-import org.beckn.one.sandbox.bap.message.entities.OnConfirmDao
 import org.beckn.one.sandbox.bap.message.entities.OrderDao
 import org.beckn.one.sandbox.bap.message.mappers.GenericResponseMapper
 import org.beckn.one.sandbox.bap.message.services.ResponseStorageService
@@ -28,4 +28,13 @@ class OnConfirmOrderService @Autowired constructor(
        repository.updateDocByQuery(OrderDao::messageId eq orderDao.messageId, orderDao)
      }
    }
+
+  fun findById(messageId: String?):Either<DatabaseError, OrderDao>{
+    return if(messageId.isNullOrEmpty()){
+      log.error("Message id is not available")
+      Either.Left(DatabaseError.NotFound)
+    }else {
+      repository.findOrderId(OrderDao::messageId eq messageId)
+    }
+  }
 }
