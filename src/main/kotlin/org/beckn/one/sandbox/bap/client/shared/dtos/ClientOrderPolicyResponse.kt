@@ -1,10 +1,6 @@
 package org.beckn.one.sandbox.bap.client.shared.dtos
 
-import org.beckn.protocol.schemas.Default
-import org.beckn.protocol.schemas.ProtocolContext
-import org.beckn.protocol.schemas.ProtocolError
-import org.beckn.protocol.schemas.ProtocolOption
-import org.beckn.protocol.schemas.ProtocolRatingCategory
+import org.beckn.protocol.schemas.*
 
 data class ClientOrderPolicyResponse @Default constructor(
   override val context: ProtocolContext,
@@ -22,3 +18,4 @@ data class ClientOrderPolicyMultipleResponse @Default constructor(
   var message: ClientOrderPolicyResponseMessage? = null,
   var error: MutableList<ProtocolError>? = mutableListOf()
 )
+

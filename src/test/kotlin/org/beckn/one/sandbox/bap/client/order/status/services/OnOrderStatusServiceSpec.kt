@@ -41,7 +41,7 @@ class OnOrderStatusServiceSpec : DescribeSpec() {
           onGeneric { updateDocByQuery(any(), any()) }.thenReturn(Either.Left(DatabaseError.OnWrite))
         }
         val onOrderStatusService = OnOrderStatusService(onOrderRepoFail)
-        val orderDao = OrderDao(messageId = "23232323232",userId = "james")
+        val orderDao = OrderDao(id = "23232323232",userId = "james")
         val response =  onOrderStatusService.updateOrder(orderDao)
         response.shouldBeLeft()
         response.value.shouldNotBeNull()
@@ -53,6 +53,7 @@ class OnOrderStatusServiceSpec : DescribeSpec() {
           userId = "rocky",
          context = null,
          messageId = "122221129272972",
+         id = "122221129272972",
          error = null
         )
         val onOrderRepoSuccess = mock<ResponseStorageService<OrderResponse, OrderDao>> {
@@ -60,7 +61,7 @@ class OnOrderStatusServiceSpec : DescribeSpec() {
             .thenReturn(Either.Right(orderResponse))
         }
         val onOrderStatusService = OnOrderStatusService(onOrderRepoSuccess)
-        val orderDao = OrderDao(messageId = "23232323232",userId = "james")
+        val orderDao = OrderDao(id = "23232323232",userId = "james")
         val response =  onOrderStatusService.updateOrder(orderDao)
         response.shouldBeRight()
         response.value.shouldNotBeNull()

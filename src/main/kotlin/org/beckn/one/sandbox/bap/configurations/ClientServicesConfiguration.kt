@@ -8,6 +8,7 @@ import org.beckn.one.sandbox.bap.client.order.confirm.mappers.ConfirmClientRespo
 import org.beckn.one.sandbox.bap.client.order.init.mapper.InitClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.quote.mapper.QuoteClientResponseMapper
 import org.beckn.one.sandbox.bap.client.order.status.mappers.OrderStatusClientResponseMapper
+import org.beckn.one.sandbox.bap.client.policy.mappers.OnCancellationReasonsResponseMapper
 import org.beckn.one.sandbox.bap.client.rating.mappers.RatingClientResponseMapper
 import org.beckn.one.sandbox.bap.client.shared.dtos.*
 import org.beckn.one.sandbox.bap.client.shared.services.GenericOnPollMapper
@@ -68,6 +69,10 @@ class ClientServicesConfiguration @Autowired constructor(
     CancelClientResponseMapper()
 
   @Bean
+  fun forCancellationReasonsResults(): GenericOnPollMapper<ProtocolOnCancellationReasons, ClientOrderPolicyResponse> =
+    OnCancellationReasonsResponseMapper()
+
+  @Bean
   fun selectProtocolClientService() = GenericProtocolClientService<ProtocolOnSelect>()
 
   @Bean
@@ -87,6 +92,9 @@ class ClientServicesConfiguration @Autowired constructor(
 
   @Bean
   fun cancelProtocolClientService() = GenericProtocolClientService<ProtocolOnCancel>()
+
+  @Bean
+  fun cancellationReasonsProtocolClientService() = GenericProtocolClientService<ProtocolOnCancellationReasons>()
 
   @Bean
   fun searchResultReplyService(
@@ -137,6 +145,13 @@ class ClientServicesConfiguration @Autowired constructor(
   ) = GenericOnPollService(protocolService, transformer)
 
   @Bean
+  fun onCancellationReasonsService(
+    @Autowired protocolService: GenericProtocolClientService<ProtocolOnCancellationReasons>,
+    @Autowired transformer: GenericOnPollMapper<ProtocolOnCancellationReasons, ClientOrderPolicyResponse>
+  ) = GenericOnPollService(protocolService, transformer)
+
+
+  @Bean
   fun cancelReplyService(
     @Autowired protocolService: GenericProtocolClientService<ProtocolOnCancel>,
     @Autowired transformer: GenericOnPollMapper<ProtocolOnCancel, ClientCancelResponse>
@@ -165,5 +180,6 @@ class ClientServicesConfiguration @Autowired constructor(
     @Autowired responseRepository: BecknResponseRepository<OrderDao>,
     @Autowired mapper: GenericResponseMapper<OrderResponse, OrderDao>,
   ): ResponseStorageService<OrderResponse, OrderDao> = ResponseStorageServiceImpl(responseRepository,mapper)
+
 
 }
