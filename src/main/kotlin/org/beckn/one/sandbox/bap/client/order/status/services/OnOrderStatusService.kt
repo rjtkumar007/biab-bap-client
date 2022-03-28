@@ -15,6 +15,6 @@ class OnOrderStatusService @Autowired constructor(
   val repository: ResponseStorageService<OrderResponse, OrderDao>
   ) {
    fun updateOrder(orderDao: OrderDao):Either<DatabaseError, ClientResponse>{
-     return repository.updateDocByQuery(OrderDao::messageId eq orderDao.messageId!!, orderDao)
+     return repository.updateDocByQuery(OrderDao::id eq orderDao.id!!, orderDao)
    }
 }
