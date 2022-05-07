@@ -25,8 +25,8 @@ data class OrderDao @Default constructor(
   var transactionId: String? = null,
   var messageId: String? = null,
   var parentOrderId:String? = null,
-  @JsonProperty("./ondc-cancellation") val ondcCancellation: OndcOrderCancellationDao?,
-  @JsonProperty("./ondc-linked_orders") val ondcLinkedOrders: List<OndcLinkedOrdersDao>?,
+  @JsonProperty("./ondc-cancellation") val ondcCancellation: OndcOrderCancellationDao? = null,
+  @JsonProperty("./ondc-linked_orders") val ondcLinkedOrders: List<OndcLinkedOrdersDao>?= null,
 ):BecknResponseDao
 
 
@@ -85,7 +85,8 @@ data class PolicyDao @Default constructor(
   val descriptor: DescriptorDao? = null,
   val time: TimeDao? = null,
 )
-data class OptionDao(
+
+data class OptionDao  @Default constructor(
   val id: String? = null,
   val descriptor: DescriptorDao? = null,
 )
