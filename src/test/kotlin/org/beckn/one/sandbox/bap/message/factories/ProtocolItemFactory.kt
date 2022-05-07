@@ -1,5 +1,7 @@
 package org.beckn.one.sandbox.bap.message.factories
 
+import org.beckn.protocol.schemas.OndcStatutoryPackagedCommodities
+import org.beckn.protocol.schemas.OndcStatutoryPackagedFood
 import org.beckn.protocol.schemas.ProtocolItem
 
 object ProtocolItemFactory {
@@ -13,6 +15,14 @@ object ProtocolItemFactory {
     matched = true,
     related = true,
     recommended = true,
-    time = ProtocolTimeFactory.fixedRange("range")
+    time = ProtocolTimeFactory.fixedRange("range"),
+    ondcReturnable = true,
+    ondcCancellable = true,
+    ondcSellerPickupReturn = true,
+    ondcTimeToShip = "10:00",
+    ondcAvailableOnCod = true,
+    ondcStatutoryPackagedCommodities = OndcStatutoryPackagedCommodities(),
+    ondcStatutoryPackagedFood = OndcStatutoryPackagedFood(),
+    ondcReturnWindow = "true",
   )
 }
